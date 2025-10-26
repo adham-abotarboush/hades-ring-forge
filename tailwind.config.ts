@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        'heading': ['Cinzel', 'serif'],
+        'sans': ['Inter', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -84,6 +88,16 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.5s ease-out",
+        "scale-in": "scale-in 0.3s ease-out",
+      },
+      backgroundImage: {
+        'gradient-underworld': 'var(--gradient-underworld)',
+        'gradient-forge': 'var(--gradient-forge)',
+      },
+      boxShadow: {
+        'gold': 'var(--shadow-gold)',
+        'crimson': 'var(--shadow-crimson)',
       },
     },
   },
