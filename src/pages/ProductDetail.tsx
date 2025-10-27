@@ -3,7 +3,9 @@ import { useParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Loader2 } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ShoppingCart, Loader2, Plus, Minus } from "lucide-react";
 import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
@@ -12,6 +14,8 @@ const ProductDetail = () => {
   const { handle } = useParams();
   const [product, setProduct] = useState<ShopifyProduct | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedSize, setSelectedSize] = useState<string>("");
+  const [quantity, setQuantity] = useState<number>(1);
   const addItem = useCartStore(state => state.addItem);
 
   useEffect(() => {
@@ -20,6 +24,14 @@ const ProductDetail = () => {
         const products = await fetchProducts(100);
         const found = products.find(p => p.node.handle === handle);
         setProduct(found || null);
+        
+        // Set default size to first variant
+        if (found && found.node.variants.edges.length > 0) {
+          const firstVariant = found.node.variants.edges[0].node;
+          if (firstVariant.selectedOptions.length > 0) {
+            setSelectedSize(firstVariant.selectedOptions[0].value);
+          }
+        }
       } catch (error) {
         console.error("Failed to load product:", error);
       } finally {
@@ -33,23 +45,30 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     if (!product) return;
     
-    const firstVariant = product.node.variants.edges[0]?.node;
-    if (!firstVariant) return;
+    // Find the variant matching the selected size
+    const selectedVariant = product.node.variants.edges.find(
+      v => v.node.selectedOptions.some(opt => opt.value === selectedSize)
+    )?.node || product.node.variants.edges[0]?.node;
+    
+    if (!selectedVariant) return;
 
     const cartItem = {
       product,
-      variantId: firstVariant.id,
-      variantTitle: firstVariant.title,
-      price: firstVariant.price,
-      quantity: 1,
-      selectedOptions: firstVariant.selectedOptions || []
+      variantId: selectedVariant.id,
+      variantTitle: selectedVariant.title,
+      price: selectedVariant.price,
+      quantity: quantity,
+      selectedOptions: selectedVariant.selectedOptions || []
     };
     
     addItem(cartItem);
-    toast.success("Added to cart!", {
+    toast.success(`Added ${quantity} item(s) to cart!`, {
       position: "top-center",
     });
   };
+
+  const incrementQuantity = () => setQuantity(prev => prev + 1);
+  const decrementQuantity = () => setQuantity(prev => Math.max(1, prev - 1));
 
   if (loading) {
     return (
@@ -101,6 +120,60 @@ const ProductDetail = () => {
             <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
               {node.description}
             </p>
+            
+            {/* Size Selector */}
+            {node.options.length > 0 && node.options[0].values.length > 1 && (
+              <div className="mb-6">
+                <Label className="text-base font-semibold mb-3 block">
+                  {node.options[0].name}
+                </Label>
+                <RadioGroup value={selectedSize} onValueChange={setSelectedSize}>
+                  <div className="flex flex-wrap gap-3">
+                    {node.options[0].values.map((size) => (
+                      <div key={size} className="flex items-center">
+                        <RadioGroupItem
+                          value={size}
+                          id={`size-${size}`}
+                          className="peer sr-only"
+                        />
+                        <Label
+                          htmlFor={`size-${size}`}
+                          className="flex items-center justify-center px-4 py-2 border-2 border-border rounded-md cursor-pointer transition-all hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary min-w-[60px]"
+                        >
+                          {size}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </RadioGroup>
+              </div>
+            )}
+            
+            {/* Quantity Selector */}
+            <div className="mb-8">
+              <Label className="text-base font-semibold mb-3 block">Quantity</Label>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={decrementQuantity}
+                  className="h-10 w-10"
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="text-xl font-semibold min-w-[40px] text-center">
+                  {quantity}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={incrementQuantity}
+                  className="h-10 w-10"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
             
             <Button
               onClick={handleAddToCart}
