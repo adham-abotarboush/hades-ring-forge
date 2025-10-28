@@ -122,14 +122,15 @@ const ProductDetail = () => {
             </p>
             
             {/* Size Selector */}
-            {node.options.length > 0 && node.options[0].values.length > 1 && (
+            {node.options.length > 0 && node.options[0].values.length > 1 && 
+             node.options[0].values.filter(v => v !== "Default Title").length > 0 && (
               <div className="mb-6">
                 <Label className="text-base font-semibold mb-3 block">
-                  {node.options[0].name}
+                  Size
                 </Label>
                 <RadioGroup value={selectedSize} onValueChange={setSelectedSize}>
                   <div className="flex flex-wrap gap-3">
-                    {node.options[0].values.map((size) => (
+                    {node.options[0].values.filter(v => v !== "Default Title").map((size) => (
                       <div key={size} className="flex items-center">
                         <RadioGroupItem
                           value={size}
