@@ -12,15 +12,19 @@ import {
 import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2 } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 export const CartDrawer = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { 
     items, 
     isLoading, 
     updateQuantity, 
     removeItem, 
-    createCheckout 
+    createCheckout,
+    clearCart,
   } = useCartStore();
   
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -28,11 +32,60 @@ export const CartDrawer = () => {
 
   const handleCheckout = async () => {
     try {
+      // Check if user is logged in
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        // Check if user has phone number
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("phone_number")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (!profile?.phone_number) {
+          toast.error("Please add your phone number in your profile to complete checkout", {
+            action: {
+              label: "Go to Profile",
+              onClick: () => {
+                setIsOpen(false);
+                navigate("/profile");
+              },
+            },
+          });
+          return;
+        }
+      }
+
       await createCheckout();
       const checkoutUrl = useCartStore.getState().checkoutUrl;
+      
       if (checkoutUrl) {
+        // Save order to database for logged-in users
+        if (user) {
+          const currencyCode = items[0]?.price.currencyCode || 'USD';
+          
+          await supabase.from("orders").insert([{
+            user_id: user.id,
+            checkout_url: checkoutUrl,
+            total_amount: totalPrice,
+            currency_code: currencyCode,
+            status: 'pending',
+            order_data: {
+              items: items,
+              total: totalPrice,
+              currency: currencyCode,
+            } as any,
+          }]);
+        }
+        
         window.open(checkoutUrl, '_blank');
         setIsOpen(false);
+        
+        // Clear cart after successful checkout
+        if (user) {
+          clearCart();
+        }
       }
     } catch (error) {
       console.error('Checkout failed:', error);

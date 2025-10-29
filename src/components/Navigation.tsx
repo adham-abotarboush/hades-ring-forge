@@ -1,5 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
-import { Menu, User, LogOut } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, User, LogOut, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CartDrawer } from "@/components/CartDrawer";
@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
@@ -22,6 +23,7 @@ const navLinks = [
 ];
 
 export const Navigation = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
@@ -81,9 +83,14 @@ export const Navigation = () => {
                     <User className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem disabled className="text-xs text-muted-foreground">
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem disabled className="text-xs opacity-70">
                     {user.email}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    Profile
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="h-4 w-4 mr-2" />
@@ -128,6 +135,17 @@ export const Navigation = () => {
                     {user ? (
                       <>
                         <p className="text-xs text-muted-foreground mb-2 px-2">{user.email}</p>
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-start"
+                          onClick={() => {
+                            navigate("/profile");
+                            setIsOpen(false);
+                          }}
+                        >
+                          <UserCircle className="h-4 w-4 mr-2" />
+                          Profile
+                        </Button>
                         <Button 
                           variant="ghost" 
                           className="w-full justify-start"

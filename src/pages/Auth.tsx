@@ -40,6 +40,7 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
     // Check if user is already logged in
@@ -72,6 +73,11 @@ export default function Auth() {
       return;
     }
 
+    if (!phoneNumber) {
+      toast.error("Phone number is required");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -82,6 +88,7 @@ export default function Auth() {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
             full_name: name,
+            phone_number: phoneNumber,
           },
         },
       });
@@ -93,6 +100,7 @@ export default function Auth() {
       setPassword("");
       setConfirmPassword("");
       setName("");
+      setPhoneNumber("");
     } catch (error: any) {
       toast.error(error.message || "Failed to create account");
     } finally {
@@ -125,7 +133,7 @@ export default function Auth() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/profile`,
         },
       });
 
@@ -140,7 +148,7 @@ export default function Auth() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "apple",
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/profile`,
         },
       });
 
@@ -288,6 +296,20 @@ export default function Auth() {
                       placeholder="you@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-phone">
+                      Phone Number <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="signup-phone"
+                      type="tel"
+                      placeholder="+1 (555) 000-0000"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
                       required
                       className="bg-background"
                     />
