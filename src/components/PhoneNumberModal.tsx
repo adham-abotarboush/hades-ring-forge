@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { phoneSchema } from "@/lib/validation";
 
 export const PhoneNumberModal = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,21 +48,19 @@ export const PhoneNumberModal = () => {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!phoneNumber) {
-      toast.error("Phone number is required");
-      return;
-    }
-
     setIsSaving(true);
 
     try {
+      // Validate phone number
+      const validatedPhone = phoneSchema.parse(phoneNumber);
+
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) throw new Error("No user found");
 
       const { error } = await supabase
         .from("profiles")
-        .update({ phone_number: phoneNumber })
+        .update({ phone_number: validatedPhone })
         .eq("user_id", user.id);
 
       if (error) throw error;
@@ -69,7 +68,12 @@ export const PhoneNumberModal = () => {
       toast.success("Phone number saved successfully!");
       setIsOpen(false);
     } catch (error: any) {
-      toast.error(error.message || "Failed to save phone number");
+      if (error.errors) {
+        // Zod validation error
+        toast.error(error.errors[0].message);
+      } else {
+        toast.error(error.message || "Failed to save phone number");
+      }
     } finally {
       setIsSaving(false);
     }

@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Loader2, Package, User as UserIcon } from "lucide-react";
+import { phoneSchema } from "@/lib/validation";
 
 interface Profile {
   full_name: string;
@@ -89,14 +90,12 @@ export default function Profile() {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!profile.phone_number) {
-      toast.error("Phone number is required");
-      return;
-    }
-
     setIsSaving(true);
 
     try {
+      // Validate phone number
+      const validatedPhone = phoneSchema.parse(profile.phone_number);
+
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) throw new Error("No user found");
@@ -104,8 +103,8 @@ export default function Profile() {
       const { error } = await supabase
         .from("profiles")
         .update({
-          full_name: profile.full_name,
-          phone_number: profile.phone_number,
+          full_name: profile.full_name.trim(),
+          phone_number: validatedPhone,
         })
         .eq("user_id", user.id);
 
@@ -113,7 +112,12 @@ export default function Profile() {
 
       toast.success("Profile updated successfully!");
     } catch (error: any) {
-      toast.error(error.message || "Failed to update profile");
+      if (error.errors) {
+        // Zod validation error
+        toast.error(error.errors[0].message);
+      } else {
+        toast.error(error.message || "Failed to update profile");
+      }
     } finally {
       setIsSaving(false);
     }

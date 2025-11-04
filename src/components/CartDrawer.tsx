@@ -14,6 +14,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { orderDataSchema } from "@/lib/validation";
 
 export const CartDrawer = () => {
   const navigate = useNavigate();
@@ -65,17 +66,27 @@ export const CartDrawer = () => {
         if (user) {
           const currencyCode = items[0]?.price.currencyCode || 'USD';
           
+          // Validate and sanitize order data
+          const validatedOrderData = orderDataSchema.parse({
+            items: items.map(item => ({
+              productId: item.product.node.id,
+              variantId: item.variantId,
+              title: item.product.node.title,
+              quantity: item.quantity,
+              price: parseFloat(item.price.amount),
+              options: item.selectedOptions
+            })),
+            total: totalPrice,
+            currency: currencyCode
+          });
+          
           await supabase.from("orders").insert([{
             user_id: user.id,
             checkout_url: checkoutUrl,
             total_amount: totalPrice,
             currency_code: currencyCode,
             status: 'pending',
-            order_data: {
-              items: items,
-              total: totalPrice,
-              currency: currencyCode,
-            } as any,
+            order_data: validatedOrderData,
           }]);
         }
         

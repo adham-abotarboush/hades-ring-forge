@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { signUpSchema, signInSchema } from "@/lib/validation";
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
@@ -62,32 +63,26 @@ export default function Auth() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
-
-    if (!phoneNumber) {
-      toast.error("Phone number is required");
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      // Validate input using Zod schema
+      const validatedData = signUpSchema.parse({
         email,
         password,
+        confirmPassword,
+        name,
+        phoneNumber,
+      });
+
+      const { error } = await supabase.auth.signUp({
+        email: validatedData.email,
+        password: validatedData.password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            full_name: name,
-            phone_number: phoneNumber,
+            full_name: validatedData.name,
+            phone_number: validatedData.phoneNumber,
           },
         },
       });
@@ -101,7 +96,12 @@ export default function Auth() {
       setName("");
       setPhoneNumber("");
     } catch (error: any) {
-      toast.error(error.message || "Failed to create account");
+      if (error.errors) {
+        // Zod validation error
+        toast.error(error.errors[0].message);
+      } else {
+        toast.error(error.message || "Failed to create account");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -112,16 +112,27 @@ export default function Auth() {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      // Validate input using Zod schema
+      const validatedData = signInSchema.parse({
         email,
         password,
+      });
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: validatedData.email,
+        password: validatedData.password,
       });
 
       if (error) throw error;
 
       toast.success("Signed in successfully!");
     } catch (error: any) {
-      toast.error(error.message || "Failed to sign in");
+      if (error.errors) {
+        // Zod validation error
+        toast.error(error.errors[0].message);
+      } else {
+        toast.error(error.message || "Failed to sign in");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -203,7 +214,7 @@ export default function Auth() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      minLength={6}
+                      minLength={8}
                       className="bg-background"
                     />
                   </div>
@@ -285,7 +296,7 @@ export default function Auth() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      minLength={6}
+                      minLength={8}
                       className="bg-background"
                     />
                   </div>
@@ -298,11 +309,11 @@ export default function Auth() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      minLength={6}
+                      minLength={8}
                       className="bg-background"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Must be at least 6 characters
+                      Must be at least 8 characters
                     </p>
                   </div>
                   <Button

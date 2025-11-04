@@ -1,9 +1,8 @@
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const SHOPIFY_API_VERSION = '2025-07';
 const SHOPIFY_STORE_PERMANENT_DOMAIN = 'hades-ring-forge-fu4e8.myshopify.com';
-const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_PERMANENT_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
-const SHOPIFY_STOREFRONT_TOKEN = '7a2b59c925b9a3f62d561b22df7e02ed';
 
 export interface ShopifyProduct {
   node: {
@@ -100,36 +99,28 @@ const STOREFRONT_QUERY = `
 `;
 
 export async function storefrontApiRequest(query: string, variables: any = {}) {
-  const response = await fetch(SHOPIFY_STOREFRONT_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_TOKEN
-    },
-    body: JSON.stringify({
-      query,
-      variables,
-    }),
-  });
-
-  if (response.status === 402) {
-    toast.error("Shopify: Payment required", {
-      description: "Shopify API access requires an active Shopify billing plan. Visit https://admin.shopify.com to upgrade."
+  try {
+    const { data, error } = await supabase.functions.invoke('shopify-products', {
+      body: { query, variables },
     });
-    return;
-  }
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
+    if (error) throw error;
 
-  const data = await response.json();
-  
-  if (data.errors) {
-    throw new Error(`Error calling Shopify: ${data.errors.map((e: any) => e.message).join(', ')}`);
-  }
+    if (data?.error) {
+      if (data.error === 'Payment required') {
+        toast.error("Shopify: Payment required", {
+          description: data.message
+        });
+        return null;
+      }
+      throw new Error(data.error);
+    }
 
-  return data;
+    return data;
+  } catch (error: any) {
+    console.error('Error calling Shopify via edge function:', error);
+    throw error;
+  }
 }
 
 export async function fetchProducts(count: number = 20): Promise<ShopifyProduct[]> {
