@@ -10,7 +10,6 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Apple } from "lucide-react";
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
@@ -143,21 +142,6 @@ export default function Auth() {
     }
   };
 
-  const handleAppleSignIn = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "apple",
-        options: {
-          redirectTo: `${window.location.origin}/profile`,
-        },
-      });
-
-      if (error) throw error;
-    } catch (error: any) {
-      toast.error(error.message || "Failed to sign in with Apple");
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
@@ -178,26 +162,15 @@ export default function Auth() {
               </TabsList>
 
               <TabsContent value="signin" className="space-y-4">
-                <div className="space-y-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleGoogleSignIn}
-                  >
-                    <GoogleIcon />
-                    Continue with Google
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleAppleSignIn}
-                  >
-                    <Apple className="h-5 w-5 mr-2" />
-                    Continue with Apple
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleGoogleSignIn}
+                >
+                  <GoogleIcon />
+                  Continue with Google
+                </Button>
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
@@ -245,26 +218,15 @@ export default function Auth() {
               </TabsContent>
 
               <TabsContent value="signup" className="space-y-4">
-                <div className="space-y-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleGoogleSignIn}
-                  >
-                    <GoogleIcon />
-                    Continue with Google
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleAppleSignIn}
-                  >
-                    <Apple className="h-5 w-5 mr-2" />
-                    Continue with Apple
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleGoogleSignIn}
+                >
+                  <GoogleIcon />
+                  Continue with Google
+                </Button>
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
