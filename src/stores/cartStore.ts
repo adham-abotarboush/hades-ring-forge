@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { ShopifyProduct, storefrontApiRequest } from '@/lib/shopify';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface CartItem {
   product: ShopifyProduct;
@@ -31,6 +32,9 @@ interface CartStore {
   setCheckoutUrl: (url: string) => void;
   setLoading: (loading: boolean) => void;
   createCheckout: () => Promise<void>;
+  syncWithDatabase: (userId: string) => Promise<void>;
+  loadFromDatabase: (userId: string) => Promise<void>;
+  saveToDatabase: (userId: string) => Promise<void>;
 }
 
 const CART_CREATE_MUTATION = `
@@ -142,7 +146,102 @@ export const useCartStore = create<CartStore>()(
         } finally {
           setLoading(false);
         }
-      }
+      },
+
+      syncWithDatabase: async (userId: string) => {
+        try {
+          const { items } = get();
+          
+          // Check if user has saved cart in database
+          const { data: savedCartItems } = await supabase
+            .from('cart_items')
+            .select('*')
+            .eq('user_id', userId);
+
+          if (savedCartItems && savedCartItems.length > 0) {
+            // User has saved cart - load it and discard guest cart
+            const dbItems: CartItem[] = savedCartItems.map(dbItem => {
+              const productData = dbItem.product_data as any;
+              return {
+                product: productData.product,
+                variantId: dbItem.variant_id,
+                variantTitle: productData.variantTitle,
+                price: productData.price,
+                quantity: dbItem.quantity,
+                selectedOptions: productData.selectedOptions,
+              };
+            });
+            
+            set({ items: dbItems });
+          } else if (items.length > 0) {
+            // User has no saved cart but has guest cart - save guest cart to database
+            await get().saveToDatabase(userId);
+          }
+        } catch (error) {
+          console.error('Failed to sync cart with database:', error);
+        }
+      },
+
+      loadFromDatabase: async (userId: string) => {
+        try {
+          const { data: savedCartItems } = await supabase
+            .from('cart_items')
+            .select('*')
+            .eq('user_id', userId);
+
+          if (savedCartItems && savedCartItems.length > 0) {
+            const dbItems: CartItem[] = savedCartItems.map(dbItem => {
+              const productData = dbItem.product_data as any;
+              return {
+                product: productData.product,
+                variantId: dbItem.variant_id,
+                variantTitle: productData.variantTitle,
+                price: productData.price,
+                quantity: dbItem.quantity,
+                selectedOptions: productData.selectedOptions,
+              };
+            });
+            
+            set({ items: dbItems });
+          }
+        } catch (error) {
+          console.error('Failed to load cart from database:', error);
+        }
+      },
+
+      saveToDatabase: async (userId: string) => {
+        try {
+          const { items } = get();
+          
+          // Delete existing cart items
+          await supabase
+            .from('cart_items')
+            .delete()
+            .eq('user_id', userId);
+
+          // Insert current cart items
+          if (items.length > 0) {
+            const cartItemsToInsert = items.map(item => ({
+              user_id: userId,
+              variant_id: item.variantId,
+              product_id: item.product.node.id,
+              quantity: item.quantity,
+              product_data: {
+                product: item.product,
+                variantTitle: item.variantTitle,
+                price: item.price,
+                selectedOptions: item.selectedOptions,
+              } as any,
+            }));
+
+            await supabase
+              .from('cart_items')
+              .insert(cartItemsToInsert);
+          }
+        } catch (error) {
+          console.error('Failed to save cart to database:', error);
+        }
+      },
     }),
     {
       name: 'hades-cart',

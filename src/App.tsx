@@ -12,12 +12,15 @@ import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { PhoneNumberModal } from "./components/PhoneNumberModal";
+import { useCartSync } from "./hooks/useCartSync";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+const AppContent = () => {
+  useCartSync();
+  
+  return (
+    <>
       <Toaster />
       <Sonner />
       <PhoneNumberModal />
@@ -34,6 +37,14 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+    </>
+  );
+};
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <AppContent />
     </TooltipProvider>
   </QueryClientProvider>
 );
