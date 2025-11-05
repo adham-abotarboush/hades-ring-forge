@@ -41,8 +41,8 @@ export const useCartSync = () => {
       }
     };
 
-    // Debounce save operations
-    const timeoutId = setTimeout(saveCart, 500);
+    // Debounce save operations - increased to 1500ms for better stability
+    const timeoutId = setTimeout(saveCart, 1500);
     return () => clearTimeout(timeoutId);
   }, [useCartStore.getState().items, saveToDatabase]);
 };

@@ -48,60 +48,10 @@ export interface ShopifyProduct {
   };
 }
 
-const STOREFRONT_QUERY = `
-  query GetProducts($first: Int!) {
-    products(first: $first) {
-      edges {
-        node {
-          id
-          title
-          description
-          handle
-          priceRange {
-            minVariantPrice {
-              amount
-              currencyCode
-            }
-          }
-          images(first: 5) {
-            edges {
-              node {
-                url
-                altText
-              }
-            }
-          }
-          variants(first: 10) {
-            edges {
-              node {
-                id
-                title
-                price {
-                  amount
-                  currencyCode
-                }
-                availableForSale
-                selectedOptions {
-                  name
-                  value
-                }
-              }
-            }
-          }
-          options {
-            name
-            values
-          }
-        }
-      }
-    }
-  }
-`;
-
-export async function storefrontApiRequest(query: string, variables: any = {}) {
+export async function storefrontApiRequest(queryName: string, variables: any = {}) {
   try {
     const { data, error } = await supabase.functions.invoke('shopify-products', {
-      body: { query, variables },
+      body: { queryName, variables },
     });
 
     if (error) throw error;
@@ -124,6 +74,6 @@ export async function storefrontApiRequest(query: string, variables: any = {}) {
 }
 
 export async function fetchProducts(count: number = 20): Promise<ShopifyProduct[]> {
-  const data = await storefrontApiRequest(STOREFRONT_QUERY, { first: count });
+  const data = await storefrontApiRequest('getProducts', { first: count });
   return data?.data?.products?.edges || [];
 }

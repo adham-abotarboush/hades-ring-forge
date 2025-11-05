@@ -37,28 +37,6 @@ interface CartStore {
   saveToDatabase: (userId: string) => Promise<void>;
 }
 
-const CART_CREATE_MUTATION = `
-  mutation cartCreate($input: CartInput!) {
-    cartCreate(input: $input) {
-      cart {
-        id
-        checkoutUrl
-        totalQuantity
-        cost {
-          totalAmount {
-            amount
-            currencyCode
-          }
-        }
-      }
-      userErrors {
-        field
-        message
-      }
-    }
-  }
-`;
-
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
@@ -122,7 +100,7 @@ export const useCartStore = create<CartStore>()(
             merchandiseId: item.variantId,
           }));
 
-          const cartData = await storefrontApiRequest(CART_CREATE_MUTATION, {
+          const cartData = await storefrontApiRequest('cartCreate', {
             input: { lines },
           });
 
@@ -213,33 +191,62 @@ export const useCartStore = create<CartStore>()(
         try {
           const { items } = get();
           
-          // Delete existing cart items
-          await supabase
-            .from('cart_items')
-            .delete()
-            .eq('user_id', userId);
-
-          // Insert current cart items
-          if (items.length > 0) {
-            const cartItemsToInsert = items.map(item => ({
-              user_id: userId,
-              variant_id: item.variantId,
-              product_id: item.product.node.id,
-              quantity: item.quantity,
-              product_data: {
-                product: item.product,
-                variantTitle: item.variantTitle,
-                price: item.price,
-                selectedOptions: item.selectedOptions,
-              } as any,
-            }));
-
+          if (items.length === 0) {
+            // If cart is empty, delete all items
             await supabase
               .from('cart_items')
-              .insert(cartItemsToInsert);
+              .delete()
+              .eq('user_id', userId);
+            return;
           }
+
+          // Fetch existing cart items from database
+          const { data: existingItems, error: fetchError } = await supabase
+            .from('cart_items')
+            .select('variant_id')
+            .eq('user_id', userId);
+
+          if (fetchError) throw fetchError;
+
+          const existingVariantIds = new Set(existingItems?.map(item => item.variant_id) || []);
+          const currentVariantIds = new Set(items.map(item => item.variantId));
+
+          // Delete items that are no longer in cart
+          const itemsToDelete = Array.from(existingVariantIds).filter(id => !currentVariantIds.has(id));
+          if (itemsToDelete.length > 0) {
+            await supabase
+              .from('cart_items')
+              .delete()
+              .eq('user_id', userId)
+              .in('variant_id', itemsToDelete);
+          }
+
+          // Upsert current cart items (insert new or update existing)
+          const cartItemsToUpsert = items.map(item => ({
+            user_id: userId,
+            variant_id: item.variantId,
+            product_id: item.product.node.id,
+            quantity: item.quantity,
+            product_data: {
+              product: item.product,
+              variantTitle: item.variantTitle,
+              price: item.price,
+              selectedOptions: item.selectedOptions,
+            } as any,
+          }));
+
+          const { error: upsertError } = await supabase
+            .from('cart_items')
+            .upsert(cartItemsToUpsert, {
+              onConflict: 'user_id,variant_id',
+              ignoreDuplicates: false
+            });
+
+          if (upsertError) throw upsertError;
+          
         } catch (error) {
           console.error('Failed to save cart to database:', error);
+          // Error recovery: cart data remains in localStorage and will retry on next change
         }
       },
     }),

@@ -1,9 +1,98 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Whitelisted GraphQL queries
+const ALLOWED_QUERIES = {
+  'getProducts': `
+    query GetProducts($first: Int!) {
+      products(first: $first) {
+        edges {
+          node {
+            id
+            title
+            description
+            handle
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+            images(first: 5) {
+              edges {
+                node {
+                  url
+                  altText
+                }
+              }
+            }
+            variants(first: 10) {
+              edges {
+                node {
+                  id
+                  title
+                  price {
+                    amount
+                    currencyCode
+                  }
+                  availableForSale
+                  selectedOptions {
+                    name
+                    value
+                  }
+                }
+              }
+            }
+            options {
+              name
+              values
+            }
+          }
+        }
+      }
+    }
+  `,
+  'cartCreate': `
+    mutation cartCreate($input: CartInput!) {
+      cartCreate(input: $input) {
+        cart {
+          id
+          checkoutUrl
+          totalQuantity
+          cost {
+            totalAmount {
+              amount
+              currencyCode
+            }
+          }
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `
+} as const;
+
+// Validation schemas for query variables
+const getProductsVariablesSchema = z.object({
+  first: z.number().min(1).max(250)
+});
+
+const cartCreateVariablesSchema = z.object({
+  input: z.object({
+    lines: z.array(z.object({
+      quantity: z.number().min(1).max(100),
+      merchandiseId: z.string()
+    })).min(1).max(50)
+  })
+});
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -21,13 +110,34 @@ serve(async (req) => {
       throw new Error('SHOPIFY_STOREFRONT_ACCESS_TOKEN is not configured');
     }
 
-    const { query, variables } = await req.json();
+    const { queryName, variables } = await req.json();
 
-    if (!query) {
-      throw new Error('GraphQL query is required');
+    if (!queryName) {
+      throw new Error('Query name is required');
     }
 
-    console.log('Fetching products from Shopify...', { variables });
+    // Validate query name
+    const query = ALLOWED_QUERIES[queryName as keyof typeof ALLOWED_QUERIES];
+    if (!query) {
+      throw new Error(`Invalid query name: ${queryName}. Allowed queries: ${Object.keys(ALLOWED_QUERIES).join(', ')}`);
+    }
+
+    // Validate variables based on query type
+    let validatedVariables = variables;
+    try {
+      if (queryName === 'getProducts') {
+        validatedVariables = getProductsVariablesSchema.parse(variables);
+      } else if (queryName === 'cartCreate') {
+        validatedVariables = cartCreateVariablesSchema.parse(variables);
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw new Error(`Invalid variables: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
+      }
+      throw error;
+    }
+
+    console.log('Fetching from Shopify...', { queryName, variables: validatedVariables });
 
     const response = await fetch(SHOPIFY_STOREFRONT_URL, {
       method: 'POST',
@@ -37,7 +147,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         query,
-        variables,
+        variables: validatedVariables,
       }),
     });
 
@@ -64,7 +174,7 @@ serve(async (req) => {
       throw new Error(`Shopify API error: ${data.errors.map((e: any) => e.message).join(', ')}`);
     }
 
-    console.log('Successfully fetched products from Shopify');
+    console.log('Successfully fetched from Shopify');
 
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
