@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,36 +14,15 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { phoneSchema } from "@/lib/validation";
 
-export const PhoneNumberModal = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface PhoneNumberModalProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
+}
+
+export const PhoneNumberModal = ({ isOpen, onOpenChange, onSuccess }: PhoneNumberModalProps) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    checkPhoneNumber();
-  }, []);
-
-  const checkPhoneNumber = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("phone_number")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Error checking phone number:", error);
-      return;
-    }
-
-    // Show modal if phone number is missing
-    if (!data?.phone_number) {
-      setIsOpen(true);
-    }
-  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,15 +37,22 @@ export const PhoneNumberModal = () => {
       
       if (!user) throw new Error("No user found");
 
+      // Use upsert to handle cases where profile might not exist
       const { error } = await supabase
         .from("profiles")
-        .update({ phone_number: validatedPhone })
-        .eq("user_id", user.id);
+        .upsert({ 
+          user_id: user.id,
+          phone_number: validatedPhone 
+        }, {
+          onConflict: 'user_id'
+        });
 
       if (error) throw error;
 
       toast.success("Phone number saved successfully!");
-      setIsOpen(false);
+      setPhoneNumber("");
+      onOpenChange(false);
+      onSuccess?.();
     } catch (error: any) {
       if (error.errors) {
         // Zod validation error
@@ -80,7 +66,7 @@ export const PhoneNumberModal = () => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !isSaving && setIsOpen(open)}>
+    <Dialog open={isOpen} onOpenChange={(open) => !isSaving && onOpenChange(open)}>
       <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="font-heading">Phone Number Required</DialogTitle>

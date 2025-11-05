@@ -11,7 +11,6 @@ import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
-import { PhoneNumberModal } from "./components/PhoneNumberModal";
 import { useCartSync } from "./hooks/useCartSync";
 
 const queryClient = new QueryClient();
@@ -23,7 +22,6 @@ const AppContent = () => {
     <>
       <Toaster />
       <Sonner />
-      <PhoneNumberModal />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />

@@ -13,12 +13,12 @@ import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2 } from "lucide
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { PhoneNumberModal } from "./PhoneNumberModal";
 import { orderDataSchema } from "@/lib/validation";
 
 export const CartDrawer = () => {
-  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
   const { 
     items, 
     isLoading, 
@@ -45,15 +45,7 @@ export const CartDrawer = () => {
           .maybeSingle();
 
         if (!profile?.phone_number) {
-          toast.error("Please add your phone number in your profile to complete checkout", {
-            action: {
-              label: "Go to Profile",
-              onClick: () => {
-                setIsOpen(false);
-                navigate("/profile");
-              },
-            },
-          });
+          setShowPhoneModal(true);
           return;
         }
       }
@@ -105,7 +97,13 @@ export const CartDrawer = () => {
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <>
+      <PhoneNumberModal 
+        isOpen={showPhoneModal} 
+        onOpenChange={setShowPhoneModal}
+        onSuccess={handleCheckout}
+      />
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button variant="outline" size="icon" className="relative border-primary/30 hover:bg-primary/10">
           <ShoppingCart className="h-5 w-5" />
@@ -226,5 +224,6 @@ export const CartDrawer = () => {
         </div>
       </SheetContent>
     </Sheet>
+    </>
   );
 };
