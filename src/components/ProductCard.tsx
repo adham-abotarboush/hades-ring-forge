@@ -37,40 +37,48 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   const price = node.priceRange.minVariantPrice;
 
   return (
-    <Card className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-gold">
+    <Card className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-500 hover-lift h-full flex flex-col">
       <Link to={`/product/${node.handle}`}>
-        <div className="relative aspect-square overflow-hidden bg-muted">
-          {image && (
+        <div className="relative aspect-square overflow-hidden bg-gradient-forge">
+          {image ? (
             <img
               src={image.url}
               alt={image.altText || node.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
             />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-6xl">⚡</div>
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          
+          {/* Quick View Badge */}
+          <div className="absolute top-4 right-4 px-3 py-1 bg-primary/90 backdrop-blur-sm rounded-full text-xs font-medium text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            View Details
+          </div>
         </div>
       </Link>
       
-      <CardContent className="p-4">
+      <CardContent className="p-6 flex-1 flex flex-col">
         <Link to={`/product/${node.handle}`}>
-          <h3 className="font-heading font-semibold mb-2 group-hover:text-primary transition-colors">
+          <h3 className="text-xl font-heading font-semibold mb-3 group-hover:text-primary transition-colors duration-300 leading-tight">
             {node.title}
           </h3>
         </Link>
-        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+        <p className="text-sm text-muted-foreground mb-6 line-clamp-2 flex-1">
           {node.description}
         </p>
         
-        <div className="flex items-center justify-between">
-          <span className="text-xl font-bold text-primary">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-2xl font-bold text-primary">
             ${parseFloat(price.amount).toFixed(2)}
           </span>
           <Button
             onClick={handleAddToCart}
             size="sm"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold group/btn"
           >
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            Add to Cart
+            <ShoppingCart className="h-4 w-4 mr-2 group-hover/btn:rotate-12 transition-transform" />
+            Add
           </Button>
         </div>
       </CardContent>

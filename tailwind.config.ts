@@ -94,10 +94,13 @@ export default {
       backgroundImage: {
         'gradient-underworld': 'var(--gradient-underworld)',
         'gradient-forge': 'var(--gradient-forge)',
+        'gradient-hero': 'var(--gradient-hero)',
       },
       boxShadow: {
         'gold': 'var(--shadow-gold)',
+        'gold-lg': 'var(--shadow-gold-lg)',
         'crimson': 'var(--shadow-crimson)',
+        'elevated': 'var(--shadow-elevated)',
       },
     },
   },

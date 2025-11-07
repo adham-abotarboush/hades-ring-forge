@@ -40,8 +40,11 @@ All colors MUST be HSL.
     
     --gradient-underworld: linear-gradient(135deg, hsl(0 0% 7%) 0%, hsl(0 0% 12%) 100%);
     --gradient-forge: linear-gradient(135deg, hsl(20 70% 12%) 0%, hsl(38 90% 20%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 7% / 0.95) 0%, hsl(0 0% 10% / 0.8) 50%, transparent 100%);
     --shadow-gold: 0 10px 40px -10px hsl(38 90% 55% / 0.3);
+    --shadow-gold-lg: 0 20px 60px -15px hsl(38 90% 55% / 0.4);
     --shadow-crimson: 0 10px 40px -10px hsl(0 70% 45% / 0.3);
+    --shadow-elevated: 0 4px 20px hsl(0 0% 0% / 0.5);
 
     --sidebar-background: 0 0% 98%;
 
@@ -110,5 +113,78 @@ All colors MUST be HSL.
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+  
+  .animate-fade-in-delay-1 {
+    animation: fade-in 0.6s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+  
+  .animate-fade-in-delay-2 {
+    animation: fade-in 0.6s ease-out 0.4s forwards;
+    opacity: 0;
+  }
+  
+  .animate-slide-in-left {
+    animation: slide-in-left 0.6s ease-out forwards;
+  }
+  
+  .animate-slide-in-right {
+    animation: slide-in-right 0.6s ease-out forwards;
+  }
+  
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-gold-lg);
+  }
+  
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }

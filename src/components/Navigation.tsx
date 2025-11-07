@@ -48,11 +48,13 @@ export const Navigation = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border/50 shadow-elevated">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center space-x-2">
-            <h1 className="text-2xl font-heading font-bold text-primary">HADES</h1>
+          <Link to="/" className="flex items-center space-x-2 group">
+            <h1 className="text-2xl md:text-3xl font-heading font-bold text-gradient group-hover:scale-105 transition-transform">
+              HADES
+            </h1>
           </Link>
 
           {/* Desktop Navigation */}
@@ -61,13 +63,16 @@ export const Navigation = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
+                className={`text-sm font-medium transition-all duration-300 hover:text-primary relative group ${
                   location.pathname === link.path
                     ? "text-primary"
                     : "text-foreground/80"
                 }`}
               >
                 {link.name}
+                <span className={`absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300 ${
+                  location.pathname === link.path ? "w-full" : "w-0 group-hover:w-full"
+                }`} />
               </Link>
             ))}
           </div>
