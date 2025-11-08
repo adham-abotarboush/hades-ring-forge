@@ -4,22 +4,8 @@ import { Footer } from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-forge.jpg";
-import { useState, useEffect } from "react";
 
 const Index = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 20;
-      const y = (e.clientY / window.innerHeight - 0.5) * 20;
-      setMousePosition({ x, y });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -27,11 +13,8 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center scale-105 transition-transform duration-300 ease-out"
-          style={{ 
-            backgroundImage: `url(${heroImage})`,
-            transform: `translate(${mousePosition.x}px, ${mousePosition.y}px) scale(1.05)`
-          }}
+          className="absolute inset-0 bg-cover bg-center scale-105"
+          style={{ backgroundImage: `url(${heroImage})` }}
         >
           <div className="absolute inset-0 bg-gradient-to-br from-background via-background/60 to-transparent" />
         </div>
@@ -42,15 +25,11 @@ const Index = () => {
               <p className="text-sm font-medium text-primary">✨ Handcrafted with Ancient Techniques</p>
             </div>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold mb-4 leading-tight animate-fade-in-up">
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-heading font-bold mb-8 leading-tight animate-fade-in-up">
               Forged in the <span className="text-gradient">Underworld</span>
             </h1>
             
-            <p className="text-lg md:text-xl text-primary/90 mb-8 font-medium animate-fade-in-delay-1">
-              Where Ancient Myths Become Timeless Treasures
-            </p>
-            
-            <p className="text-base md:text-lg text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed animate-fade-in-delay-2">
+            <p className="text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-delay-1">
               Each ring is a unique piece of wearable mythology, transformed from recycled forks into eternal treasures
             </p>
             
