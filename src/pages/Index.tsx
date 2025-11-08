@@ -25,11 +25,15 @@ const Index = () => {
               <p className="text-sm font-medium text-primary">✨ Handcrafted with Ancient Techniques</p>
             </div>
             
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-heading font-bold mb-8 leading-tight animate-fade-in-up">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold mb-4 leading-tight animate-fade-in-up">
               Forged in the <span className="text-gradient">Underworld</span>
             </h1>
             
-            <p className="text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-delay-1">
+            <p className="text-lg md:text-xl lg:text-2xl text-primary/90 font-medium mb-8 animate-fade-in-delay-1">
+              Where Ancient Myths Become Timeless Treasures
+            </p>
+            
+            <p className="text-base md:text-lg text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed animate-fade-in-delay-1">
               Each ring is a unique piece of wearable mythology, transformed from recycled forks into eternal treasures
             </p>
             
