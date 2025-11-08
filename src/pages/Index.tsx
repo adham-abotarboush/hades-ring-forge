@@ -29,7 +29,7 @@ const Index = () => {
               Forged in the <span className="text-gradient">Underworld</span>
             </h1>
             
-            <p className="text-lg md:text-xl lg:text-2xl text-primary/90 font-medium mb-8 animate-fade-in-delay-1">
+            <p className="text-lg md:text-xl lg:text-2xl text-primary font-medium mb-8 animate-fade-in-delay-1">
               Where Ancient Myths Become Timeless Treasures
             </p>
             
