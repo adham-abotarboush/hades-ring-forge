@@ -1,11 +1,31 @@
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { ProductCard } from "@/components/ProductCard";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Flame, Sparkles } from "lucide-react";
 import heroImage from "@/assets/hero-forge.jpg";
+import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
+import { useEffect, useState } from "react";
 
 const Index = () => {
+  const [featuredProducts, setFeaturedProducts] = useState<ShopifyProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const products = await fetchProducts(6);
+        setFeaturedProducts(products);
+      } catch (error) {
+        console.error('Error loading products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProducts();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -29,24 +49,15 @@ const Index = () => {
               Forged in the <span className="text-gradient">Underworld</span>
             </h1>
             
-            <p className="text-lg md:text-xl lg:text-2xl text-primary font-medium mb-8 animate-fade-in-delay-1">
+            <p className="text-lg md:text-xl lg:text-2xl text-primary font-medium mb-12 animate-fade-in-delay-1">
               Where Ancient Myths Become Timeless Treasures
             </p>
             
-            <p className="text-base md:text-lg text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed animate-fade-in-delay-1">
-              Each ring is a unique piece of wearable mythology, transformed from recycled forks into eternal treasures
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-delay-2">
+            <div className="flex justify-center animate-fade-in-delay-2">
               <Link to="/shop">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold text-lg px-8 py-6 h-auto group">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold text-lg px-10 py-7 h-auto group">
                   Explore Collection 
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link to="/about">
-                <Button size="lg" variant="outline" className="border-primary/30 text-foreground hover:bg-primary/10 hover:border-primary text-lg px-8 py-6 h-auto">
-                  Our Story
                 </Button>
               </Link>
             </div>
@@ -61,17 +72,64 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Section */}
-      <section className="py-32 container mx-auto px-4 relative">
+      {/* Best Sellers Section */}
+      <section className="py-20 container mx-auto px-4 relative">
+        <div className="absolute inset-0 bg-gradient-forge opacity-30 blur-3xl" />
+        
+        <div className="relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full">
+              <Flame className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Most Forged</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-6">
+              Legendary Bestsellers
+            </h2>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              The most sought-after rings from the depths of the Underworld
+            </p>
+          </div>
+          
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-96 bg-card/50 animate-pulse rounded-xl" />
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                {featuredProducts.slice(0, 6).map((product) => (
+                  <div key={product.node.id} className="animate-fade-in-up">
+                    <ProductCard product={product} />
+                  </div>
+                ))}
+              </div>
+              
+              <div className="text-center">
+                <Link to="/shop">
+                  <Button size="lg" variant="outline" className="border-primary/50 text-foreground hover:bg-primary/10 hover:border-primary group">
+                    View All Rings
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 container mx-auto px-4 relative">
         <div className="absolute inset-0 bg-gradient-forge opacity-50 blur-3xl" />
         
         <div className="relative z-10">
-          <div className="text-center mb-20">
+          <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-6">
               Mythic Craftsmanship
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Each ring is a unique piece of wearable mythology, forged with care and inspired by ancient Greek legends
+              Each ring is forged with care and inspired by ancient Greek legends
             </p>
           </div>
           
