@@ -45,19 +45,22 @@ const Index = () => {
               <p className="text-sm font-medium text-primary">✨ Handcrafted with Ancient Techniques</p>
             </div>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold mb-4 leading-tight animate-fade-in-up">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-6 leading-tight animate-fade-in-up tracking-tight">
               Forged in the <span className="text-gradient">Underworld</span>
             </h1>
             
-            <p className="text-lg md:text-xl lg:text-2xl text-primary font-medium mb-12 animate-fade-in-delay-1">
+            <p className="text-xl md:text-2xl lg:text-3xl text-primary font-medium mb-14 animate-fade-in-delay-1 tracking-wide">
               Where Ancient Myths Become Timeless Treasures
             </p>
             
             <div className="flex justify-center animate-fade-in-delay-2">
               <Link to="/shop">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold text-lg px-10 py-7 h-auto group">
-                  Explore Collection 
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <Button variant="hero" size="lg" className="text-xl px-12 py-8 h-auto group relative overflow-hidden">
+                  <span className="relative z-10 flex items-center gap-3">
+                    <Sparkles className="h-5 w-5" />
+                    Explore Collection
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-2 transition-transform duration-300" />
+                  </span>
                 </Button>
               </Link>
             </div>
@@ -79,13 +82,13 @@ const Index = () => {
         <div className="relative z-10">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full">
-              <Flame className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Most Forged</span>
+              <Flame className="h-5 w-5 text-primary" />
+              <span className="text-sm font-semibold tracking-wider uppercase text-primary">Most Forged</span>
             </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-6">
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold mb-6 tracking-tight">
               Legendary Bestsellers
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
               The most sought-after rings from the depths of the Underworld
             </p>
           </div>
@@ -125,10 +128,10 @@ const Index = () => {
         
         <div className="relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-6">
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold mb-6 tracking-tight">
               Mythic Craftsmanship
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
               Each ring is forged with care and inspired by ancient Greek legends
             </p>
           </div>
@@ -136,20 +139,20 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
             <div className="group text-center p-8 rounded-xl bg-card/50 backdrop-blur-sm border border-border hover:border-primary/50 transition-all duration-300 hover-lift">
               <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">♻️</div>
-              <h3 className="text-2xl font-heading font-semibold mb-4 group-hover:text-primary transition-colors">Sustainable</h3>
-              <p className="text-muted-foreground leading-relaxed">Crafted from recycled forks, giving new life to old metal with environmental consciousness</p>
+              <h3 className="text-2xl md:text-3xl font-heading font-semibold mb-4 group-hover:text-primary transition-colors">Sustainable</h3>
+              <p className="text-muted-foreground leading-relaxed font-light">Crafted from recycled forks, giving new life to old metal with environmental consciousness</p>
             </div>
             
             <div className="group text-center p-8 rounded-xl bg-card/50 backdrop-blur-sm border border-border hover:border-primary/50 transition-all duration-300 hover-lift">
               <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">⚒️</div>
-              <h3 className="text-2xl font-heading font-semibold mb-4 group-hover:text-primary transition-colors">Handmade</h3>
-              <p className="text-muted-foreground leading-relaxed">Each piece individually forged by skilled artisans using traditional techniques</p>
+              <h3 className="text-2xl md:text-3xl font-heading font-semibold mb-4 group-hover:text-primary transition-colors">Handmade</h3>
+              <p className="text-muted-foreground leading-relaxed font-light">Each piece individually forged by skilled artisans using traditional techniques</p>
             </div>
             
             <div className="group text-center p-8 rounded-xl bg-card/50 backdrop-blur-sm border border-border hover:border-primary/50 transition-all duration-300 hover-lift">
               <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">🏛️</div>
-              <h3 className="text-2xl font-heading font-semibold mb-4 group-hover:text-primary transition-colors">Mythic Design</h3>
-              <p className="text-muted-foreground leading-relaxed">Inspired by the timeless tales and symbols of ancient Greek mythology</p>
+              <h3 className="text-2xl md:text-3xl font-heading font-semibold mb-4 group-hover:text-primary transition-colors">Mythic Design</h3>
+              <p className="text-muted-foreground leading-relaxed font-light">Inspired by the timeless tales and symbols of ancient Greek mythology</p>
             </div>
           </div>
         </div>
