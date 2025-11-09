@@ -47,11 +47,11 @@ const Index = () => {
             </div>
             
             <h1 className="text-6xl md:text-7xl lg:text-9xl font-heading font-bold mb-8 leading-[0.95] animate-fade-in-up tracking-tighter">
-              Hades <span className="text-gradient bg-clip-text text-transparent">Underworld</span>
+              Forged in the <span className="text-gradient bg-clip-text text-transparent">Underworld</span>
             </h1>
             
             <p className="text-2xl md:text-3xl lg:text-4xl text-foreground/90 font-light mb-12 animate-fade-in-delay-1 tracking-wide max-w-4xl mx-auto leading-relaxed">
-              You Had To Eat The Pomegranate
+              Where Ancient Myths Become Timeless Treasures
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-delay-2 mb-16">
