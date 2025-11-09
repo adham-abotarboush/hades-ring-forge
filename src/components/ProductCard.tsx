@@ -1,6 +1,7 @@
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
@@ -35,6 +36,8 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 
   const image = node.images.edges[0]?.node;
   const price = node.priceRange.minVariantPrice;
+  const totalInventory = node.totalInventory || 0;
+  const isLowStock = totalInventory > 0 && totalInventory <= 5;
 
   return (
     <Card className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-500 hover-lift h-full flex flex-col">
@@ -50,6 +53,14 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             <div className="w-full h-full flex items-center justify-center text-6xl">⚡</div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          
+          {/* Low Stock Badge */}
+          {isLowStock && (
+            <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-destructive text-destructive-foreground border-0 shadow-crimson animate-pulse">
+              <Flame className="h-3 w-3 mr-1" />
+              Almost Sold Out
+            </Badge>
+          )}
           
           {/* Quick View Badge */}
           <div className="absolute top-4 right-4 px-3 py-1 bg-primary/90 backdrop-blur-sm rounded-full text-xs font-medium text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
