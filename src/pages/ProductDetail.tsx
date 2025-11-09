@@ -25,11 +25,14 @@ const ProductDetail = () => {
         const found = products.find(p => p.node.handle === handle);
         setProduct(found || null);
         
-        // Set default size to first variant
+        // Set default size to first AVAILABLE variant
         if (found && found.node.variants.edges.length > 0) {
-          const firstVariant = found.node.variants.edges[0].node;
-          if (firstVariant.selectedOptions.length > 0) {
-            setSelectedSize(firstVariant.selectedOptions[0].value);
+          const firstAvailableVariant = found.node.variants.edges.find(
+            v => v.node.quantityAvailable > 0
+          )?.node || found.node.variants.edges[0].node;
+          
+          if (firstAvailableVariant.selectedOptions.length > 0) {
+            setSelectedSize(firstAvailableVariant.selectedOptions[0].value);
           }
         }
       } catch (error) {
@@ -51,6 +54,22 @@ const ProductDetail = () => {
     )?.node || product.node.variants.edges[0]?.node;
     
     if (!selectedVariant) return;
+
+    // Check if variant is available
+    if (selectedVariant.quantityAvailable <= 0) {
+      toast.error("This size is out of stock", {
+        position: "top-center",
+      });
+      return;
+    }
+
+    // Check if requested quantity exceeds available quantity
+    if (quantity > selectedVariant.quantityAvailable) {
+      toast.error(`Only ${selectedVariant.quantityAvailable} available in stock`, {
+        position: "top-center",
+      });
+      return;
+    }
 
     const cartItem = {
       product,
@@ -94,6 +113,19 @@ const ProductDetail = () => {
   const { node } = product;
   const image = node.images.edges[0]?.node;
   const price = node.priceRange.minVariantPrice;
+  
+  // Get current selected variant
+  const selectedVariant = node.variants.edges.find(
+    v => v.node.selectedOptions.some(opt => opt.value === selectedSize)
+  )?.node;
+  
+  // Helper to check if a size is available
+  const isSizeAvailable = (size: string) => {
+    const variant = node.variants.edges.find(
+      v => v.node.selectedOptions.some(opt => opt.value === size)
+    )?.node;
+    return variant ? variant.quantityAvailable > 0 : false;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -129,23 +161,36 @@ const ProductDetail = () => {
                 </Label>
                 <RadioGroup value={selectedSize} onValueChange={setSelectedSize}>
                   <div className="flex flex-wrap gap-3">
-                    {node.options[0].values.map((size) => (
-                      <div key={size} className="flex items-center">
-                        <RadioGroupItem
-                          value={size}
-                          id={`size-${size}`}
-                          className="peer sr-only"
-                        />
-                        <Label
-                          htmlFor={`size-${size}`}
-                          className="flex items-center justify-center px-4 py-2 border-2 border-border rounded-md cursor-pointer transition-all hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary min-w-[60px]"
-                        >
-                          {size}
-                        </Label>
-                      </div>
-                    ))}
+                    {node.options[0].values.map((size) => {
+                      const isAvailable = isSizeAvailable(size);
+                      return (
+                        <div key={size} className="flex items-center">
+                          <RadioGroupItem
+                            value={size}
+                            id={`size-${size}`}
+                            className="peer sr-only"
+                            disabled={!isAvailable}
+                          />
+                          <Label
+                            htmlFor={`size-${size}`}
+                            className={`flex items-center justify-center px-4 py-2 border-2 rounded-md transition-all min-w-[60px] ${
+                              isAvailable
+                                ? 'border-border cursor-pointer hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary'
+                                : 'border-muted bg-muted/50 text-muted-foreground cursor-not-allowed opacity-50 line-through'
+                            }`}
+                          >
+                            {size}
+                          </Label>
+                        </div>
+                      );
+                    })}
                   </div>
                 </RadioGroup>
+                {selectedVariant && selectedVariant.quantityAvailable <= 5 && selectedVariant.quantityAvailable > 0 && (
+                  <p className="text-sm text-destructive mt-2">
+                    Only {selectedVariant.quantityAvailable} left in stock
+                  </p>
+                )}
               </div>
             )}
             
@@ -179,9 +224,10 @@ const ProductDetail = () => {
               onClick={handleAddToCart}
               size="lg"
               className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold w-full md:w-auto"
+              disabled={!selectedVariant || selectedVariant.quantityAvailable <= 0}
             >
               <ShoppingCart className="h-5 w-5 mr-2" />
-              Add to Cart
+              {selectedVariant && selectedVariant.quantityAvailable <= 0 ? 'Out of Stock' : 'Add to Cart'}
             </Button>
           </div>
         </div>
