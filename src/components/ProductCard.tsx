@@ -37,6 +37,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   const image = node.images.edges[0]?.node;
   const price = node.priceRange.minVariantPrice;
   const totalInventory = node.totalInventory || 0;
+  const isSoldOut = totalInventory === 0;
   const isLowStock = totalInventory > 0 && totalInventory <= 5;
 
   return (
@@ -54,8 +55,15 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
+          {/* Sold Out Badge */}
+          {isSoldOut && (
+            <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-muted text-muted-foreground border-0 shadow-lg">
+              Sold Out
+            </Badge>
+          )}
+          
           {/* Low Stock Badge */}
-          {isLowStock && (
+          {!isSoldOut && isLowStock && (
             <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-destructive text-destructive-foreground border-0 shadow-crimson animate-pulse">
               <Flame className="h-3 w-3 mr-1" />
               Almost Sold Out
@@ -86,10 +94,11 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           <Button
             onClick={handleAddToCart}
             size="sm"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold group/btn"
+            disabled={isSoldOut}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold group/btn disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShoppingCart className="h-4 w-4 mr-2 group-hover/btn:rotate-12 transition-transform" />
-            Add
+            {isSoldOut ? "Sold Out" : "Add"}
           </Button>
         </div>
       </CardContent>
