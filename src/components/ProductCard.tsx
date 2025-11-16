@@ -30,13 +30,17 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     };
     
     addItem(cartItem);
-    toast.success("Added to cart!", {
-      position: "top-center",
-      action: {
-        label: "View Cart",
-        onClick: () => setCartOpen(true),
-      },
-    });
+    toast.success(
+      <div 
+        onClick={() => setCartOpen(true)} 
+        className="cursor-pointer w-full"
+      >
+        Added to cart! Click to view
+      </div>,
+      {
+        position: "top-center",
+      }
+    );
   };
 
   const image = node.images.edges[0]?.node;
