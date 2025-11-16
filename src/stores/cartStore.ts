@@ -23,6 +23,7 @@ interface CartStore {
   cartId: string | null;
   checkoutUrl: string | null;
   isLoading: boolean;
+  isCartOpen: boolean;
   
   addItem: (item: CartItem) => void;
   updateQuantity: (variantId: string, quantity: number) => void;
@@ -31,6 +32,7 @@ interface CartStore {
   setCartId: (cartId: string) => void;
   setCheckoutUrl: (url: string) => void;
   setLoading: (loading: boolean) => void;
+  setCartOpen: (open: boolean) => void;
   createCheckout: () => Promise<void>;
   syncWithDatabase: (userId: string) => Promise<void>;
   loadFromDatabase: (userId: string) => Promise<void>;
@@ -44,6 +46,9 @@ export const useCartStore = create<CartStore>()(
       cartId: null,
       checkoutUrl: null,
       isLoading: false,
+      isCartOpen: false,
+      
+      setCartOpen: (open) => set({ isCartOpen: open }),
 
       addItem: (item) => {
         const { items } = get();

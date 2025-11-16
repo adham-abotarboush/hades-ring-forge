@@ -17,11 +17,12 @@ import { PhoneNumberModal } from "./PhoneNumberModal";
 import { orderDataSchema } from "@/lib/validation";
 
 export const CartDrawer = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
   const { 
     items, 
-    isLoading, 
+    isLoading,
+    isCartOpen,
+    setCartOpen,
     updateQuantity, 
     removeItem, 
     createCheckout,
@@ -83,7 +84,7 @@ export const CartDrawer = () => {
         }
         
         window.open(checkoutUrl, '_blank');
-        setIsOpen(false);
+        setCartOpen(false);
         
         // Clear cart after successful checkout
         if (user) {
@@ -103,7 +104,7 @@ export const CartDrawer = () => {
         onOpenChange={setShowPhoneModal}
         onSuccess={handleCheckout}
       />
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <Sheet open={isCartOpen} onOpenChange={setCartOpen}>
       <SheetTrigger asChild>
         <Button variant="outline" size="icon" className="relative border-primary/30 hover:bg-primary/10">
           <ShoppingCart className="h-5 w-5" />

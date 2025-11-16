@@ -13,6 +13,7 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product }: ProductCardProps) => {
   const addItem = useCartStore(state => state.addItem);
+  const setCartOpen = useCartStore(state => state.setCartOpen);
   const { node } = product;
 
   const handleAddToCart = () => {
@@ -31,6 +32,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     addItem(cartItem);
     toast.success("Added to cart!", {
       position: "top-center",
+      action: {
+        label: "View Cart",
+        onClick: () => setCartOpen(true),
+      },
     });
   };
 
