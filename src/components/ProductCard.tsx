@@ -98,7 +98,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         
         <div className="flex items-center justify-between gap-3">
           <span className="text-2xl font-bold text-primary">
-            ${parseFloat(price.amount).toFixed(2)}
+            E£{parseFloat(price.amount).toFixed(2)}
           </span>
           <Button
             onClick={handleAddToCart}
