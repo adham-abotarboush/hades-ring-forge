@@ -1,22 +1,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ShopifyProduct, storefrontApiRequest } from '@/lib/shopify';
+import { ShopifyProduct, createStorefrontCheckout, CartItem as ShopifyCartItem } from '@/lib/shopify';
 import { supabase } from '@/integrations/supabase/client';
 
-export interface CartItem {
-  product: ShopifyProduct;
-  variantId: string;
-  variantTitle: string;
-  price: {
-    amount: string;
-    currencyCode: string;
-  };
-  quantity: number;
-  selectedOptions: Array<{
-    name: string;
-    value: string;
-  }>;
-}
+export type CartItem = ShopifyCartItem;
 
 interface CartStore {
   items: CartItem[];
@@ -100,28 +87,7 @@ export const useCartStore = create<CartStore>()(
 
         setLoading(true);
         try {
-          const lines = items.map(item => ({
-            quantity: item.quantity,
-            merchandiseId: item.variantId,
-          }));
-
-          const cartData = await storefrontApiRequest('cartCreate', {
-            input: { lines },
-          });
-
-          if (cartData.data.cartCreate.userErrors.length > 0) {
-            throw new Error(`Cart creation failed: ${cartData.data.cartCreate.userErrors.map((e: any) => e.message).join(', ')}`);
-          }
-
-          const cart = cartData.data.cartCreate.cart;
-          
-          if (!cart.checkoutUrl) {
-            throw new Error('No checkout URL returned from Shopify');
-          }
-
-          const url = new URL(cart.checkoutUrl);
-          url.searchParams.set('channel', 'online_store');
-          const checkoutUrl = url.toString();
+          const checkoutUrl = await createStorefrontCheckout(items);
           setCheckoutUrl(checkoutUrl);
         } catch (error) {
           console.error('Failed to create checkout:', error);

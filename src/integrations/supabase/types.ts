@@ -92,6 +92,7 @@ export type Database = {
           full_name: string | null
           id: string
           phone_number: string | null
+          shopify_customer_id: string | null
           updated_at: string
           user_id: string
         }
@@ -100,6 +101,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           phone_number?: string | null
+          shopify_customer_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -108,6 +110,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           phone_number?: string | null
+          shopify_customer_id?: string | null
           updated_at?: string
           user_id?: string
         }
