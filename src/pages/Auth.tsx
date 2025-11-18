@@ -75,7 +75,7 @@ export default function Auth() {
         phoneNumber,
       });
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: validatedData.email,
         password: validatedData.password,
         options: {
@@ -88,6 +88,27 @@ export default function Auth() {
       });
 
       if (error) throw error;
+
+      // Create Shopify customer
+      if (data.user) {
+        try {
+          const { error: shopifyError } = await supabase.functions.invoke('create-shopify-customer', {
+            body: {
+              userId: data.user.id,
+              email: validatedData.email,
+              fullName: validatedData.name,
+              phoneNumber: validatedData.phoneNumber,
+            },
+          });
+
+          if (shopifyError) {
+            console.error('Failed to create Shopify customer:', shopifyError);
+            toast.warning("Account created, but Shopify sync may have failed");
+          }
+        } catch (shopifyError) {
+          console.error('Shopify customer creation error:', shopifyError);
+        }
+      }
 
       toast.success("Account created successfully! You can now sign in.");
       setEmail("");

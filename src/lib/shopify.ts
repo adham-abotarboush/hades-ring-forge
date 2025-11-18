@@ -79,3 +79,74 @@ export async function fetchProducts(count: number = 20): Promise<ShopifyProduct[
   const data = await storefrontApiRequest('getProducts', { first: count });
   return data?.data?.products?.edges || [];
 }
+
+export interface CartItem {
+  product: ShopifyProduct;
+  variantId: string;
+  variantTitle: string;
+  price: {
+    amount: string;
+    currencyCode: string;
+  };
+  quantity: number;
+  selectedOptions: Array<{
+    name: string;
+    value: string;
+  }>;
+}
+
+// Create checkout function
+export async function createStorefrontCheckout(items: CartItem[]): Promise<string> {
+  try {
+    // Get current user to associate with Shopify customer
+    const { data: { user } } = await supabase.auth.getUser();
+    let buyerIdentity = undefined;
+
+    // If user is logged in, try to get their Shopify customer ID
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('shopify_customer_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profile?.shopify_customer_id) {
+        buyerIdentity = {
+          customerAccessToken: profile.shopify_customer_id,
+        };
+      }
+    }
+
+    // Format cart lines for Shopify
+    const lines = items.map(item => ({
+      quantity: item.quantity,
+      merchandiseId: item.variantId,
+    }));
+
+    // Create cart with initial items and buyer identity
+    const cartData = await storefrontApiRequest('cartCreate', {
+      input: {
+        lines,
+        buyerIdentity,
+      },
+    });
+
+    if (cartData.data.cartCreate.userErrors.length > 0) {
+      throw new Error(`Cart creation failed: ${cartData.data.cartCreate.userErrors.map(e => e.message).join(', ')}`);
+    }
+
+    const cart = cartData.data.cartCreate.cart;
+    
+    if (!cart.checkoutUrl) {
+      throw new Error('No checkout URL returned from Shopify');
+    }
+
+    const url = new URL(cart.checkoutUrl);
+    url.searchParams.set('channel', 'online_store');
+    const checkoutUrl = url.toString();
+    return checkoutUrl;
+  } catch (error: any) {
+    console.error('Error creating storefront checkout:', error);
+    throw error;
+  }
+}
