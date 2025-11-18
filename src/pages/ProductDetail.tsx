@@ -146,7 +146,7 @@ const ProductDetail = () => {
           <div className="flex flex-col justify-center">
             <h1 className="text-4xl font-heading font-bold mb-4">{node.title}</h1>
             <p className="text-3xl font-bold text-primary mb-6">
-              ${parseFloat(price.amount).toFixed(2)}
+              E£{parseFloat(price.amount).toFixed(2)}
             </p>
             
             <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
