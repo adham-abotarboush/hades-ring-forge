@@ -10,6 +10,11 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import RefundPolicy from "./pages/RefundPolicy";
+import ExchangePolicy from "./pages/ExchangePolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import DeliveryPolicy from "./pages/DeliveryPolicy";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import { useCartSync } from "./hooks/useCartSync";
 
@@ -31,6 +36,11 @@ const AppContent = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/exchange-policy" element={<ExchangePolicy />} />
+          <Route path="/shipping-policy" element={<ShippingPolicy />} />
+          <Route path="/delivery-policy" element={<DeliveryPolicy />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

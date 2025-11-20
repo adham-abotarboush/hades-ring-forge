@@ -29,12 +29,12 @@ const Contact = () => {
       
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+            <div className="text-center mb-16">
             <h1 className="text-4xl md:text-5xl font-heading font-bold mb-6">
               Contact Us
             </h1>
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-              Have questions about our mythic rings? Reach out to our forge masters
+              We are here to help!
             </p>
           </div>
 
@@ -96,7 +96,7 @@ const Contact = () => {
                     <Mail className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                     <div>
                       <h3 className="font-semibold mb-1">Email</h3>
-                      <p className="text-muted-foreground">forge@hades-rings.com</p>
+                      <p className="text-muted-foreground">hadesegy@gmail.com</p>
                     </div>
                   </div>
 
@@ -104,17 +104,17 @@ const Contact = () => {
                     <Phone className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                     <div>
                       <h3 className="font-semibold mb-1">Phone</h3>
-                      <p className="text-muted-foreground">+1 (555) 123-4567</p>
+                      <p className="text-muted-foreground">01022671067</p>
                     </div>
                   </div>
 
                   <div className="flex items-start space-x-4">
                     <MapPin className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                     <div>
-                      <h3 className="font-semibold mb-1">Workshop</h3>
+                      <h3 className="font-semibold mb-1">Address</h3>
                       <p className="text-muted-foreground">
-                        123 Underworld Forge Lane<br />
-                        Mythic District, MT 98765
+                        <strong>HQ:</strong> New Cairo, Egypt<br />
+                        <strong>Shipping From:</strong> Borg El Arab, Alexandria
                       </p>
                     </div>
                   </div>
@@ -122,20 +122,14 @@ const Contact = () => {
               </div>
 
               <div className="bg-card border border-border rounded-lg p-6">
-                <h3 className="text-xl font-heading font-bold mb-4">Workshop Hours</h3>
-                <div className="space-y-2 text-muted-foreground">
-                  <div className="flex justify-between">
-                    <span>Monday - Friday</span>
-                    <span>9:00 AM - 6:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Saturday</span>
-                    <span>10:00 AM - 4:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Sunday</span>
-                    <span>Closed</span>
-                  </div>
+                <h3 className="text-xl font-heading font-bold mb-4">Connect With Us</h3>
+                <div className="space-y-3 text-muted-foreground">
+                  <p>
+                    <strong>Instagram:</strong> <a href="https://instagram.com/by.hades" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">by.hades</a>
+                  </p>
+                  <p className="text-sm leading-relaxed">
+                    Follow us on Instagram to see our latest creations and behind-the-scenes looks at our crafting process.
+                  </p>
                 </div>
               </div>
             </div>
