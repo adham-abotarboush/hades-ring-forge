@@ -9,6 +9,7 @@ import { ShoppingCart, Loader2, Plus, Minus } from "lucide-react";
 import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
+import { ReviewsList } from "@/components/reviews/ReviewsList";
 
 const ProductDetail = () => {
   const { handle } = useParams();
@@ -230,6 +231,11 @@ const ProductDetail = () => {
               {selectedVariant && selectedVariant.quantityAvailable <= 0 ? 'Out of Stock' : 'Add to Cart'}
             </Button>
           </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-20">
+          <ReviewsList productHandle={handle || ""} />
         </div>
       </main>
 
