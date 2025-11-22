@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PhoneNumberModal } from "./PhoneNumberModal";
 import { orderDataSchema } from "@/lib/validation";
+import { Link } from "react-router-dom";
 
 export const CartDrawer = () => {
   const [showPhoneModal, setShowPhoneModal] = useState(false);
@@ -219,6 +220,12 @@ export const CartDrawer = () => {
                     </>
                   )}
                 </Button>
+                
+                <Link to="/cart" onClick={() => setCartOpen(false)}>
+                  <Button variant="outline" className="w-full">
+                    View Full Cart
+                  </Button>
+                </Link>
               </div>
             </>
           )}
