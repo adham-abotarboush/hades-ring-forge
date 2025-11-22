@@ -17,6 +17,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const addItem = useCartStore(state => state.addItem);
 
   useEffect(() => {
@@ -85,6 +86,57 @@ const ProductDetail = () => {
     toast.success(`Added ${quantity} item(s) to cart!`, {
       position: "top-center",
     });
+  };
+
+  const handleBuyNow = async () => {
+    if (!product) return;
+    
+    const selectedVariant = product.node.variants.edges.find(
+      v => v.node.selectedOptions.some(opt => opt.value === selectedSize)
+    )?.node || product.node.variants.edges[0]?.node;
+    
+    if (!selectedVariant) return;
+
+    if (selectedVariant.quantityAvailable <= 0) {
+      toast.error("This size is out of stock", {
+        position: "top-center",
+      });
+      return;
+    }
+
+    if (quantity > selectedVariant.quantityAvailable) {
+      toast.error(`Only ${selectedVariant.quantityAvailable} available in stock`, {
+        position: "top-center",
+      });
+      return;
+    }
+
+    setIsCheckingOut(true);
+    
+    const cartItem = {
+      product,
+      variantId: selectedVariant.id,
+      variantTitle: selectedVariant.title,
+      price: selectedVariant.price,
+      quantity: quantity,
+      selectedOptions: selectedVariant.selectedOptions || []
+    };
+    
+    addItem(cartItem);
+    
+    try {
+      await useCartStore.getState().createCheckout();
+      const checkoutUrl = useCartStore.getState().checkoutUrl;
+      if (checkoutUrl) {
+        window.open(checkoutUrl, '_blank');
+      }
+    } catch (error) {
+      toast.error("Failed to create checkout", {
+        position: "top-center",
+      });
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
 
   const incrementQuantity = () => setQuantity(prev => prev + 1);
@@ -221,15 +273,36 @@ const ProductDetail = () => {
               </div>
             </div>
             
-            <Button
-              onClick={handleAddToCart}
-              size="lg"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold w-full md:w-auto"
-              disabled={!selectedVariant || selectedVariant.quantityAvailable <= 0}
-            >
-              <ShoppingCart className="h-5 w-5 mr-2" />
-              {selectedVariant && selectedVariant.quantityAvailable <= 0 ? 'Out of Stock' : 'Add to Cart'}
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                onClick={handleAddToCart}
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto"
+                disabled={!selectedVariant || selectedVariant.quantityAvailable <= 0}
+              >
+                <ShoppingCart className="h-5 w-5 mr-2" />
+                Add to Cart
+              </Button>
+              
+              <Button
+                onClick={handleBuyNow}
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold w-full sm:w-auto"
+                disabled={!selectedVariant || selectedVariant.quantityAvailable <= 0 || isCheckingOut}
+              >
+                {isCheckingOut ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    {selectedVariant && selectedVariant.quantityAvailable <= 0 ? 'Out of Stock' : 'Buy Now'}
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
 
