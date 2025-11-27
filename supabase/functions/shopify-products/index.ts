@@ -32,7 +32,12 @@ const ALLOWED_QUERIES = {
                 }
               }
             }
-            variants(first: 10) {
+            metafields(identifiers: [{namespace: "shopify", key: "ring-size"}]) {
+              namespace
+              key
+              value
+            }
+            variants(first: 25) {
               edges {
                 node {
                   id
