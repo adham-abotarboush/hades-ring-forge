@@ -27,15 +27,9 @@ const ProductDetail = () => {
         const found = products.find(p => p.node.handle === handle);
         setProduct(found || null);
         
-        // Set default size to first AVAILABLE variant
-        if (found && found.node.variants.edges.length > 0) {
-          const firstAvailableVariant = found.node.variants.edges.find(
-            v => v.node.quantityAvailable > 0
-          )?.node || found.node.variants.edges[0].node;
-          
-          if (firstAvailableVariant.selectedOptions.length > 0) {
-            setSelectedSize(firstAvailableVariant.selectedOptions[0].value);
-          }
+        // Set default size to first available size (16)
+        if (found) {
+          setSelectedSize("16");
         }
       } catch (error) {
         console.error("Failed to load product:", error);
@@ -50,24 +44,22 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     if (!product) return;
     
-    // Find the variant matching the selected size
-    const selectedVariant = product.node.variants.edges.find(
-      v => v.node.selectedOptions.some(opt => opt.value === selectedSize)
-    )?.node || product.node.variants.edges[0]?.node;
+    // Use the first variant for cart (size will be stored in selectedOptions)
+    const selectedVariant = product.node.variants.edges[0]?.node;
     
     if (!selectedVariant) return;
 
-    // Check if variant is available
-    if (selectedVariant.quantityAvailable <= 0) {
-      toast.error("This size is out of stock", {
+    // Check if product is available
+    if (product.node.totalInventory <= 0) {
+      toast.error("This product is out of stock", {
         position: "top-center",
       });
       return;
     }
 
     // Check if requested quantity exceeds available quantity
-    if (quantity > selectedVariant.quantityAvailable) {
-      toast.error(`Only ${selectedVariant.quantityAvailable} available in stock`, {
+    if (quantity > product.node.totalInventory) {
+      toast.error(`Only ${product.node.totalInventory} available in stock`, {
         position: "top-center",
       });
       return;
@@ -76,10 +68,10 @@ const ProductDetail = () => {
     const cartItem = {
       product,
       variantId: selectedVariant.id,
-      variantTitle: selectedVariant.title,
+      variantTitle: `Size ${selectedSize}`,
       price: selectedVariant.price,
       quantity: quantity,
-      selectedOptions: selectedVariant.selectedOptions || []
+      selectedOptions: [{ name: "Ring Size", value: selectedSize }]
     };
     
     addItem(cartItem);
@@ -91,21 +83,19 @@ const ProductDetail = () => {
   const handleBuyNow = async () => {
     if (!product) return;
     
-    const selectedVariant = product.node.variants.edges.find(
-      v => v.node.selectedOptions.some(opt => opt.value === selectedSize)
-    )?.node || product.node.variants.edges[0]?.node;
+    const selectedVariant = product.node.variants.edges[0]?.node;
     
     if (!selectedVariant) return;
 
-    if (selectedVariant.quantityAvailable <= 0) {
-      toast.error("This size is out of stock", {
+    if (product.node.totalInventory <= 0) {
+      toast.error("This product is out of stock", {
         position: "top-center",
       });
       return;
     }
 
-    if (quantity > selectedVariant.quantityAvailable) {
-      toast.error(`Only ${selectedVariant.quantityAvailable} available in stock`, {
+    if (quantity > product.node.totalInventory) {
+      toast.error(`Only ${product.node.totalInventory} available in stock`, {
         position: "top-center",
       });
       return;
@@ -116,10 +106,10 @@ const ProductDetail = () => {
     const cartItem = {
       product,
       variantId: selectedVariant.id,
-      variantTitle: selectedVariant.title,
+      variantTitle: `Size ${selectedSize}`,
       price: selectedVariant.price,
       quantity: quantity,
-      selectedOptions: selectedVariant.selectedOptions || []
+      selectedOptions: [{ name: "Ring Size", value: selectedSize }]
     };
     
     addItem(cartItem);
@@ -167,17 +157,22 @@ const ProductDetail = () => {
   const image = node.images.edges[0]?.node;
   const price = node.priceRange.minVariantPrice;
   
-  // Get current selected variant
-  const selectedVariant = node.variants.edges.find(
-    v => v.node.selectedOptions.some(opt => opt.value === selectedSize)
-  )?.node;
+  // Get ring size metafield
+  const ringSizeMetafield = node.metafields?.find(
+    m => m.namespace === "shopify" && m.key === "ring-size"
+  );
   
-  // Helper to check if a size is available
+  // Parse available sizes from metafield (16 to 22)
+  const availableSizes = ringSizeMetafield?.value 
+    ? JSON.parse(ringSizeMetafield.value) 
+    : Array.from({ length: 7 }, (_, i) => (16 + i).toString());
+  
+  // Get the first available variant for the selected size
+  const selectedVariant = node.variants.edges[0]?.node;
+  
+  // Helper to check if a size is available (all sizes available if product has inventory)
   const isSizeAvailable = (size: string) => {
-    const variant = node.variants.edges.find(
-      v => v.node.selectedOptions.some(opt => opt.value === size)
-    )?.node;
-    return variant ? variant.quantityAvailable > 0 : false;
+    return node.totalInventory > 0;
   };
 
   return (
@@ -207,45 +202,43 @@ const ProductDetail = () => {
             </p>
             
             {/* Size Selector */}
-            {node.options.length > 0 && node.options[0].values.length > 1 && (
-              <div className="mb-6">
-                <Label className="text-base font-semibold mb-3 block">
-                  {node.options[0].name}
-                </Label>
-                <RadioGroup value={selectedSize} onValueChange={setSelectedSize}>
-                  <div className="flex flex-wrap gap-3">
-                    {node.options[0].values.map((size) => {
-                      const isAvailable = isSizeAvailable(size);
-                      return (
-                        <div key={size} className="flex items-center">
-                          <RadioGroupItem
-                            value={size}
-                            id={`size-${size}`}
-                            className="peer sr-only"
-                            disabled={!isAvailable}
-                          />
-                          <Label
-                            htmlFor={`size-${size}`}
-                            className={`flex items-center justify-center px-4 py-2 border-2 rounded-md transition-all min-w-[60px] ${
-                              isAvailable
-                                ? 'border-border cursor-pointer hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary'
-                                : 'border-muted bg-muted/50 text-muted-foreground cursor-not-allowed opacity-50 line-through'
-                            }`}
-                          >
-                            {size}
-                          </Label>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </RadioGroup>
-                {selectedVariant && selectedVariant.quantityAvailable <= 5 && selectedVariant.quantityAvailable > 0 && (
-                  <p className="text-sm text-destructive mt-2">
-                    Only {selectedVariant.quantityAvailable} left in stock
-                  </p>
-                )}
-              </div>
-            )}
+            <div className="mb-6">
+              <Label className="text-base font-semibold mb-3 block">
+                Ring Size
+              </Label>
+              <RadioGroup value={selectedSize} onValueChange={setSelectedSize}>
+                <div className="flex flex-wrap gap-3">
+                  {availableSizes.map((size: string) => {
+                    const isAvailable = isSizeAvailable(size);
+                    return (
+                      <div key={size} className="flex items-center">
+                        <RadioGroupItem
+                          value={size}
+                          id={`size-${size}`}
+                          className="peer sr-only"
+                          disabled={!isAvailable}
+                        />
+                        <Label
+                          htmlFor={`size-${size}`}
+                          className={`flex items-center justify-center px-4 py-2 border-2 rounded-md transition-all min-w-[60px] ${
+                            isAvailable
+                              ? 'border-border cursor-pointer hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary'
+                              : 'border-muted bg-muted/50 text-muted-foreground cursor-not-allowed opacity-50 line-through'
+                          }`}
+                        >
+                          {size}
+                        </Label>
+                      </div>
+                    );
+                  })}
+                </div>
+              </RadioGroup>
+              {node.totalInventory <= 5 && node.totalInventory > 0 && (
+                <p className="text-sm text-destructive mt-2">
+                  Only {node.totalInventory} left in stock
+                </p>
+              )}
+            </div>
             
             {/* Quantity Selector */}
             <div className="mb-8">
@@ -279,7 +272,7 @@ const ProductDetail = () => {
                 size="lg"
                 variant="outline"
                 className="w-full sm:w-auto"
-                disabled={!selectedVariant || selectedVariant.quantityAvailable <= 0}
+                disabled={!selectedVariant || node.totalInventory <= 0}
               >
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 Add to Cart
@@ -289,7 +282,7 @@ const ProductDetail = () => {
                 onClick={handleBuyNow}
                 size="lg"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold w-full sm:w-auto"
-                disabled={!selectedVariant || selectedVariant.quantityAvailable <= 0 || isCheckingOut}
+                disabled={!selectedVariant || node.totalInventory <= 0 || isCheckingOut}
               >
                 {isCheckingOut ? (
                   <>
@@ -298,7 +291,7 @@ const ProductDetail = () => {
                   </>
                 ) : (
                   <>
-                    {selectedVariant && selectedVariant.quantityAvailable <= 0 ? 'Out of Stock' : 'Buy Now'}
+                    {node.totalInventory <= 0 ? 'Out of Stock' : 'Buy Now'}
                   </>
                 )}
               </Button>

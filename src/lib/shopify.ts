@@ -25,6 +25,11 @@ export interface ShopifyProduct {
         };
       }>;
     };
+    metafields: Array<{
+      namespace: string;
+      key: string;
+      value: string;
+    }>;
     variants: {
       edges: Array<{
         node: {
