@@ -1,4 +1,5 @@
 import { Instagram, Music } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const Footer = () => {
   return (
@@ -41,34 +42,10 @@ export const Footer = () => {
           </div>
           
           <div>
-            <h4 className="text-lg font-heading font-semibold mb-6">Policies</h4>
-            <ul className="space-y-3">
-              <li>
-                <a href="/policies#refund" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
-                  <span className="group-hover:translate-x-1 transition-transform">Refund Policy</span>
-                </a>
-              </li>
-              <li>
-                <a href="/policies#exchange" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
-                  <span className="group-hover:translate-x-1 transition-transform">Exchange Policy</span>
-                </a>
-              </li>
-              <li>
-                <a href="/policies#shipping" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
-                  <span className="group-hover:translate-x-1 transition-transform">Shipping Policy</span>
-                </a>
-              </li>
-              <li>
-                <a href="/policies#delivery" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
-                  <span className="group-hover:translate-x-1 transition-transform">Delivery Policy</span>
-                </a>
-              </li>
-              <li>
-                <a href="/policies#privacy" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
-                  <span className="group-hover:translate-x-1 transition-transform">Privacy Policy</span>
-                </a>
-              </li>
-            </ul>
+            <h4 className="text-lg font-heading font-semibold mb-6">Legal</h4>
+            <Button asChild variant="outline" className="w-full">
+              <a href="/policies">View Our Policies</a>
+            </Button>
           </div>
           
           <div>
