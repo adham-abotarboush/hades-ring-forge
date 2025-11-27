@@ -30,7 +30,7 @@ const ProductDetail = () => {
         // Set default size to first AVAILABLE variant
         if (found && found.node.variants.edges.length > 0) {
           const firstAvailableVariant = found.node.variants.edges.find(
-            v => v.node.quantityAvailable > 0
+            v => v.node.availableForSale
           )?.node || found.node.variants.edges[0].node;
           
           if (firstAvailableVariant.selectedOptions.length > 0) {
@@ -58,16 +58,8 @@ const ProductDetail = () => {
     if (!selectedVariant) return;
 
     // Check if variant is available
-    if (selectedVariant.quantityAvailable <= 0) {
+    if (!selectedVariant.availableForSale) {
       toast.error("This size is out of stock", {
-        position: "top-center",
-      });
-      return;
-    }
-
-    // Check if requested quantity exceeds available quantity
-    if (quantity > selectedVariant.quantityAvailable) {
-      toast.error(`Only ${selectedVariant.quantityAvailable} available in stock`, {
         position: "top-center",
       });
       return;
@@ -97,15 +89,8 @@ const ProductDetail = () => {
     
     if (!selectedVariant) return;
 
-    if (selectedVariant.quantityAvailable <= 0) {
+    if (!selectedVariant.availableForSale) {
       toast.error("This size is out of stock", {
-        position: "top-center",
-      });
-      return;
-    }
-
-    if (quantity > selectedVariant.quantityAvailable) {
-      toast.error(`Only ${selectedVariant.quantityAvailable} available in stock`, {
         position: "top-center",
       });
       return;
@@ -177,7 +162,7 @@ const ProductDetail = () => {
     const variant = node.variants.edges.find(
       v => v.node.selectedOptions.some(opt => opt.value === size)
     )?.node;
-    return variant ? variant.quantityAvailable > 0 : false;
+    return variant ? variant.availableForSale : false;
   };
 
   return (
@@ -239,11 +224,6 @@ const ProductDetail = () => {
                     })}
                   </div>
                 </RadioGroup>
-                {selectedVariant && selectedVariant.quantityAvailable <= 5 && selectedVariant.quantityAvailable > 0 && (
-                  <p className="text-sm text-destructive mt-2">
-                    Only {selectedVariant.quantityAvailable} left in stock
-                  </p>
-                )}
               </div>
             )}
             
@@ -279,7 +259,7 @@ const ProductDetail = () => {
                 size="lg"
                 variant="outline"
                 className="w-full sm:w-auto"
-                disabled={!selectedVariant || selectedVariant.quantityAvailable <= 0}
+                disabled={!selectedVariant || !selectedVariant.availableForSale}
               >
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 Add to Cart
@@ -289,7 +269,7 @@ const ProductDetail = () => {
                 onClick={handleBuyNow}
                 size="lg"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold w-full sm:w-auto"
-                disabled={!selectedVariant || selectedVariant.quantityAvailable <= 0 || isCheckingOut}
+                disabled={!selectedVariant || !selectedVariant.availableForSale || isCheckingOut}
               >
                 {isCheckingOut ? (
                   <>
@@ -298,7 +278,7 @@ const ProductDetail = () => {
                   </>
                 ) : (
                   <>
-                    {selectedVariant && selectedVariant.quantityAvailable <= 0 ? 'Out of Stock' : 'Buy Now'}
+                    {selectedVariant && !selectedVariant.availableForSale ? 'Out of Stock' : 'Buy Now'}
                   </>
                 )}
               </Button>
