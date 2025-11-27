@@ -5,11 +5,13 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ShoppingCart, Loader2, Plus, Minus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ShoppingCart, Loader2, Plus, Minus, Info } from "lucide-react";
 import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { ReviewsList } from "@/components/reviews/ReviewsList";
+import sizeChartImage from "@/assets/sizeChart.jpg";
 
 const ProductDetail = () => {
   const { handle } = useParams();
@@ -196,9 +198,31 @@ const ProductDetail = () => {
             
             {/* Size Selector */}
             <div className="mb-6">
-              <Label className="text-base font-semibold mb-3 block">
-                Ring Size
-              </Label>
+              <div className="flex items-center gap-2 mb-3">
+                <Label className="text-base font-semibold">
+                  Ring Size
+                </Label>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+                      <Info className="h-4 w-4" />
+                      How to choose your size?
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Ring Size Guide</DialogTitle>
+                    </DialogHeader>
+                    <div className="mt-4">
+                      <img 
+                        src={sizeChartImage} 
+                        alt="Ring Size Chart" 
+                        className="w-full h-auto"
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
               <RadioGroup value={selectedSize} onValueChange={setSelectedSize}>
                 <div className="flex flex-wrap gap-3">
                   {availableSizes.map((size: string) => {
