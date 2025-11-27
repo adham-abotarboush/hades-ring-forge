@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Instagram, Music } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -44,27 +44,27 @@ export const Footer = () => {
             <h4 className="text-lg font-heading font-semibold mb-6">Policies</h4>
             <ul className="space-y-3">
               <li>
-                <a href="/refund-policy" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
+                <a href="/policies#refund" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
                   <span className="group-hover:translate-x-1 transition-transform">Refund Policy</span>
                 </a>
               </li>
               <li>
-                <a href="/exchange-policy" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
+                <a href="/policies#exchange" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
                   <span className="group-hover:translate-x-1 transition-transform">Exchange Policy</span>
                 </a>
               </li>
               <li>
-                <a href="/shipping-policy" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
+                <a href="/policies#shipping" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
                   <span className="group-hover:translate-x-1 transition-transform">Shipping Policy</span>
                 </a>
               </li>
               <li>
-                <a href="/delivery-policy" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
+                <a href="/policies#delivery" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
                   <span className="group-hover:translate-x-1 transition-transform">Delivery Policy</span>
                 </a>
               </li>
               <li>
-                <a href="/privacy-policy" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
+                <a href="/policies#privacy" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
                   <span className="group-hover:translate-x-1 transition-transform">Privacy Policy</span>
                 </a>
               </li>
@@ -77,8 +77,11 @@ export const Footer = () => {
               <a href="https://instagram.com/by.hades" target="_blank" rel="noopener noreferrer" className="p-3 bg-background/50 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1">
                 <Instagram className="h-5 w-5" />
               </a>
+              <a href="https://www.tiktok.com/@hades.eg" target="_blank" rel="noopener noreferrer" className="p-3 bg-background/50 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1">
+                <Music className="h-5 w-5" />
+              </a>
             </div>
-            <p className="text-muted-foreground text-sm mt-4">@by.hades</p>
+            <p className="text-muted-foreground text-sm mt-4">@by.hades | @hades.eg</p>
           </div>
         </div>
         
