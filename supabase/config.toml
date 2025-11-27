@@ -1,4 +1,1 @@
 project_id = "giqkkvalcctvpzauglxx"
-
-[functions.publish-product]
-verify_jwt = false

@@ -17,6 +17,7 @@ const ALLOWED_QUERIES = {
             title
             description
             handle
+            totalInventory
             priceRange {
               minVariantPrice {
                 amount
@@ -41,6 +42,7 @@ const ALLOWED_QUERIES = {
                     currencyCode
                   }
                   availableForSale
+                  quantityAvailable
                   selectedOptions {
                     name
                     value
