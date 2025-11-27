@@ -1,4 +1,4 @@
-import { ShoppingCart, Flame } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -45,9 +45,8 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 
   const image = node.images.edges[0]?.node;
   const price = node.priceRange.minVariantPrice;
-  const totalInventory = node.totalInventory || 0;
-  const isSoldOut = totalInventory === 0;
-  const isLowStock = totalInventory > 0 && totalInventory <= 5;
+  const firstVariant = node.variants.edges[0]?.node;
+  const isSoldOut = !firstVariant?.availableForSale;
 
   return (
     <Card className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-500 hover-lift h-full flex flex-col">
@@ -68,14 +67,6 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           {isSoldOut && (
             <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-muted text-muted-foreground border-0 shadow-lg">
               Sold Out
-            </Badge>
-          )}
-          
-          {/* Low Stock Badge */}
-          {!isSoldOut && isLowStock && (
-            <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-destructive text-destructive-foreground border-0 shadow-crimson animate-pulse">
-              <Flame className="h-3 w-3 mr-1" />
-              Almost Sold Out
             </Badge>
           )}
           
