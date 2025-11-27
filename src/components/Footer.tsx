@@ -1,5 +1,4 @@
 import { Instagram, Music } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export const Footer = () => {
   return (
@@ -43,22 +42,27 @@ export const Footer = () => {
           
           <div>
             <h4 className="text-lg font-heading font-semibold mb-6">Legal</h4>
-            <Button asChild variant="outline" className="w-full">
-              <a href="/policies">View Our Policies</a>
-            </Button>
+            <ul className="space-y-3">
+              <li>
+                <a href="/policies" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
+                  <span className="group-hover:translate-x-1 transition-transform">Our Policies</span>
+                </a>
+              </li>
+            </ul>
           </div>
           
           <div>
             <h4 className="text-lg font-heading font-semibold mb-6">Follow Us</h4>
-            <div className="flex space-x-4">
-              <a href="https://instagram.com/by.hades" target="_blank" rel="noopener noreferrer" className="p-3 bg-background/50 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1">
-                <Instagram className="h-5 w-5" />
+            <div className="space-y-4">
+              <a href="https://instagram.com/by.hades" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 p-3 bg-background/50 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/50 transition-all duration-300 group">
+                <Instagram className="h-5 w-5 flex-shrink-0" />
+                <span className="text-sm font-medium">@by.hades</span>
               </a>
-              <a href="https://www.tiktok.com/@hades.eg" target="_blank" rel="noopener noreferrer" className="p-3 bg-background/50 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1">
-                <Music className="h-5 w-5" />
+              <a href="https://www.tiktok.com/@hades.eg" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 p-3 bg-background/50 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/50 transition-all duration-300 group">
+                <Music className="h-5 w-5 flex-shrink-0" />
+                <span className="text-sm font-medium">@hades.eg</span>
               </a>
             </div>
-            <p className="text-muted-foreground text-sm mt-4">@by.hades | @hades.eg</p>
           </div>
         </div>
         
