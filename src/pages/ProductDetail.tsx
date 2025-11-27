@@ -157,15 +157,8 @@ const ProductDetail = () => {
   const image = node.images.edges[0]?.node;
   const price = node.priceRange.minVariantPrice;
   
-  // Get ring size metafield
-  const ringSizeMetafield = node.metafields?.find(
-    m => m.namespace === "shopify" && m.key === "ring-size"
-  );
-  
-  // Parse available sizes from metafield (16 to 22)
-  const availableSizes = ringSizeMetafield?.value 
-    ? JSON.parse(ringSizeMetafield.value) 
-    : Array.from({ length: 7 }, (_, i) => (16 + i).toString());
+  // Available ring sizes (16 to 22)
+  const availableSizes = Array.from({ length: 7 }, (_, i) => (16 + i).toString());
   
   // Get the first available variant for the selected size
   const selectedVariant = node.variants.edges[0]?.node;
