@@ -85,6 +85,17 @@ export async function fetchProducts(count: number = 20): Promise<ShopifyProduct[
   return data?.data?.products?.edges || [];
 }
 
+// Fetch products by IDs for inventory validation
+export async function fetchProductsByIds(productIds: string[]): Promise<ShopifyProduct[]> {
+  const products = await Promise.all(
+    productIds.map(async (id) => {
+      const data = await storefrontApiRequest('getProductById', { id });
+      return data?.data?.product ? { node: data.data.product } : null;
+    })
+  );
+  return products.filter((p): p is ShopifyProduct => p !== null);
+}
+
 export interface CartItem {
   product: ShopifyProduct;
   variantId: string;

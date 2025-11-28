@@ -35,6 +35,14 @@ export const CartDrawer = () => {
 
   const handleCheckout = async () => {
     try {
+      // Validate inventory before proceeding
+      const { validateCartInventory } = useCartStore.getState();
+      const isValid = await validateCartInventory();
+      
+      if (!isValid) {
+        return; // Validation already shows error toast
+      }
+
       // Check if user is logged in
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -87,10 +95,8 @@ export const CartDrawer = () => {
         window.open(checkoutUrl, '_blank');
         setCartOpen(false);
         
-        // Clear cart after successful checkout
-        if (user) {
-          clearCart();
-        }
+        // Clear cart after successful checkout (both logged-in and guest users)
+        clearCart();
       }
     } catch (error) {
       console.error('Checkout failed:', error);

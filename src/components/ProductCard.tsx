@@ -29,18 +29,21 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       selectedOptions: firstVariant.selectedOptions || []
     };
     
-    addItem(cartItem);
-    toast.success(
-      <div 
-        onClick={() => setCartOpen(true)} 
-        className="cursor-pointer w-full"
-      >
-        Added to cart! Click to view
-      </div>,
-      {
-        position: "top-center",
-      }
-    );
+    const success = addItem(cartItem, firstVariant.quantityAvailable);
+    
+    if (success) {
+      toast.success(
+        <div 
+          onClick={() => setCartOpen(true)} 
+          className="cursor-pointer w-full"
+        >
+          Added to cart! Click to view
+        </div>,
+        {
+          position: "top-center",
+        }
+      );
+    }
   };
 
   const image = node.images.edges[0]?.node;
