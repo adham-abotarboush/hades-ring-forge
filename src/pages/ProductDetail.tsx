@@ -59,14 +59,6 @@ const ProductDetail = () => {
       return;
     }
 
-    // Check if requested quantity exceeds available quantity
-    if (quantity > product.node.totalInventory) {
-      toast.error(`Only ${product.node.totalInventory} available in stock`, {
-        position: "top-center",
-      });
-      return;
-    }
-
     const cartItem = {
       product,
       variantId: selectedVariant.id,
@@ -76,10 +68,13 @@ const ProductDetail = () => {
       selectedOptions: [{ name: "Ring Size", value: selectedSize }]
     };
     
-    addItem(cartItem);
-    toast.success(`Added ${quantity} item(s) to cart!`, {
-      position: "top-center",
-    });
+    const success = addItem(cartItem, product.node.totalInventory);
+    
+    if (success) {
+      toast.success(`Added ${quantity} item(s) to cart!`, {
+        position: "top-center",
+      });
+    }
   };
 
   const handleBuyNow = async () => {
@@ -96,13 +91,6 @@ const ProductDetail = () => {
       return;
     }
 
-    if (quantity > product.node.totalInventory) {
-      toast.error(`Only ${product.node.totalInventory} available in stock`, {
-        position: "top-center",
-      });
-      return;
-    }
-
     setIsCheckingOut(true);
     
     const cartItem = {
@@ -114,13 +102,27 @@ const ProductDetail = () => {
       selectedOptions: [{ name: "Ring Size", value: selectedSize }]
     };
     
-    addItem(cartItem);
+    const success = addItem(cartItem, product.node.totalInventory);
+    
+    if (!success) {
+      setIsCheckingOut(false);
+      return;
+    }
     
     try {
+      // Validate inventory before checkout
+      const isValid = await useCartStore.getState().validateCartInventory();
+      if (!isValid) {
+        setIsCheckingOut(false);
+        return;
+      }
+
       await useCartStore.getState().createCheckout();
       const checkoutUrl = useCartStore.getState().checkoutUrl;
       if (checkoutUrl) {
         window.open(checkoutUrl, '_blank');
+        // Clear cart after successful checkout
+        useCartStore.getState().clearCart();
       }
     } catch (error) {
       toast.error("Failed to create checkout", {

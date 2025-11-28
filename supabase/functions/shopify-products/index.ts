@@ -64,6 +64,58 @@ const ALLOWED_QUERIES = {
       }
     }
   `,
+  'getProductById': `
+    query GetProductById($id: ID!) {
+      product(id: $id) {
+        id
+        title
+        description
+        handle
+        totalInventory
+        priceRange {
+          minVariantPrice {
+            amount
+            currencyCode
+          }
+        }
+        images(first: 5) {
+          edges {
+            node {
+              url
+              altText
+            }
+          }
+        }
+        metafields(identifiers: [{namespace: "shopify", key: "ring-size"}]) {
+          namespace
+          key
+          value
+        }
+        variants(first: 25) {
+          edges {
+            node {
+              id
+              title
+              price {
+                amount
+                currencyCode
+              }
+              availableForSale
+              quantityAvailable
+              selectedOptions {
+                name
+                value
+              }
+            }
+          }
+        }
+        options {
+          name
+          values
+        }
+      }
+    }
+  `,
   'cartCreate': `
     mutation cartCreate($input: CartInput!) {
       cartCreate(input: $input) {
@@ -90,6 +142,10 @@ const ALLOWED_QUERIES = {
 // Validation schemas for query variables
 const getProductsVariablesSchema = z.object({
   first: z.number().min(1).max(250)
+});
+
+const getProductByIdVariablesSchema = z.object({
+  id: z.string().min(1)
 });
 
 const cartCreateVariablesSchema = z.object({
@@ -134,6 +190,8 @@ serve(async (req) => {
     try {
       if (queryName === 'getProducts') {
         validatedVariables = getProductsVariablesSchema.parse(variables);
+      } else if (queryName === 'getProductById') {
+        validatedVariables = getProductByIdVariablesSchema.parse(variables);
       } else if (queryName === 'cartCreate') {
         validatedVariables = cartCreateVariablesSchema.parse(variables);
       }

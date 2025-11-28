@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ShopifyProduct, createStorefrontCheckout, CartItem as ShopifyCartItem } from '@/lib/shopify';
+import { ShopifyProduct, createStorefrontCheckout, CartItem as ShopifyCartItem, fetchProductsByIds } from '@/lib/shopify';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export type CartItem = ShopifyCartItem;
 
@@ -12,8 +13,8 @@ interface CartStore {
   isLoading: boolean;
   isCartOpen: boolean;
   
-  addItem: (item: CartItem) => void;
-  updateQuantity: (variantId: string, quantity: number) => void;
+  addItem: (item: CartItem, maxInventory?: number) => boolean;
+  updateQuantity: (variantId: string, quantity: number, maxInventory?: number) => boolean;
   removeItem: (variantId: string) => void;
   clearCart: () => void;
   setCartId: (cartId: string) => void;
@@ -21,6 +22,7 @@ interface CartStore {
   setLoading: (loading: boolean) => void;
   setCartOpen: (open: boolean) => void;
   createCheckout: () => Promise<void>;
+  validateCartInventory: () => Promise<boolean>;
   syncWithDatabase: (userId: string) => Promise<void>;
   loadFromDatabase: (userId: string) => Promise<void>;
   saveToDatabase: (userId: string) => Promise<void>;
@@ -37,9 +39,38 @@ export const useCartStore = create<CartStore>()(
       
       setCartOpen: (open) => set({ isCartOpen: open }),
 
-      addItem: (item) => {
+      addItem: (item, maxInventory) => {
         const { items } = get();
         const existingItem = items.find(i => i.variantId === item.variantId);
+        const currentQuantity = existingItem?.quantity || 0;
+        const newTotalQuantity = currentQuantity + item.quantity;
+        
+        // Check inventory if provided
+        if (maxInventory !== undefined && newTotalQuantity > maxInventory) {
+          const availableToAdd = Math.max(0, maxInventory - currentQuantity);
+          if (availableToAdd === 0) {
+            toast.error("Cannot add more", {
+              description: `Only ${maxInventory} available in stock`
+            });
+            return false;
+          }
+          toast.error("Quantity adjusted", {
+            description: `Only ${availableToAdd} more can be added (${maxInventory} total in stock)`
+          });
+          // Add only what's available
+          if (existingItem) {
+            set({
+              items: items.map(i =>
+                i.variantId === item.variantId
+                  ? { ...i, quantity: maxInventory }
+                  : i
+              )
+            });
+          } else {
+            set({ items: [...items, { ...item, quantity: availableToAdd }] });
+          }
+          return false;
+        }
         
         if (existingItem) {
           set({
@@ -52,12 +83,21 @@ export const useCartStore = create<CartStore>()(
         } else {
           set({ items: [...items, item] });
         }
+        return true;
       },
 
-      updateQuantity: (variantId, quantity) => {
+      updateQuantity: (variantId, quantity, maxInventory) => {
         if (quantity <= 0) {
           get().removeItem(variantId);
-          return;
+          return true;
+        }
+        
+        // Check inventory if provided
+        if (maxInventory !== undefined && quantity > maxInventory) {
+          toast.error("Insufficient stock", {
+            description: `Only ${maxInventory} available`
+          });
+          return false;
         }
         
         set({
@@ -65,6 +105,7 @@ export const useCartStore = create<CartStore>()(
             item.variantId === variantId ? { ...item, quantity } : item
           )
         });
+        return true;
       },
 
       removeItem: (variantId) => {
@@ -94,6 +135,74 @@ export const useCartStore = create<CartStore>()(
           throw error;
         } finally {
           setLoading(false);
+        }
+      },
+
+      validateCartInventory: async () => {
+        const { items } = get();
+        if (items.length === 0) return true;
+
+        try {
+          // Fetch fresh product data
+          const productIds = [...new Set(items.map(item => item.product.node.id))];
+          const freshProducts = await fetchProductsByIds(productIds);
+          
+          const unavailableItems: string[] = [];
+          const updatedItems: CartItem[] = [];
+          
+          for (const item of items) {
+            const freshProduct = freshProducts.find(p => p.node.id === item.product.node.id);
+            if (!freshProduct) {
+              unavailableItems.push(item.product.node.title);
+              continue;
+            }
+            
+            // Find the specific variant
+            const variant = freshProduct.node.variants.edges.find(
+              v => v.node.id === item.variantId
+            );
+            
+            if (!variant || !variant.node.availableForSale) {
+              unavailableItems.push(`${item.product.node.title} (${item.variantTitle})`);
+              continue;
+            }
+            
+            const availableQuantity = variant.node.quantityAvailable;
+            
+            if (item.quantity > availableQuantity) {
+              if (availableQuantity === 0) {
+                unavailableItems.push(`${item.product.node.title} (${item.variantTitle})`);
+              } else {
+                // Update quantity to what's available
+                updatedItems.push({ ...item, quantity: availableQuantity });
+                toast.warning("Quantity adjusted", {
+                  description: `${item.product.node.title} quantity reduced to ${availableQuantity} (available stock)`
+                });
+              }
+            } else {
+              updatedItems.push(item);
+            }
+          }
+          
+          if (unavailableItems.length > 0) {
+            toast.error("Items unavailable", {
+              description: `The following items are no longer available: ${unavailableItems.join(', ')}`
+            });
+            set({ items: updatedItems });
+            return false;
+          }
+          
+          if (updatedItems.length !== items.length) {
+            set({ items: updatedItems });
+          }
+          
+          return true;
+        } catch (error) {
+          console.error('Failed to validate cart inventory:', error);
+          toast.error("Validation failed", {
+            description: "Unable to verify product availability"
+          });
+          return false;
         }
       },
 
