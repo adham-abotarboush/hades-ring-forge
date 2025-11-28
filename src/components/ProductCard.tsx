@@ -44,6 +44,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   const image = node.images.edges[0]?.node;
+  const secondImage = node.images.edges[1]?.node;
   const price = node.priceRange.minVariantPrice;
   const totalInventory = node.totalInventory || 0;
   const isSoldOut = totalInventory === 0;
@@ -54,11 +55,21 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       <Link to={`/product/${node.handle}`}>
         <div className="relative aspect-square overflow-hidden bg-gradient-forge">
           {image ? (
-            <img
-              src={image.url}
-              alt={image.altText || node.title}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-            />
+            <>
+              <img
+                src={image.url}
+                alt={image.altText || node.title}
+                className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ease-out absolute inset-0"
+                style={{ opacity: secondImage ? undefined : 1 }}
+              />
+              {secondImage && (
+                <img
+                  src={secondImage.url}
+                  alt={secondImage.altText || node.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ease-out absolute inset-0 opacity-0 group-hover:opacity-100"
+                />
+              )}
+            </>
           ) : (
             <div className="w-full h-full flex items-center justify-center text-6xl">⚡</div>
           )}
