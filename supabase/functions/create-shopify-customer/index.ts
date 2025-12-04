@@ -12,7 +12,41 @@ serve(async (req) => {
   }
 
   try {
+    // Validate the caller's identity from JWT
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const authSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { userId, email, fullName, phoneNumber } = await req.json();
+
+    // Verify the caller is requesting their own userId
+    if (user.id !== userId) {
+      console.error('User ID mismatch: caller', user.id, 'requested', userId);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized: cannot modify another user' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (!userId || !email) {
       return new Response(
@@ -108,8 +142,7 @@ serve(async (req) => {
       );
     }
 
-    // Update Supabase profile with Shopify customer ID
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    // Update Supabase profile with Shopify customer ID using service role
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
