@@ -80,9 +80,20 @@ export async function storefrontApiRequest(queryName: string, variables: any = {
   }
 }
 
-export async function fetchProducts(count: number = 20): Promise<ShopifyProduct[]> {
+// Shuffle array utility
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+export async function fetchProducts(count: number = 50, randomize: boolean = false): Promise<ShopifyProduct[]> {
   const data = await storefrontApiRequest('getProducts', { first: count });
-  return data?.data?.products?.edges || [];
+  const products = data?.data?.products?.edges || [];
+  return randomize ? shuffleArray(products) : products;
 }
 
 // Fetch products by IDs for inventory validation
