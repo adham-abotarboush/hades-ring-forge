@@ -14,7 +14,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import logo from "@/assets/logo.svg";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -53,7 +52,6 @@ export const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <Link to="/" className="flex items-center space-x-2 group">
-            <img src={logo} alt="Hades logo" className="h-8 w-8 group-hover:scale-105 transition-transform" />
             <h1 className="text-2xl md:text-3xl font-heading font-bold text-gradient group-hover:scale-105 transition-transform">
               HADES
             </h1>
