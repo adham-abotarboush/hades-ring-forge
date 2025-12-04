@@ -12,7 +12,7 @@ const Shop = () => {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const data = await fetchProducts(20);
+        const data = await fetchProducts(50, true);
         setProducts(data);
       } catch (error) {
         console.error("Failed to load products:", error);
