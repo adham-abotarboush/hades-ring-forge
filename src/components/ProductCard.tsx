@@ -2,6 +2,7 @@ import { ShoppingCart, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 import { ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
@@ -28,13 +29,13 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       quantity: 1,
       selectedOptions: firstVariant.selectedOptions || []
     };
-    
+
     const success = addItem(cartItem, firstVariant.quantityAvailable);
-    
+
     if (success) {
       toast.success(
-        <div 
-          onClick={() => setCartOpen(true)} 
+        <div
+          onClick={() => setCartOpen(true)}
           className="cursor-pointer w-full"
         >
           Added to cart! Click to view
@@ -59,17 +60,20 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         <div className="relative aspect-square overflow-hidden bg-gradient-forge">
           {image ? (
             <>
-              <img
+              <ProgressiveImage
                 src={image.url}
                 alt={image.altText || node.title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ease-out absolute inset-0"
-                style={{ opacity: secondImage ? undefined : 1 }}
+                className="group-hover:scale-110 transition-all duration-700 ease-out"
+                containerClassName="absolute inset-0"
+                rootMargin="200px"
               />
               {secondImage && (
-                <img
+                <ProgressiveImage
                   src={secondImage.url}
                   alt={secondImage.altText || node.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ease-out absolute inset-0 opacity-0 group-hover:opacity-100"
+                  className="group-hover:scale-110 transition-all duration-700 ease-out opacity-0 group-hover:opacity-100"
+                  containerClassName="absolute inset-0"
+                  rootMargin="200px"
                 />
               )}
             </>
@@ -77,14 +81,14 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             <div className="w-full h-full flex items-center justify-center text-6xl">⚡</div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          
+
           {/* Sold Out Badge */}
           {isSoldOut && (
             <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-muted text-muted-foreground border-0 shadow-lg">
               Sold Out
             </Badge>
           )}
-          
+
           {/* Low Stock Badge */}
           {!isSoldOut && isLowStock && (
             <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-destructive text-destructive-foreground border-0 shadow-crimson animate-pulse">
@@ -92,14 +96,14 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               Almost Sold Out
             </Badge>
           )}
-          
+
           {/* Quick View Badge */}
           <div className="absolute top-4 right-4 px-3 py-1 bg-primary/90 backdrop-blur-sm rounded-full text-xs font-medium text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             View Details
           </div>
         </div>
       </Link>
-      
+
       <CardContent className="p-6 flex-1 flex flex-col">
         <Link to={`/product/${node.handle}`}>
           <h3 className="text-xl font-heading font-semibold mb-3 group-hover:text-primary transition-colors duration-300 leading-tight">
@@ -109,7 +113,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         <p className="text-sm text-muted-foreground mb-6 line-clamp-2 flex-1">
           {node.description}
         </p>
-        
+
         <div className="flex items-center justify-between gap-3">
           <span className="text-2xl font-bold text-primary">
             E£{parseFloat(price.amount).toFixed(2)}

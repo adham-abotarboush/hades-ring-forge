@@ -6,13 +6,21 @@ import { toast } from 'sonner';
 
 export type CartItem = ShopifyCartItem;
 
+// Track pending operations for optimistic UI
+type PendingOperation = {
+  type: 'add' | 'update' | 'remove';
+  variantId: string;
+  timestamp: number;
+};
+
 interface CartStore {
   items: CartItem[];
   cartId: string | null;
   checkoutUrl: string | null;
   isLoading: boolean;
   isCartOpen: boolean;
-  
+  pendingOperations: PendingOperation[];
+
   addItem: (item: CartItem, maxInventory?: number) => boolean;
   updateQuantity: (variantId: string, quantity: number, maxInventory?: number) => boolean;
   removeItem: (variantId: string) => void;
@@ -26,6 +34,10 @@ interface CartStore {
   syncWithDatabase: (userId: string) => Promise<void>;
   loadFromDatabase: (userId: string) => Promise<void>;
   saveToDatabase: (userId: string) => Promise<void>;
+  // Optimistic UI helpers
+  isItemPending: (variantId: string) => boolean;
+  addPendingOperation: (op: Omit<PendingOperation, 'timestamp'>) => void;
+  removePendingOperation: (variantId: string) => void;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -36,15 +48,33 @@ export const useCartStore = create<CartStore>()(
       checkoutUrl: null,
       isLoading: false,
       isCartOpen: false,
-      
+      pendingOperations: [],
+
       setCartOpen: (open) => set({ isCartOpen: open }),
+
+      // Optimistic UI helpers
+      isItemPending: (variantId) => {
+        return get().pendingOperations.some(op => op.variantId === variantId);
+      },
+
+      addPendingOperation: (op) => {
+        set({
+          pendingOperations: [...get().pendingOperations, { ...op, timestamp: Date.now() }]
+        });
+      },
+
+      removePendingOperation: (variantId) => {
+        set({
+          pendingOperations: get().pendingOperations.filter(op => op.variantId !== variantId)
+        });
+      },
 
       addItem: (item, maxInventory) => {
         const { items } = get();
         const existingItem = items.find(i => i.variantId === item.variantId);
         const currentQuantity = existingItem?.quantity || 0;
         const newTotalQuantity = currentQuantity + item.quantity;
-        
+
         // Check inventory if provided
         if (maxInventory !== undefined && newTotalQuantity > maxInventory) {
           const availableToAdd = Math.max(0, maxInventory - currentQuantity);
@@ -71,7 +101,7 @@ export const useCartStore = create<CartStore>()(
           }
           return false;
         }
-        
+
         if (existingItem) {
           set({
             items: items.map(i =>
@@ -91,7 +121,7 @@ export const useCartStore = create<CartStore>()(
           get().removeItem(variantId);
           return true;
         }
-        
+
         // Check inventory if provided
         if (maxInventory !== undefined && quantity > maxInventory) {
           toast.error("Insufficient stock", {
@@ -99,7 +129,7 @@ export const useCartStore = create<CartStore>()(
           });
           return false;
         }
-        
+
         set({
           items: get().items.map(item =>
             item.variantId === variantId ? { ...item, quantity } : item
@@ -146,29 +176,29 @@ export const useCartStore = create<CartStore>()(
           // Fetch fresh product data
           const productIds = [...new Set(items.map(item => item.product.node.id))];
           const freshProducts = await fetchProductsByIds(productIds);
-          
+
           const unavailableItems: string[] = [];
           const updatedItems: CartItem[] = [];
-          
+
           for (const item of items) {
             const freshProduct = freshProducts.find(p => p.node.id === item.product.node.id);
             if (!freshProduct) {
               unavailableItems.push(item.product.node.title);
               continue;
             }
-            
+
             // Find the specific variant
             const variant = freshProduct.node.variants.edges.find(
               v => v.node.id === item.variantId
             );
-            
+
             if (!variant || !variant.node.availableForSale) {
               unavailableItems.push(`${item.product.node.title} (${item.variantTitle})`);
               continue;
             }
-            
+
             const availableQuantity = variant.node.quantityAvailable;
-            
+
             if (item.quantity > availableQuantity) {
               if (availableQuantity === 0) {
                 unavailableItems.push(`${item.product.node.title} (${item.variantTitle})`);
@@ -183,7 +213,7 @@ export const useCartStore = create<CartStore>()(
               updatedItems.push(item);
             }
           }
-          
+
           if (unavailableItems.length > 0) {
             toast.error("Items unavailable", {
               description: `The following items are no longer available: ${unavailableItems.join(', ')}`
@@ -191,11 +221,11 @@ export const useCartStore = create<CartStore>()(
             set({ items: updatedItems });
             return false;
           }
-          
+
           if (updatedItems.length !== items.length) {
             set({ items: updatedItems });
           }
-          
+
           return true;
         } catch (error) {
           console.error('Failed to validate cart inventory:', error);
@@ -209,7 +239,7 @@ export const useCartStore = create<CartStore>()(
       syncWithDatabase: async (userId: string) => {
         try {
           const { items } = get();
-          
+
           // Check if user has saved cart in database
           const { data: savedCartItems } = await supabase
             .from('cart_items')
@@ -229,7 +259,7 @@ export const useCartStore = create<CartStore>()(
                 selectedOptions: productData.selectedOptions,
               };
             });
-            
+
             set({ items: dbItems });
           } else if (items.length > 0) {
             // User has no saved cart but has guest cart - save guest cart to database
@@ -259,7 +289,7 @@ export const useCartStore = create<CartStore>()(
                 selectedOptions: productData.selectedOptions,
               };
             });
-            
+
             set({ items: dbItems });
           }
         } catch (error) {
@@ -270,7 +300,7 @@ export const useCartStore = create<CartStore>()(
       saveToDatabase: async (userId: string) => {
         try {
           const { items } = get();
-          
+
           if (items.length === 0) {
             // If cart is empty, delete all items
             await supabase
@@ -323,7 +353,7 @@ export const useCartStore = create<CartStore>()(
             });
 
           if (upsertError) throw upsertError;
-          
+
         } catch (error) {
           console.error('Failed to save cart to database:', error);
           // Error recovery: cart data remains in localStorage and will retry on next change

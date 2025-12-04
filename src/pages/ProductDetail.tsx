@@ -11,6 +11,8 @@ import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { ReviewsList } from "@/components/reviews/ReviewsList";
+import { ProductDetailSkeleton } from "@/components/ProductCardSkeleton";
+import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 import sizeChartImage from "@/assets/sizeChart.jpg";
 
 const ProductDetail = () => {
@@ -28,7 +30,7 @@ const ProductDetail = () => {
         const products = await fetchProducts(100);
         const found = products.find(p => p.node.handle === handle);
         setProduct(found || null);
-        
+
         // Set default size to first available size (16)
         if (found) {
           setSelectedSize("16");
@@ -45,10 +47,10 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (!product) return;
-    
+
     // Use the first variant for cart (size will be stored in selectedOptions)
     const selectedVariant = product.node.variants.edges[0]?.node;
-    
+
     if (!selectedVariant) return;
 
     // Check if product is available
@@ -67,9 +69,9 @@ const ProductDetail = () => {
       quantity: quantity,
       selectedOptions: [{ name: "Ring Size", value: selectedSize }]
     };
-    
+
     const success = addItem(cartItem, product.node.totalInventory);
-    
+
     if (success) {
       toast.success(`Added ${quantity} item(s) to cart!`, {
         position: "top-center",
@@ -79,9 +81,9 @@ const ProductDetail = () => {
 
   const handleBuyNow = async () => {
     if (!product) return;
-    
+
     const selectedVariant = product.node.variants.edges[0]?.node;
-    
+
     if (!selectedVariant) return;
 
     if (product.node.totalInventory <= 0) {
@@ -92,7 +94,7 @@ const ProductDetail = () => {
     }
 
     setIsCheckingOut(true);
-    
+
     const cartItem = {
       product,
       variantId: selectedVariant.id,
@@ -101,14 +103,14 @@ const ProductDetail = () => {
       quantity: quantity,
       selectedOptions: [{ name: "Ring Size", value: selectedSize }]
     };
-    
+
     const success = addItem(cartItem, product.node.totalInventory);
-    
+
     if (!success) {
       setIsCheckingOut(false);
       return;
     }
-    
+
     try {
       // Validate inventory before checkout
       const isValid = await useCartStore.getState().validateCartInventory();
@@ -138,8 +140,12 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="pt-32 pb-20 container mx-auto px-4">
+          <ProductDetailSkeleton />
+        </main>
+        <Footer />
       </div>
     );
   }
@@ -160,13 +166,13 @@ const ProductDetail = () => {
   const { node } = product;
   const image = node.images.edges[0]?.node;
   const price = node.priceRange.minVariantPrice;
-  
+
   // Available ring sizes (16 to 22)
   const availableSizes = Array.from({ length: 7 }, (_, i) => (16 + i).toString());
-  
+
   // Get the first available variant for the selected size
   const selectedVariant = node.variants.edges[0]?.node;
-  
+
   // Helper to check if a size is available (all sizes available if product has inventory)
   const isSizeAvailable = (size: string) => {
     return node.totalInventory > 0;
@@ -175,29 +181,30 @@ const ProductDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <main className="pt-32 pb-20 container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div className="aspect-square bg-muted rounded-lg overflow-hidden">
             {image && (
-              <img
+              <ProgressiveImage
                 src={image.url}
                 alt={image.altText || node.title}
-                className="w-full h-full object-cover"
+                containerClassName="w-full h-full"
+                lazy={false}
               />
             )}
           </div>
-          
+
           <div className="flex flex-col justify-center">
             <h1 className="text-4xl font-heading font-bold mb-4">{node.title}</h1>
             <p className="text-3xl font-bold text-primary mb-6">
               E£{parseFloat(price.amount).toFixed(2)}
             </p>
-            
+
             <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
               {node.description}
             </p>
-            
+
             {/* Size Selector */}
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-3">
@@ -216,9 +223,9 @@ const ProductDetail = () => {
                       <DialogTitle>Ring Size Guide</DialogTitle>
                     </DialogHeader>
                     <div className="mt-4">
-                      <img 
-                        src={sizeChartImage} 
-                        alt="Ring Size Chart" 
+                      <img
+                        src={sizeChartImage}
+                        alt="Ring Size Chart"
                         className="w-full h-auto"
                       />
                     </div>
@@ -239,11 +246,10 @@ const ProductDetail = () => {
                         />
                         <Label
                           htmlFor={`size-${size}`}
-                          className={`flex items-center justify-center px-4 py-2 border-2 rounded-md transition-all min-w-[60px] ${
-                            isAvailable
+                          className={`flex items-center justify-center px-4 py-2 border-2 rounded-md transition-all min-w-[60px] ${isAvailable
                               ? 'border-border cursor-pointer hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary'
                               : 'border-muted bg-muted/50 text-muted-foreground cursor-not-allowed opacity-50 line-through'
-                          }`}
+                            }`}
                         >
                           {size}
                         </Label>
@@ -258,7 +264,7 @@ const ProductDetail = () => {
                 </p>
               )}
             </div>
-            
+
             {/* Quantity Selector */}
             <div className="mb-8">
               <Label className="text-base font-semibold mb-3 block">Quantity</Label>
@@ -284,7 +290,7 @@ const ProductDetail = () => {
                 </Button>
               </div>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 onClick={handleAddToCart}
@@ -296,7 +302,7 @@ const ProductDetail = () => {
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 Add to Cart
               </Button>
-              
+
               <Button
                 onClick={handleBuyNow}
                 size="lg"

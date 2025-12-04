@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
 import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
-import { Loader2 } from "lucide-react";
 
 const Shop = () => {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
@@ -27,7 +27,7 @@ const Shop = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <main className="pt-32 pb-20 container mx-auto px-4">
         <div className="text-center mb-16 animate-fade-in-up">
           <div className="inline-block mb-4 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full">
@@ -42,9 +42,10 @@ const Shop = () => {
         </div>
 
         {loading ? (
-          <div className="flex flex-col justify-center items-center py-32">
-            <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-            <p className="text-muted-foreground">Summoning mythic treasures...</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-32 animate-fade-in">
@@ -57,7 +58,7 @@ const Shop = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
             {products.map((product, index) => (
-              <div 
+              <div
                 key={product.node.id}
                 className="animate-fade-in-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
