@@ -80,11 +80,29 @@ export async function storefrontApiRequest(queryName: string, variables: any = {
   }
 }
 
-// Shuffle array utility
+// Daily seed randomization - same order for everyone, changes at midnight
+function getDailySeed(): number {
+  const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+  let hash = 0;
+  for (let i = 0; i < today.length; i++) {
+    hash = ((hash << 5) - hash) + today.charCodeAt(i);
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
+function seededRandom(seed: number): () => number {
+  return () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+}
+
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
+  const random = seededRandom(getDailySeed());
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
