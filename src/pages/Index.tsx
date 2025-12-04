@@ -8,6 +8,7 @@ import { ArrowRight, Flame, Sparkles, Shield, Award, Users } from "lucide-react"
 import heroImage from "@/assets/hero-forge.jpg";
 import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
 import { useEffect, useState } from "react";
+import { SEO } from "@/components/SEO";
 
 const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<ShopifyProduct[]>([]);
@@ -29,6 +30,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Hades Ring Forge"
+        description="Handcrafted rings from recycled forks, inspired by Greek mythology and the realm of Hades. Each piece tells an ancient story."
+      />
       <Navigation />
 
       {/* Hero Section */}

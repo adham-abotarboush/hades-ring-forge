@@ -12,6 +12,7 @@ import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Policies from "./pages/Policies";
+import Wishlist from "./pages/Wishlist";
 import NotFound from "./pages/NotFound";
 import { useCartSync } from "./hooks/useCartSync";
 
@@ -19,7 +20,7 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   useCartSync();
-  
+
   return (
     <>
       <Toaster />
@@ -33,6 +34,7 @@ const AppContent = () => {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/policies" element={<Policies />} />
           <Route path="/refund-policy" element={<Policies />} />

@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, User, LogOut, UserCircle } from "lucide-react";
+import { Menu, User, LogOut, UserCircle, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CartDrawer } from "@/components/CartDrawer";
@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { SearchDialog } from "@/components/SearchDialog";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -63,28 +64,30 @@ export const Navigation = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-sm font-medium transition-all duration-300 hover:text-primary relative group ${
-                  location.pathname === link.path
-                    ? "text-primary"
-                    : "text-foreground/80"
-                }`}
+                className={`text-sm font-medium transition-all duration-300 hover:text-primary relative group ${location.pathname === link.path
+                  ? "text-primary"
+                  : "text-foreground/80"
+                  }`}
               >
                 {link.name}
-                <span className={`absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300 ${
-                  location.pathname === link.path ? "w-full" : "w-0 group-hover:w-full"
-                }`} />
+                <span className={`absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300 ${location.pathname === link.path ? "w-full" : "w-0 group-hover:w-full"
+                  }`} />
               </Link>
             ))}
           </div>
 
           <div className="flex items-center space-x-4">
+            <SearchDialog />
+            <Link to="/wishlist" className="hidden md:flex items-center justify-center w-10 h-10 rounded-full hover:bg-muted transition-colors" aria-label="Wishlist">
+              <Heart className="h-5 w-5" />
+            </Link>
             <CartDrawer />
-            
+
             {/* User Menu */}
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hidden md:flex">
+                  <Button variant="ghost" size="icon" className="hidden md:flex" aria-label="User Menu">
                     <User className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -105,43 +108,49 @@ export const Navigation = () => {
               </DropdownMenu>
             ) : (
               <Link to="/auth" className="hidden md:block">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" aria-label="Sign In">
                   <User className="h-4 w-4 mr-2" />
                   Sign In
                 </Button>
               </Link>
             )}
-            
+
             {/* Mobile Menu */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" aria-label="Open Menu">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-64">
+              <SheetContent side="right" className="w-full sm:w-80 bg-gradient-underworld backdrop-blur-xl border-l border-primary/20">
                 <div className="flex flex-col space-y-4 mt-8">
-                  {navLinks.map((link) => (
+                  {navLinks.map((link, index) => (
                     <Link
                       key={link.path}
                       to={link.path}
                       onClick={() => setIsOpen(false)}
-                      className={`text-lg font-medium transition-colors hover:text-primary ${
-                        location.pathname === link.path
-                          ? "text-primary"
-                          : "text-foreground/80"
-                      }`}
+                      className={`text-2xl font-heading font-bold transition-all duration-300 hover:text-primary hover:translate-x-2 animate-fade-in-up ${location.pathname === link.path
+                        ? "text-primary"
+                        : "text-foreground/80"
+                        }`}
+                      style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       {link.name}
                     </Link>
                   ))}
-                  
+
                   <div className="pt-4 border-t border-border">
+                    <Link to="/wishlist" onClick={() => setIsOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start mb-2">
+                        <Heart className="h-4 w-4 mr-2" />
+                        Wishlist
+                      </Button>
+                    </Link>
                     {user ? (
                       <>
                         <p className="text-xs text-muted-foreground mb-2 px-2">{user.email}</p>
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           className="w-full justify-start"
                           onClick={() => {
                             navigate("/profile");
@@ -151,8 +160,8 @@ export const Navigation = () => {
                           <UserCircle className="h-4 w-4 mr-2" />
                           Profile
                         </Button>
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           className="w-full justify-start"
                           onClick={() => {
                             handleSignOut();

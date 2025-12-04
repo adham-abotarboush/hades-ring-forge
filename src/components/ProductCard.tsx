@@ -7,6 +7,7 @@ import { ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { WishlistButton } from "@/components/WishlistButton";
 
 interface ProductCardProps {
   product: ShopifyProduct;
@@ -97,9 +98,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             </Badge>
           )}
 
-          {/* Quick View Badge */}
-          <div className="absolute top-4 right-4 px-3 py-1 bg-primary/90 backdrop-blur-sm rounded-full text-xs font-medium text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            View Details
+
+
+          <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <WishlistButton product={product} />
           </div>
         </div>
       </Link>
@@ -123,6 +125,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             size="sm"
             disabled={isSoldOut}
             className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold group/btn disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label={isSoldOut ? "Sold Out" : `Add ${node.title} to cart`}
           >
             <ShoppingCart className="h-4 w-4 mr-2 group-hover/btn:rotate-12 transition-transform" />
             {isSoldOut ? "Sold Out" : "Add"}

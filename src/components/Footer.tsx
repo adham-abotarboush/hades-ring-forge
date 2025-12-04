@@ -4,7 +4,7 @@ export const Footer = () => {
   return (
     <footer className="relative bg-card border-t border-border mt-32 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-forge opacity-30" />
-      
+
       <div className="relative container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="space-y-4">
@@ -13,7 +13,7 @@ export const Footer = () => {
               Forging mythic rings from recycled forks, inspired by ancient Greek legends and the eternal flames of the underworld.
             </p>
           </div>
-          
+
           <div>
             <h4 className="text-lg font-heading font-semibold mb-6">Quick Links</h4>
             <ul className="space-y-3">
@@ -39,7 +39,7 @@ export const Footer = () => {
               </li>
             </ul>
           </div>
-          
+
           <div>
             <h4 className="text-lg font-heading font-semibold mb-6">Legal</h4>
             <ul className="space-y-3">
@@ -50,22 +50,22 @@ export const Footer = () => {
               </li>
             </ul>
           </div>
-          
+
           <div>
             <h4 className="text-lg font-heading font-semibold mb-6">Follow Us</h4>
             <div className="space-y-4">
-              <a href="https://instagram.com/by.hades" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 p-3 bg-background/50 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/50 transition-all duration-300 group">
+              <a href="https://instagram.com/by.hades" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 p-3 bg-background/50 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/50 transition-all duration-300 group" aria-label="Follow us on Instagram">
                 <Instagram className="h-5 w-5 flex-shrink-0" />
                 <span className="text-sm font-medium">@by.hades</span>
               </a>
-              <a href="https://www.tiktok.com/@hades.eg" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 p-3 bg-background/50 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/50 transition-all duration-300 group">
+              <a href="https://www.tiktok.com/@hades.eg" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 p-3 bg-background/50 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/50 transition-all duration-300 group" aria-label="Follow us on TikTok">
                 <Music className="h-5 w-5 flex-shrink-0" />
                 <span className="text-sm font-medium">@hades.eg</span>
               </a>
             </div>
           </div>
         </div>
-        
+
         <div className="pt-8 border-t border-border/50 text-center">
           <p className="text-muted-foreground text-sm">
             &copy; {new Date().getFullYear()} Hades Ring Forge. All rights reserved. Forged with passion in the depths of creativity.

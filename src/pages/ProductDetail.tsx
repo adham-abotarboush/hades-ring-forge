@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -14,6 +14,10 @@ import { ReviewsList } from "@/components/reviews/ReviewsList";
 import { ProductDetailSkeleton } from "@/components/ProductCardSkeleton";
 import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 import sizeChartImage from "@/assets/sizeChart.jpg";
+import { SEO } from "@/components/SEO";
+import { WishlistButton } from "@/components/WishlistButton";
+import { StickyAddToCart } from "@/components/StickyAddToCart";
+import { RelatedProducts } from "@/components/RelatedProducts";
 
 const ProductDetail = () => {
   const { handle } = useParams();
@@ -23,6 +27,27 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState<number>(1);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const addItem = useCartStore(state => state.addItem);
+  const addToCartRef = useRef<HTMLDivElement>(null);
+  const [isStickyVisible, setIsStickyVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsStickyVisible(!entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+
+    if (addToCartRef.current) {
+      observer.observe(addToCartRef.current);
+    }
+
+    return () => {
+      if (addToCartRef.current) {
+        observer.unobserve(addToCartRef.current);
+      }
+    };
+  }, [product]);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -180,6 +205,15 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {product && (
+        <SEO
+          title={node.title}
+          description={node.description}
+          image={image?.url}
+          url={window.location.href}
+          type="product"
+        />
+      )}
       <Navigation />
 
       <main className="pt-32 pb-20 container mx-auto px-4">
@@ -247,8 +281,8 @@ const ProductDetail = () => {
                         <Label
                           htmlFor={`size-${size}`}
                           className={`flex items-center justify-center px-4 py-2 border-2 rounded-md transition-all min-w-[60px] ${isAvailable
-                              ? 'border-border cursor-pointer hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary'
-                              : 'border-muted bg-muted/50 text-muted-foreground cursor-not-allowed opacity-50 line-through'
+                            ? 'border-border cursor-pointer hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary'
+                            : 'border-muted bg-muted/50 text-muted-foreground cursor-not-allowed opacity-50 line-through'
                             }`}
                         >
                           {size}
@@ -291,7 +325,7 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-3" ref={addToCartRef}>
               <Button
                 onClick={handleAddToCart}
                 size="lg"
@@ -320,8 +354,14 @@ const ProductDetail = () => {
                   </>
                 )}
               </Button>
+
+              <WishlistButton product={product} variant="full" className="w-full sm:w-auto" />
             </div>
           </div>
+        </div>
+
+        <div className="mt-20">
+          <RelatedProducts currentProductId={node.id} />
         </div>
 
         {/* Reviews Section */}
@@ -331,6 +371,14 @@ const ProductDetail = () => {
       </main>
 
       <Footer />
+      {product && (
+        <StickyAddToCart
+          product={product}
+          onAddToCart={handleAddToCart}
+          isCheckingOut={isCheckingOut}
+          isVisible={isStickyVisible}
+        />
+      )}
     </div>
   );
 };
