@@ -1,5 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
-
 export interface Testimonial {
     id: string;
     name: string;
@@ -9,8 +7,8 @@ export interface Testimonial {
     product_name: string | null;
 }
 
-// Fallback testimonials in case Supabase is unavailable
-const fallbackTestimonials: Testimonial[] = [
+// Static testimonials (testimonials table not yet created)
+const testimonials: Testimonial[] = [
     {
         id: "1",
         name: "Ahmed Hassan",
@@ -26,25 +24,26 @@ const fallbackTestimonials: Testimonial[] = [
         rating: 5,
         text: "I've never seen rings with such unique designs. The Greek mythology inspiration really shows in every piece.",
         product_name: "Hades Crown Ring"
+    },
+    {
+        id: "3",
+        name: "Omar Farouk",
+        location: "Alexandria, Egypt",
+        rating: 5,
+        text: "Excellent quality and fast delivery. The ring looks even better in person than in the photos!",
+        product_name: "Cerberus Ring"
+    },
+    {
+        id: "4",
+        name: "Mona El-Sayed",
+        location: "Giza, Egypt",
+        rating: 5,
+        text: "A perfect gift for my husband. He absolutely loves the unique design and the weight of the ring feels premium.",
+        product_name: "Styx Ring"
     }
 ];
 
 export async function fetchTestimonials(): Promise<Testimonial[]> {
-    try {
-        const { data, error } = await supabase
-            .from('testimonials')
-            .select('*')
-            .eq('featured', true)
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('Error fetching testimonials:', error);
-            return fallbackTestimonials;
-        }
-
-        return data || fallbackTestimonials;
-    } catch (error) {
-        console.error('Failed to fetch testimonials:', error);
-        return fallbackTestimonials;
-    }
+    // Return static testimonials (database table not yet created)
+    return testimonials;
 }
