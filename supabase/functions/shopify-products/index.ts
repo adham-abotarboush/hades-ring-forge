@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Whitelisted GraphQL queries
+// Whitelisted GraphQL queries (removed totalInventory and quantityAvailable - requires unauthenticated_read_product_inventory scope)
 const ALLOWED_QUERIES = {
   'getProducts': `
     query GetProducts($first: Int!) {
@@ -17,7 +17,6 @@ const ALLOWED_QUERIES = {
             title
             description
             handle
-            totalInventory
             priceRange {
               minVariantPrice {
                 amount
@@ -47,7 +46,6 @@ const ALLOWED_QUERIES = {
                     currencyCode
                   }
                   availableForSale
-                  quantityAvailable
                   selectedOptions {
                     name
                     value
@@ -71,7 +69,6 @@ const ALLOWED_QUERIES = {
         title
         description
         handle
-        totalInventory
         priceRange {
           minVariantPrice {
             amount
@@ -101,7 +98,6 @@ const ALLOWED_QUERIES = {
                 currencyCode
               }
               availableForSale
-              quantityAvailable
               selectedOptions {
                 name
                 value
@@ -196,7 +192,6 @@ const ALLOWED_QUERIES = {
               title
               description
               handle
-              totalInventory
               priceRange {
                 minVariantPrice {
                   amount
@@ -221,7 +216,6 @@ const ALLOWED_QUERIES = {
                       currencyCode
                     }
                     availableForSale
-                    quantityAvailable
                     selectedOptions {
                       name
                       value

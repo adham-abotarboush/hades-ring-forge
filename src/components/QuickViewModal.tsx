@@ -27,7 +27,8 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
     const { node } = product;
     const price = node.priceRange.minVariantPrice;
     const images = node.images.edges;
-    const isInStock = node.totalInventory > 0;
+    // Check if any variant is available for sale
+    const isInStock = node.variants.edges.some(v => v.node.availableForSale);
 
     const handleAddToCart = async () => {
         if (!selectedSize) return;

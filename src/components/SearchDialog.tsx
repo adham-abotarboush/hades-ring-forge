@@ -58,6 +58,11 @@ export function SearchDialog() {
 
     const isMac = typeof navigator !== 'undefined' && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
 
+    // Check if product has any available variant
+    const isProductAvailable = (product: ShopifyProduct) => {
+        return product.node.variants.edges.some(v => v.node.availableForSale);
+    };
+
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
@@ -143,7 +148,7 @@ export function SearchDialog() {
                                             <span className="text-lg font-bold text-primary">
                                                 E£{parseFloat(product.node.priceRange.minVariantPrice.amount).toFixed(0)}
                                             </span>
-                                            {product.node.totalInventory <= 0 && (
+                                            {!isProductAvailable(product) && (
                                                 <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
                                                     Sold Out
                                                 </span>
