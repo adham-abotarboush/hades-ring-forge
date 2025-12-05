@@ -19,13 +19,11 @@ import { toast } from "sonner";
 
 interface Review {
   id: string;
-  user_id: string;
   rating: number;
   review_text: string;
   created_at: string;
-  profiles?: {
-    full_name: string | null;
-  };
+  reviewer_name: string;
+  is_own_review: boolean;
 }
 
 interface ReviewsListProps {
@@ -52,14 +50,10 @@ export function ReviewsList({ productHandle }: ReviewsListProps) {
 
   const fetchReviews = async () => {
     setIsLoading(true);
+    // Use the public_reviews view which hides user_id and exposes is_own_review
     const { data, error } = await supabase
-      .from("reviews")
-      .select(`
-        *,
-        profiles (
-          full_name
-        )
-      `)
+      .from("public_reviews" as any)
+      .select("id, product_handle, rating, review_text, created_at, updated_at, reviewer_name, is_own_review")
       .eq("product_handle", productHandle)
       .order("created_at", { ascending: false });
 
@@ -67,7 +61,7 @@ export function ReviewsList({ productHandle }: ReviewsListProps) {
       console.error("Error fetching reviews:", error);
       toast.error("Failed to load reviews");
     } else {
-      setReviews(data || []);
+      setReviews((data as unknown as Review[]) || []);
     }
     setIsLoading(false);
   };
@@ -90,7 +84,7 @@ export function ReviewsList({ productHandle }: ReviewsListProps) {
     setDeleteReviewId(null);
   };
 
-  const userReview = reviews.find((r) => r.user_id === user?.id);
+  const userReview = reviews.find((r) => r.is_own_review);
   const averageRating = reviews.length > 0
     ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
     : 0;
@@ -174,8 +168,14 @@ export function ReviewsList({ productHandle }: ReviewsListProps) {
           {reviews.map((review) => (
             <ReviewCard
               key={review.id}
-              review={review}
-              currentUserId={user?.id}
+              review={{
+                id: review.id,
+                rating: review.rating,
+                review_text: review.review_text,
+                created_at: review.created_at,
+                reviewer_name: review.reviewer_name,
+              }}
+              isOwnReview={review.is_own_review}
               onEdit={() => setEditingReview(review)}
               onDelete={(id) => setDeleteReviewId(id)}
             />
