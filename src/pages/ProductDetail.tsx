@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ShoppingCart, Loader2, Plus, Minus, Info } from "lucide-react";
+import { ShoppingCart, Loader2, Plus, Minus, Info, ZoomIn } from "lucide-react";
 import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
@@ -18,6 +18,10 @@ import { SEO } from "@/components/SEO";
 import { WishlistButton } from "@/components/WishlistButton";
 import { StickyAddToCart } from "@/components/StickyAddToCart";
 import { RelatedProducts } from "@/components/RelatedProducts";
+import { ImageZoom } from "@/components/ImageZoom";
+import { SocialShareButtons } from "@/components/SocialShareButtons";
+import { RecentlyViewed } from "@/components/RecentlyViewed";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 const ProductDetail = () => {
   const { handle } = useParams();
@@ -29,6 +33,9 @@ const ProductDetail = () => {
   const addItem = useCartStore(state => state.addItem);
   const addToCartRef = useRef<HTMLDivElement>(null);
   const [isStickyVisible, setIsStickyVisible] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const { addProduct } = useRecentlyViewed();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -59,6 +66,8 @@ const ProductDetail = () => {
         // Set default size to first available size (16)
         if (found) {
           setSelectedSize("16");
+          // Track as recently viewed
+          addProduct(found);
         }
       } catch (error) {
         console.error("Failed to load product:", error);
@@ -218,19 +227,64 @@ const ProductDetail = () => {
 
       <main className="pt-32 pb-20 container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="aspect-square bg-muted rounded-lg overflow-hidden">
-            {image && (
-              <ProgressiveImage
-                src={image.url}
-                alt={image.altText || node.title}
-                containerClassName="w-full h-full"
-                lazy={false}
-              />
+          {/* Image Gallery with Zoom */}
+          <div className="space-y-4">
+            <div
+              className="aspect-square bg-muted rounded-lg overflow-hidden relative cursor-zoom-in group"
+              onClick={() => setIsZoomOpen(true)}
+            >
+              {node.images.edges[selectedImageIndex]?.node && (
+                <>
+                  <ProgressiveImage
+                    src={node.images.edges[selectedImageIndex].node.url}
+                    alt={node.images.edges[selectedImageIndex].node.altText || node.title}
+                    containerClassName="w-full h-full"
+                    lazy={false}
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-full p-3">
+                      <ZoomIn className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Thumbnails */}
+            {node.images.edges.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {node.images.edges.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImageIndex(index)}
+                    className={`w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all ${index === selectedImageIndex
+                      ? 'border-primary ring-2 ring-primary/30'
+                      : 'border-transparent hover:border-primary/50'
+                      }`}
+                  >
+                    <img
+                      src={img.node.url}
+                      alt={img.node.altText || `${node.title} thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 
           <div className="flex flex-col justify-center">
-            <h1 className="text-4xl font-heading font-bold mb-4">{node.title}</h1>
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <h1 className="text-4xl font-heading font-bold">{node.title}</h1>
+              <div className="flex items-center gap-2">
+                <WishlistButton product={product} variant="icon" />
+                <SocialShareButtons
+                  title={node.title}
+                  description={node.description}
+                  imageUrl={image?.url}
+                />
+              </div>
+            </div>
             <p className="text-3xl font-bold text-primary mb-6">
               E£{parseFloat(price.amount).toFixed(2)}
             </p>
@@ -354,8 +408,6 @@ const ProductDetail = () => {
                   </>
                 )}
               </Button>
-
-              <WishlistButton product={product} variant="full" className="w-full sm:w-auto" />
             </div>
           </div>
         </div>
@@ -364,11 +416,24 @@ const ProductDetail = () => {
           <RelatedProducts currentProductId={node.id} />
         </div>
 
+        {/* Recently Viewed Section */}
+        <div className="mt-20">
+          <RecentlyViewed currentProductHandle={handle} maxItems={4} />
+        </div>
+
         {/* Reviews Section */}
         <div className="mt-20">
           <ReviewsList productHandle={handle || ""} />
         </div>
       </main>
+
+      {/* Image Zoom Modal */}
+      <ImageZoom
+        images={node.images.edges.map(e => e.node)}
+        initialIndex={selectedImageIndex}
+        isOpen={isZoomOpen}
+        onClose={() => setIsZoomOpen(false)}
+      />
 
       <Footer />
       {product && (

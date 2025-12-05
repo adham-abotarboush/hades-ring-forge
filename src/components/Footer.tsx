@@ -33,6 +33,11 @@ export const Footer = () => {
                 </a>
               </li>
               <li>
+                <a href="/blog" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
+                  <span className="group-hover:translate-x-1 transition-transform">Blog</span>
+                </a>
+              </li>
+              <li>
                 <a href="/contact" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
                   <span className="group-hover:translate-x-1 transition-transform">Contact</span>
                 </a>

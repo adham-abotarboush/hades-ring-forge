@@ -19,6 +19,7 @@ import { SearchDialog } from "@/components/SearchDialog";
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "Shop", path: "/shop" },
+  { name: "Blog", path: "/blog" },
   { name: "About", path: "/about" },
   { name: "Contact", path: "/contact" },
 ];

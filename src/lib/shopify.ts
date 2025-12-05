@@ -55,6 +55,22 @@ export interface ShopifyProduct {
   };
 }
 
+export interface ShopifyCollection {
+  node: {
+    id: string;
+    title: string;
+    description: string;
+    handle: string;
+    image: {
+      url: string;
+      altText: string | null;
+    } | null;
+    products: {
+      edges: ShopifyProduct[];
+    };
+  };
+}
+
 export async function storefrontApiRequest(queryName: string, variables: any = {}) {
   try {
     const { data, error } = await supabase.functions.invoke('shopify-products', {
@@ -125,6 +141,18 @@ export async function fetchProductsByIds(productIds: string[]): Promise<ShopifyP
   return products.filter((p): p is ShopifyProduct => p !== null);
 }
 
+// Fetch all collections
+export async function fetchCollections(count: number = 20): Promise<ShopifyCollection[]> {
+  const data = await storefrontApiRequest('getCollections', { first: count });
+  return data?.data?.collections?.edges || [];
+}
+
+// Fetch a single collection by handle
+export async function fetchCollectionByHandle(handle: string, productCount: number = 50): Promise<ShopifyCollection | null> {
+  const data = await storefrontApiRequest('getCollectionByHandle', { handle, first: productCount });
+  return data?.data?.collection ? { node: data.data.collection } : null;
+}
+
 export interface CartItem {
   product: ShopifyProduct;
   variantId: string;
@@ -181,7 +209,7 @@ export async function createStorefrontCheckout(items: CartItem[]): Promise<strin
     }
 
     const cart = cartData.data.cartCreate.cart;
-    
+
     if (!cart.checkoutUrl) {
       throw new Error('No checkout URL returned from Shopify');
     }

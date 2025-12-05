@@ -9,6 +9,9 @@ import heroImage from "@/assets/hero-forge.jpg";
 import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
 import { useEffect, useState } from "react";
 import { SEO } from "@/components/SEO";
+import { TestimonialCarousel } from "@/components/TestimonialCarousel";
+import { BlogSection } from "@/components/BlogSection";
+
 
 const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<ShopifyProduct[]>([]);
@@ -190,6 +193,12 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Testimonials */}
+      <TestimonialCarousel />
+
+      {/* Blog Section */}
+      <BlogSection />
 
       <Footer />
     </div>

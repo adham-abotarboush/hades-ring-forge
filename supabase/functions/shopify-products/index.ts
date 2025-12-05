@@ -136,6 +136,104 @@ const ALLOWED_QUERIES = {
         }
       }
     }
+  `,
+  'getCollections': `
+    query GetCollections($first: Int!) {
+      collections(first: $first) {
+        edges {
+          node {
+            id
+            title
+            description
+            handle
+            image {
+              url
+              altText
+            }
+            products(first: 4) {
+              edges {
+                node {
+                  id
+                  title
+                  handle
+                  priceRange {
+                    minVariantPrice {
+                      amount
+                      currencyCode
+                    }
+                  }
+                  images(first: 1) {
+                    edges {
+                      node {
+                        url
+                        altText
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `,
+  'getCollectionByHandle': `
+    query GetCollectionByHandle($handle: String!, $first: Int!) {
+      collection(handle: $handle) {
+        id
+        title
+        description
+        handle
+        image {
+          url
+          altText
+        }
+        products(first: $first) {
+          edges {
+            node {
+              id
+              title
+              description
+              handle
+              totalInventory
+              priceRange {
+                minVariantPrice {
+                  amount
+                  currencyCode
+                }
+              }
+              images(first: 5) {
+                edges {
+                  node {
+                    url
+                    altText
+                  }
+                }
+              }
+              variants(first: 25) {
+                edges {
+                  node {
+                    id
+                    title
+                    price {
+                      amount
+                      currencyCode
+                    }
+                    availableForSale
+                    quantityAvailable
+                    selectedOptions {
+                      name
+                      value
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   `
 } as const;
 
@@ -155,6 +253,15 @@ const cartCreateVariablesSchema = z.object({
       merchandiseId: z.string()
     })).min(1).max(50)
   })
+});
+
+const getCollectionsVariablesSchema = z.object({
+  first: z.number().min(1).max(50)
+});
+
+const getCollectionByHandleVariablesSchema = z.object({
+  handle: z.string().min(1),
+  first: z.number().min(1).max(250)
 });
 
 serve(async (req) => {
@@ -194,6 +301,10 @@ serve(async (req) => {
         validatedVariables = getProductByIdVariablesSchema.parse(variables);
       } else if (queryName === 'cartCreate') {
         validatedVariables = cartCreateVariablesSchema.parse(variables);
+      } else if (queryName === 'getCollections') {
+        validatedVariables = getCollectionsVariablesSchema.parse(variables);
+      } else if (queryName === 'getCollectionByHandle') {
+        validatedVariables = getCollectionByHandleVariablesSchema.parse(variables);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -234,7 +345,7 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    
+
     if (data.errors) {
       throw new Error(`Shopify API error: ${data.errors.map((e: any) => e.message).join(', ')}`);
     }
