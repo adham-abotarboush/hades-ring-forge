@@ -156,7 +156,19 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_reviews: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          is_own_review: boolean | null
+          product_handle: string | null
+          rating: number | null
+          review_text: string | null
+          reviewer_name: string | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
