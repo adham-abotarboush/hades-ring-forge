@@ -7,6 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Mail, MapPin, Phone, Music } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
+import { z } from "zod";
+
+const contactSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  email: z.string().trim().email("Please enter a valid email address").max(255, "Email must be less than 255 characters"),
+  message: z.string().trim().min(10, "Message must be at least 10 characters").max(1000, "Message must be less than 1000 characters"),
+});
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -14,9 +21,23 @@ const Contact = () => {
     email: "",
     message: "",
   });
+  const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+    
+    const result = contactSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: { name?: string; email?: string; message?: string } = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof typeof fieldErrors;
+        fieldErrors[field] = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+    
     toast.success("Message sent! We'll get back to you soon.", {
       position: "top-center",
     });
@@ -48,9 +69,10 @@ const Contact = () => {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    className="mt-2"
+                    maxLength={100}
+                    className={`mt-2 ${errors.name ? "border-destructive" : ""}`}
                   />
+                  {errors.name && <p className="text-sm text-destructive mt-1">{errors.name}</p>}
                 </div>
 
                 <div>
@@ -60,9 +82,10 @@ const Contact = () => {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
-                    className="mt-2"
+                    maxLength={255}
+                    className={`mt-2 ${errors.email ? "border-destructive" : ""}`}
                   />
+                  {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
                 </div>
 
                 <div>
@@ -71,10 +94,11 @@ const Contact = () => {
                     id="message"
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    required
+                    maxLength={1000}
                     rows={6}
-                    className="mt-2"
+                    className={`mt-2 ${errors.message ? "border-destructive" : ""}`}
                   />
+                  {errors.message && <p className="text-sm text-destructive mt-1">{errors.message}</p>}
                 </div>
 
                 <Button
