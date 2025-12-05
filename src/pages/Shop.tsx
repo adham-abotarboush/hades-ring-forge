@@ -70,6 +70,11 @@ const Shop = () => {
     loadData();
   }, []);
 
+  // Helper to check if product is available
+  const isProductInStock = (product: ShopifyProduct) => {
+    return product.node.variants.edges.some(v => v.node.availableForSale);
+  };
+
   // Filter and sort products
   const filteredProducts = useMemo(() => {
     let result = [...products];
@@ -82,7 +87,7 @@ const Shop = () => {
 
     // Filter by stock
     if (showInStock) {
-      result = result.filter(p => p.node.totalInventory > 0);
+      result = result.filter(p => isProductInStock(p));
     }
 
     // Sort
@@ -345,4 +350,3 @@ const Shop = () => {
 };
 
 export default Shop;
-

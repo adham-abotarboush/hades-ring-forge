@@ -79,6 +79,11 @@ const ProductDetail = () => {
     loadProduct();
   }, [handle]);
 
+  // Helper to check if product is available
+  const isProductAvailable = (prod: ShopifyProduct) => {
+    return prod.node.variants.edges.some(v => v.node.availableForSale);
+  };
+
   const handleAddToCart = () => {
     if (!product) return;
 
@@ -88,7 +93,7 @@ const ProductDetail = () => {
     if (!selectedVariant) return;
 
     // Check if product is available
-    if (product.node.totalInventory <= 0) {
+    if (!isProductAvailable(product)) {
       toast.error("This product is out of stock", {
         position: "top-center",
       });
@@ -104,7 +109,7 @@ const ProductDetail = () => {
       selectedOptions: [{ name: "Ring Size", value: selectedSize }]
     };
 
-    const success = addItem(cartItem, product.node.totalInventory);
+    const success = addItem(cartItem);
 
     if (success) {
       toast.success(`Added ${quantity} item(s) to cart!`, {
@@ -120,7 +125,7 @@ const ProductDetail = () => {
 
     if (!selectedVariant) return;
 
-    if (product.node.totalInventory <= 0) {
+    if (!isProductAvailable(product)) {
       toast.error("This product is out of stock", {
         position: "top-center",
       });
@@ -138,7 +143,7 @@ const ProductDetail = () => {
       selectedOptions: [{ name: "Ring Size", value: selectedSize }]
     };
 
-    const success = addItem(cartItem, product.node.totalInventory);
+    const success = addItem(cartItem);
 
     if (!success) {
       setIsCheckingOut(false);
@@ -207,9 +212,12 @@ const ProductDetail = () => {
   // Get the first available variant for the selected size
   const selectedVariant = node.variants.edges[0]?.node;
 
-  // Helper to check if a size is available (all sizes available if product has inventory)
+  // Check if product is available for sale
+  const isAvailable = isProductAvailable(product);
+
+  // Helper to check if a size is available (all sizes available if product has any available variant)
   const isSizeAvailable = (size: string) => {
-    return node.totalInventory > 0;
+    return isAvailable;
   };
 
   return (
@@ -323,18 +331,18 @@ const ProductDetail = () => {
               <RadioGroup value={selectedSize} onValueChange={setSelectedSize}>
                 <div className="flex flex-wrap gap-3">
                   {availableSizes.map((size: string) => {
-                    const isAvailable = isSizeAvailable(size);
+                    const sizeAvailable = isSizeAvailable(size);
                     return (
                       <div key={size} className="flex items-center">
                         <RadioGroupItem
                           value={size}
                           id={`size-${size}`}
                           className="peer sr-only"
-                          disabled={!isAvailable}
+                          disabled={!sizeAvailable}
                         />
                         <Label
                           htmlFor={`size-${size}`}
-                          className={`flex items-center justify-center px-4 py-2 border-2 rounded-md transition-all min-w-[60px] ${isAvailable
+                          className={`flex items-center justify-center px-4 py-2 border-2 rounded-md transition-all min-w-[60px] ${sizeAvailable
                             ? 'border-border cursor-pointer hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary'
                             : 'border-muted bg-muted/50 text-muted-foreground cursor-not-allowed opacity-50 line-through'
                             }`}
@@ -346,11 +354,6 @@ const ProductDetail = () => {
                   })}
                 </div>
               </RadioGroup>
-              {node.totalInventory <= 5 && node.totalInventory > 0 && (
-                <p className="text-sm text-destructive mt-2">
-                  Only {node.totalInventory} left in stock
-                </p>
-              )}
             </div>
 
             {/* Quantity Selector */}
@@ -385,7 +388,7 @@ const ProductDetail = () => {
                 size="lg"
                 variant="outline"
                 className="w-full sm:w-auto"
-                disabled={!selectedVariant || node.totalInventory <= 0}
+                disabled={!selectedVariant || !isAvailable}
               >
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 Add to Cart
@@ -395,7 +398,7 @@ const ProductDetail = () => {
                 onClick={handleBuyNow}
                 size="lg"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold w-full sm:w-auto"
-                disabled={!selectedVariant || node.totalInventory <= 0 || isCheckingOut}
+                disabled={!selectedVariant || !isAvailable || isCheckingOut}
               >
                 {isCheckingOut ? (
                   <>
@@ -404,7 +407,7 @@ const ProductDetail = () => {
                   </>
                 ) : (
                   <>
-                    {node.totalInventory <= 0 ? 'Out of Stock' : 'Buy Now'}
+                    {!isAvailable ? 'Out of Stock' : 'Buy Now'}
                   </>
                 )}
               </Button>

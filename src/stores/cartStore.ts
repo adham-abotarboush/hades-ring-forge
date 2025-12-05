@@ -21,8 +21,8 @@ interface CartStore {
   isCartOpen: boolean;
   pendingOperations: PendingOperation[];
 
-  addItem: (item: CartItem, maxInventory?: number) => boolean;
-  updateQuantity: (variantId: string, quantity: number, maxInventory?: number) => boolean;
+  addItem: (item: CartItem) => boolean;
+  updateQuantity: (variantId: string, quantity: number) => boolean;
   removeItem: (variantId: string) => void;
   clearCart: () => void;
   setCartId: (cartId: string) => void;
@@ -69,38 +69,9 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
-      addItem: (item, maxInventory) => {
+      addItem: (item) => {
         const { items } = get();
         const existingItem = items.find(i => i.variantId === item.variantId);
-        const currentQuantity = existingItem?.quantity || 0;
-        const newTotalQuantity = currentQuantity + item.quantity;
-
-        // Check inventory if provided
-        if (maxInventory !== undefined && newTotalQuantity > maxInventory) {
-          const availableToAdd = Math.max(0, maxInventory - currentQuantity);
-          if (availableToAdd === 0) {
-            toast.error("Cannot add more", {
-              description: `Only ${maxInventory} available in stock`
-            });
-            return false;
-          }
-          toast.error("Quantity adjusted", {
-            description: `Only ${availableToAdd} more can be added (${maxInventory} total in stock)`
-          });
-          // Add only what's available
-          if (existingItem) {
-            set({
-              items: items.map(i =>
-                i.variantId === item.variantId
-                  ? { ...i, quantity: maxInventory }
-                  : i
-              )
-            });
-          } else {
-            set({ items: [...items, { ...item, quantity: availableToAdd }] });
-          }
-          return false;
-        }
 
         if (existingItem) {
           set({
@@ -116,18 +87,10 @@ export const useCartStore = create<CartStore>()(
         return true;
       },
 
-      updateQuantity: (variantId, quantity, maxInventory) => {
+      updateQuantity: (variantId, quantity) => {
         if (quantity <= 0) {
           get().removeItem(variantId);
           return true;
-        }
-
-        // Check inventory if provided
-        if (maxInventory !== undefined && quantity > maxInventory) {
-          toast.error("Insufficient stock", {
-            description: `Only ${maxInventory} available`
-          });
-          return false;
         }
 
         set({
@@ -197,21 +160,8 @@ export const useCartStore = create<CartStore>()(
               continue;
             }
 
-            const availableQuantity = variant.node.quantityAvailable;
-
-            if (item.quantity > availableQuantity) {
-              if (availableQuantity === 0) {
-                unavailableItems.push(`${item.product.node.title} (${item.variantTitle})`);
-              } else {
-                // Update quantity to what's available
-                updatedItems.push({ ...item, quantity: availableQuantity });
-                toast.warning("Quantity adjusted", {
-                  description: `${item.product.node.title} quantity reduced to ${availableQuantity} (available stock)`
-                });
-              }
-            } else {
-              updatedItems.push(item);
-            }
+            // Product is available, keep in cart
+            updatedItems.push(item);
           }
 
           if (unavailableItems.length > 0) {

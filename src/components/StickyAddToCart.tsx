@@ -28,7 +28,8 @@ export const StickyAddToCart = ({ product, onAddToCart, isCheckingOut, isVisible
     const { node } = product;
     const image = node.images.edges[0]?.node;
     const price = node.priceRange.minVariantPrice;
-    const isSoldOut = node.totalInventory <= 0;
+    // Check if any variant is available for sale
+    const isSoldOut = !node.variants.edges.some(v => v.node.availableForSale);
 
     return (
         <div

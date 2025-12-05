@@ -10,7 +10,6 @@ export interface ShopifyProduct {
     title: string;
     description: string;
     handle: string;
-    totalInventory: number;
     priceRange: {
       minVariantPrice: {
         amount: string;
@@ -40,7 +39,6 @@ export interface ShopifyProduct {
             currencyCode: string;
           };
           availableForSale: boolean;
-          quantityAvailable: number;
           selectedOptions: Array<{
             name: string;
             value: string;
