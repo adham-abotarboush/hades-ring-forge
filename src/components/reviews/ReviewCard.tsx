@@ -10,27 +10,21 @@ interface ReviewCardProps {
     rating: number;
     review_text: string;
     created_at: string;
-    user_id: string;
-    profiles?: {
-      full_name: string | null;
-    };
+    reviewer_name: string;
   };
-  currentUserId?: string;
+  isOwnReview?: boolean;
   onEdit?: (reviewId: string) => void;
   onDelete?: (reviewId: string) => void;
 }
 
-export function ReviewCard({ review, currentUserId, onEdit, onDelete }: ReviewCardProps) {
-  const isOwnReview = currentUserId === review.user_id;
-  const reviewerName = review.profiles?.full_name || "Anonymous";
-
+export function ReviewCard({ review, isOwnReview, onEdit, onDelete }: ReviewCardProps) {
   return (
     <Card className="p-4 space-y-3">
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <RatingStars rating={review.rating} size="sm" />
-            <span className="text-sm font-medium">{reviewerName}</span>
+            <span className="text-sm font-medium">{review.reviewer_name}</span>
           </div>
           <p className="text-xs text-muted-foreground">
             {format(new Date(review.created_at), "MMM d, yyyy")}
