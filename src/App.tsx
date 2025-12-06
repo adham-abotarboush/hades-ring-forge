@@ -17,7 +17,6 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 import { useCartSync } from "./hooks/useCartSync";
-import { EmailPopup } from "./components/EmailPopup";
 
 const queryClient = new QueryClient();
 
@@ -28,7 +27,6 @@ const AppContent = () => {
     <>
       <Toaster />
       <Sonner />
-      <EmailPopup />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
