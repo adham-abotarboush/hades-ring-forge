@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ShoppingCart, Loader2, Plus, Minus, Info, ZoomIn } from "lucide-react";
+import { ShoppingCart, Loader2, Plus, Minus, Info, ZoomIn, Flame } from "lucide-react";
 import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
@@ -217,6 +217,11 @@ const ProductDetail = () => {
 
   // Check if product is available for sale
   const isAvailable = isProductAvailable(product);
+  
+  // Check stock levels for badges
+  const totalInventory = node.totalInventory ?? 0;
+  const isSoldOut = !isAvailable;
+  const isAlmostSoldOut = !isSoldOut && totalInventory > 0 && totalInventory <= 5;
 
   // Helper to check if a size is available (all sizes available if product has any available variant)
   const isSizeAvailable = (size: string) => {
@@ -311,6 +316,23 @@ const ProductDetail = () => {
                 </span>
               )}
             </div>
+            
+            {/* Stock Badge */}
+            {isSoldOut ? (
+              <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 bg-muted text-muted-foreground rounded-md text-sm font-medium">
+                Sold Out
+              </div>
+            ) : totalInventory === 1 ? (
+              <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 bg-destructive text-destructive-foreground rounded-md text-sm font-medium animate-pulse">
+                <Flame className="h-4 w-4" />
+                Only 1 Left!
+              </div>
+            ) : isAlmostSoldOut && (
+              <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 bg-destructive text-destructive-foreground rounded-md text-sm font-medium animate-pulse">
+                <Flame className="h-4 w-4" />
+                Almost Sold Out - Only {totalInventory} Left!
+              </div>
+            )}
 
             <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
               {node.description}
