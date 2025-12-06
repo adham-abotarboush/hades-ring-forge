@@ -50,7 +50,7 @@ const Index = () => {
 
         <div className="relative z-10 container mx-auto px-4 py-32">
           <div className="max-w-5xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 mb-8 px-6 py-3 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full animate-fade-in shadow-lg">
+            <div className="inline-flex items-center gap-2 mt-16 mb-8 px-6 py-3 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full animate-fade-in shadow-lg">
               <Sparkles className="h-4 w-4 text-primary animate-pulse" />
               <p className="text-sm font-semibold text-primary tracking-wider">HANDCRAFTED WITH ANCIENT TECHNIQUES</p>
             </div>
