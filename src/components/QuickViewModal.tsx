@@ -25,7 +25,10 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
     if (!product) return null;
 
     const { node } = product;
-    const price = node.priceRange.minVariantPrice;
+    const firstVariant = node.variants.edges[0]?.node;
+    const price = firstVariant?.price || node.priceRange.minVariantPrice;
+    const compareAtPrice = firstVariant?.compareAtPrice;
+    const isOnSale = compareAtPrice && parseFloat(compareAtPrice.amount) > parseFloat(price.amount);
     const images = node.images.edges;
     // Check if any variant is available for sale
     const isInStock = node.variants.edges.some(v => v.node.availableForSale);
@@ -98,10 +101,22 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                     {/* Info Section */}
                     <div className="p-6 md:p-8 flex flex-col">
                         <div className="flex-1">
-                            <h2 className="text-2xl font-heading font-bold mb-2">{node.title}</h2>
-                            <p className="text-3xl font-bold text-primary mb-4">
-                                E£{parseFloat(price.amount).toFixed(2)}
+                        <h2 className="text-2xl font-heading font-bold mb-2">{node.title}</h2>
+                        <div className="flex items-center gap-2 mb-4">
+                            <p className="text-3xl font-bold text-primary">
+                                E£{parseFloat(price.amount).toFixed(0)}
                             </p>
+                            {isOnSale && compareAtPrice && (
+                                <p className="text-xl text-muted-foreground line-through">
+                                    E£{parseFloat(compareAtPrice.amount).toFixed(0)}
+                                </p>
+                            )}
+                            {isOnSale && (
+                                <span className="px-2 py-1 bg-destructive text-destructive-foreground text-xs font-semibold rounded">
+                                    SALE
+                                </span>
+                            )}
+                        </div>
 
                             <p className="text-muted-foreground mb-6 line-clamp-3">
                                 {node.description}

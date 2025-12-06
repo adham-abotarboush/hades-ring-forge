@@ -6,7 +6,7 @@ const RefundPolicy = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="pt-32 pb-20">
+      <main className="pt-40 pb-20">
         <div className="container mx-auto px-4 max-w-4xl">
           <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">
             Refund Policy

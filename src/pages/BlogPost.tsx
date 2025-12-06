@@ -32,7 +32,7 @@ const BlogPostPage = () => {
         return (
             <div className="min-h-screen bg-background">
                 <Navigation />
-                <main className="pt-32 pb-20">
+                <main className="pt-40 pb-20">
                     <div className="container mx-auto px-4 flex justify-center">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
@@ -46,7 +46,7 @@ const BlogPostPage = () => {
         return (
             <div className="min-h-screen bg-background">
                 <Navigation />
-                <main className="pt-32 pb-20">
+                <main className="pt-40 pb-20">
                     <div className="container mx-auto px-4 text-center">
                         <h1 className="text-4xl font-heading font-bold mb-4">Post Not Found</h1>
                         <p className="text-muted-foreground mb-8">
@@ -66,7 +66,7 @@ const BlogPostPage = () => {
         <div className="min-h-screen bg-background">
             <Navigation />
 
-            <main className="pt-32 pb-20">
+            <main className="pt-40 pb-20">
                 <article className="container mx-auto px-4">
                     {/* Back Link */}
                     <Link

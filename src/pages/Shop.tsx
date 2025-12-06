@@ -213,7 +213,7 @@ const Shop = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      <main className="pt-32 pb-20 container mx-auto px-4">
+      <main className="pt-40 pb-20 container mx-auto px-4">
         <div className="text-center mb-12 animate-fade-in-up">
           <div className="inline-block mb-4 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full">
             <p className="text-sm font-medium text-primary">⚡ Limited Edition Pieces</p>

@@ -48,7 +48,7 @@ const Contact = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="pt-32 pb-20">
+      <main className="pt-40 pb-20">
         <div className="container mx-auto px-4">
             <div className="text-center mb-16">
             <h1 className="text-4xl md:text-5xl font-heading font-bold mb-6">

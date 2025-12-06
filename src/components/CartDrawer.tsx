@@ -169,9 +169,17 @@ export const CartDrawer = () => {
                             <p className="text-sm text-muted-foreground">
                               {item.selectedOptions.map(option => option.value).join(' • ')}
                             </p>
-                            <p className="font-semibold text-primary">
-                              E£{parseFloat(item.price.amount).toFixed(2)}
-                            </p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-semibold text-primary">
+                                E£{parseFloat(item.price.amount).toFixed(0)}
+                              </p>
+                              {item.product.node.variants.edges[0]?.node.compareAtPrice && 
+                               parseFloat(item.product.node.variants.edges[0].node.compareAtPrice.amount) > parseFloat(item.price.amount) && (
+                                <p className="text-sm text-muted-foreground line-through">
+                                  E£{parseFloat(item.product.node.variants.edges[0].node.compareAtPrice.amount).toFixed(0)}
+                                </p>
+                              )}
+                            </div>
                           </div>
 
                           <div className="flex flex-col items-end gap-2 flex-shrink-0">
