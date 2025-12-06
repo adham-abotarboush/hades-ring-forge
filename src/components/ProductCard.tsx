@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShoppingCart, Eye, Tag } from "lucide-react";
+import { ShoppingCart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -97,15 +97,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-            {/* Sale or Sold Out Badge */}
-            {isSoldOut ? (
+            {/* Sold Out Badge */}
+            {isSoldOut && (
               <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-muted text-muted-foreground border-0 shadow-lg">
                 Sold Out
-              </Badge>
-            ) : isOnSale && (
-              <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-destructive text-destructive-foreground border-0 shadow-lg flex items-center gap-1">
-                <Tag className="h-3 w-3" />
-                SALE
               </Badge>
             )}
 
