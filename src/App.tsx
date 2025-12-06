@@ -17,8 +17,17 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 import { useCartSync } from "./hooks/useCartSync";
+import { ProductsProvider } from "./contexts/ProductsContext";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 30, // 30 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const AppContent = () => {
   useCartSync();
@@ -57,7 +66,9 @@ const AppContent = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AppContent />
+      <ProductsProvider>
+        <AppContent />
+      </ProductsProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

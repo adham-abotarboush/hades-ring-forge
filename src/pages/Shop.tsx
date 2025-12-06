@@ -1,9 +1,9 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
-import { fetchProducts, ShopifyProduct, fetchCollections, ShopifyCollection } from "@/lib/shopify";
+import { ShopifyProduct } from "@/lib/shopify";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -22,6 +22,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useProducts } from "@/contexts/ProductsContext";
 
 const MAX_PRICE = 1000;
 
@@ -36,39 +37,13 @@ const PRICE_PRESETS = [
 ];
 
 const Shop = () => {
-  const [products, setProducts] = useState<ShopifyProduct[]>([]);
-  const [collections, setCollections] = useState<ShopifyCollection[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { products, collections, isLoading: loading } = useProducts();
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, MAX_PRICE]);
   const [showInStock, setShowInStock] = useState(false);
   const [selectedCollection, setSelectedCollection] = useState<string>("all");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [mobileFiltersVisible, setMobileFiltersVisible] = useState(false);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        // Fetch products first (essential)
-        const productsData = await fetchProducts(100, false);
-        setProducts(productsData);
-
-        // Fetch collections separately (optional - may fail if edge function not deployed)
-        try {
-          const collectionsData = await fetchCollections(10);
-          setCollections(collectionsData);
-        } catch (collectionError) {
-          console.warn("Collections not available:", collectionError);
-        }
-      } catch (error) {
-        console.error("Failed to load products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
 
   // Helper to check if product is available
   const isProductInStock = (product: ShopifyProduct) => {
