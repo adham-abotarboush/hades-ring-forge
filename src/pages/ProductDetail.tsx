@@ -166,7 +166,7 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background page-transition">
         <Navigation />
         <main className="pt-40 pb-20 container mx-auto px-4">
           <ProductDetailSkeleton />
@@ -178,7 +178,7 @@ const ProductDetail = () => {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background page-transition">
         <Navigation />
         <main className="pt-40 pb-20 container mx-auto px-4 text-center">
           <h1 className="text-3xl font-heading font-bold mb-4">Product Not Found</h1>
@@ -216,7 +216,7 @@ const ProductDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-transition">
       {product && (
         <SEO
           title={node.title}

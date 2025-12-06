@@ -16,7 +16,7 @@ const Index = () => {
   const featuredProducts = getFeaturedProducts(6);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-transition">
       <SEO
         title="Hades Ring Forge"
         description="Handcrafted rings from recycled forks, inspired by Greek mythology and the realm of Hades. Each piece tells an ancient story."

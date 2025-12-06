@@ -185,7 +185,7 @@ const Shop = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-transition">
       <Navigation />
 
       <main className="pt-40 pb-20 container mx-auto px-4">

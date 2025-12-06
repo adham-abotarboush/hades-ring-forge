@@ -29,7 +29,7 @@ function preloadImages(products: ShopifyProduct[], count: number = 12) {
 export function ProductsProvider({ children }: { children: ReactNode }) {
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
 
-  // Fetch all products once with long cache time
+  // Fetch all products in background - don't block initial render
   const {
     data: products = [],
     isLoading: productsLoading,
@@ -43,7 +43,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     refetchOnMount: false,
   });
 
-  // Fetch all collections once
+  // Fetch collections with lower priority (after products)
   const {
     data: collections = [],
     isLoading: collectionsLoading,
@@ -54,6 +54,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     gcTime: 1000 * 60 * 30,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+    enabled: products.length > 0, // Only fetch after products are loaded
   });
 
   // Preload images after products are loaded
@@ -81,12 +82,15 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     return products.slice(0, count);
   };
 
+  // Only show loading for products, not collections
+  const isLoading = productsLoading;
+
   return (
     <ProductsContext.Provider
       value={{
         products,
         collections,
-        isLoading: productsLoading || collectionsLoading,
+        isLoading,
         error: productsError as Error | null,
         getProductByHandle,
         getRelatedProducts,
