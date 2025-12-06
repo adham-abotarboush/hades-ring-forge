@@ -156,7 +156,7 @@ const Contact = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold mb-1">Instagram</h4>
-                      <a href="https://instagram.com/by.hades" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      <a href="https://www.instagram.com/by.hades/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                         @by.hades
                       </a>
                       <p className="text-sm text-muted-foreground mt-1">

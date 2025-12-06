@@ -59,7 +59,7 @@ export const Footer = () => {
           <div>
             <h4 className="text-lg font-heading font-semibold mb-6">Follow Us</h4>
             <div className="space-y-4">
-              <a href="https://instagram.com/by.hades" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 p-3 bg-background/50 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/50 transition-all duration-300 group" aria-label="Follow us on Instagram">
+              <a href="https://www.instagram.com/by.hades/" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 p-3 bg-background/50 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/50 transition-all duration-300 group" aria-label="Follow us on Instagram">
                 <Instagram className="h-5 w-5 flex-shrink-0" />
                 <span className="text-sm font-medium">@by.hades</span>
               </a>
