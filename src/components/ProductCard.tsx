@@ -116,8 +116,8 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               </Badge>
             )}
 
-            {/* Quick View Button */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            {/* Quick View Button - hidden on mobile */}
+            <div className="absolute inset-0 hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <Button
                 variant="secondary"
                 size="sm"
