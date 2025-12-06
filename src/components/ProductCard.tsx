@@ -104,6 +104,11 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-muted text-muted-foreground border-0 shadow-lg">
                 Sold Out
               </Badge>
+            ) : totalInventory === 1 ? (
+              <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-destructive text-destructive-foreground border-0 shadow-lg flex items-center gap-1 animate-pulse">
+                <Flame className="h-3 w-3" />
+                Only 1 Left!
+              </Badge>
             ) : isAlmostSoldOut && (
               <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-destructive text-destructive-foreground border-0 shadow-lg flex items-center gap-1 animate-pulse">
                 <Flame className="h-3 w-3" />
