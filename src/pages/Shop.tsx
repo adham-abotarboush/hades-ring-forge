@@ -39,7 +39,7 @@ const Shop = () => {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [collections, setCollections] = useState<ShopifyCollection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState<SortOption>("featured");
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, MAX_PRICE]);
   const [showInStock, setShowInStock] = useState(false);
   const [selectedCollection, setSelectedCollection] = useState<string>("all");
