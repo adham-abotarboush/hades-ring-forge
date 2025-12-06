@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ShoppingCart, Loader2, Plus, Minus, Info, ZoomIn, Flame } from "lucide-react";
-import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
+import { ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { ReviewsList } from "@/components/reviews/ReviewsList";
@@ -22,12 +22,15 @@ import { ImageZoom } from "@/components/ImageZoom";
 import { SocialShareButtons } from "@/components/SocialShareButtons";
 import { RecentlyViewed } from "@/components/RecentlyViewed";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { useProducts } from "@/contexts/ProductsContext";
 
 const ProductDetail = () => {
   const { handle } = useParams();
-  const [product, setProduct] = useState<ShopifyProduct | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [selectedSize, setSelectedSize] = useState<string>("");
+  const { getProductByHandle, isLoading } = useProducts();
+  const product = getProductByHandle(handle || "");
+  const loading = isLoading;
+  
+  const [selectedSize, setSelectedSize] = useState<string>("16");
   const [quantity, setQuantity] = useState<number>(1);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const addItem = useCartStore(state => state.addItem);
@@ -56,28 +59,12 @@ const ProductDetail = () => {
     };
   }, [product]);
 
+  // Track as recently viewed when product loads
   useEffect(() => {
-    const loadProduct = async () => {
-      try {
-        const products = await fetchProducts(100);
-        const found = products.find(p => p.node.handle === handle);
-        setProduct(found || null);
-
-        // Set default size to first available size (16)
-        if (found) {
-          setSelectedSize("16");
-          // Track as recently viewed
-          addProduct(found);
-        }
-      } catch (error) {
-        console.error("Failed to load product:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProduct();
-  }, [handle]);
+    if (product) {
+      addProduct(product);
+    }
+  }, [product, addProduct]);
 
   // Helper to check if product is available
   const isProductAvailable = (prod: ShopifyProduct) => {

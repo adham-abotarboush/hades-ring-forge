@@ -1,37 +1,16 @@
-import { useEffect, useState } from "react";
-import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
+import { useProducts } from "@/contexts/ProductsContext";
 
 interface RelatedProductsProps {
     currentProductId: string;
 }
 
 export function RelatedProducts({ currentProductId }: RelatedProductsProps) {
-    const [products, setProducts] = useState<ShopifyProduct[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { getRelatedProducts, isLoading } = useProducts();
+    const products = getRelatedProducts(currentProductId, 4);
 
-    useEffect(() => {
-        const loadProducts = async () => {
-            try {
-                // Fetch random products
-                const allProducts = await fetchProducts(8, true);
-                // Filter out current product and take top 4
-                const related = allProducts
-                    .filter(p => p.node.id !== currentProductId)
-                    .slice(0, 4);
-                setProducts(related);
-            } catch (error) {
-                console.error("Failed to load related products:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadProducts();
-    }, [currentProductId]);
-
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {Array.from({ length: 4 }).map((_, i) => (

@@ -6,30 +6,14 @@ import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
 import { Link } from "react-router-dom";
 import { ArrowRight, Flame, Sparkles, Shield, Award, Users } from "lucide-react";
 import heroImage from "@/assets/hero-forge.jpg";
-import { fetchProducts, ShopifyProduct } from "@/lib/shopify";
-import { useEffect, useState } from "react";
 import { SEO } from "@/components/SEO";
 import { TestimonialCarousel } from "@/components/TestimonialCarousel";
 import { BlogSection } from "@/components/BlogSection";
-
+import { useProducts } from "@/contexts/ProductsContext";
 
 const Index = () => {
-  const [featuredProducts, setFeaturedProducts] = useState<ShopifyProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const products = await fetchProducts(6);
-        setFeaturedProducts(products);
-      } catch (error) {
-        console.error('Error loading products:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadProducts();
-  }, []);
+  const { getFeaturedProducts, isLoading: loading } = useProducts();
+  const featuredProducts = getFeaturedProducts(6);
 
   return (
     <div className="min-h-screen bg-background">
