@@ -316,23 +316,6 @@ const ProductDetail = () => {
                 </span>
               )}
             </div>
-            
-            {/* Stock Badge */}
-            {isSoldOut ? (
-              <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 bg-muted text-muted-foreground rounded-md text-sm font-medium">
-                Sold Out
-              </div>
-            ) : totalInventory === 1 ? (
-              <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 bg-destructive text-destructive-foreground rounded-md text-sm font-medium animate-pulse">
-                <Flame className="h-4 w-4" />
-                Only 1 Left!
-              </div>
-            ) : isAlmostSoldOut && (
-              <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 bg-destructive text-destructive-foreground rounded-md text-sm font-medium animate-pulse">
-                <Flame className="h-4 w-4" />
-                Almost Sold Out - Only {totalInventory} Left!
-              </div>
-            )}
 
             <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
               {node.description}
@@ -449,6 +432,23 @@ const ProductDetail = () => {
                 )}
               </Button>
             </div>
+            
+            {/* Stock Badge */}
+            {isSoldOut ? (
+              <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-muted text-muted-foreground rounded-md text-sm font-medium">
+                Sold Out
+              </div>
+            ) : totalInventory === 1 ? (
+              <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-destructive text-destructive-foreground rounded-md text-sm font-medium animate-pulse">
+                <Flame className="h-4 w-4" />
+                Only 1 Left!
+              </div>
+            ) : isAlmostSoldOut && (
+              <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-destructive text-destructive-foreground rounded-md text-sm font-medium animate-pulse">
+                <Flame className="h-4 w-4" />
+                Almost Sold Out - Only {totalInventory} Left!
+              </div>
+            )}
           </div>
         </div>
 
