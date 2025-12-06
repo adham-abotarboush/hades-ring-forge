@@ -25,12 +25,29 @@ const Cart = () => {
   const totalPrice = items.reduce((sum, item) => sum + (parseFloat(item.price.amount) * item.quantity), 0);
 
   const handleCheckout = async () => {
+    // Open window IMMEDIATELY (synchronously) - Safari/iOS allows this
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      newWindow.document.write(`
+        <html>
+          <head><title>Loading Checkout...</title></head>
+          <body style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;background:#1a1a1a;color:#fff;">
+            <div style="text-align:center;">
+              <h2>Preparing your checkout...</h2>
+              <p>Please wait</p>
+            </div>
+          </body>
+        </html>
+      `);
+    }
+
     try {
       // Validate inventory before proceeding
       const { validateCartInventory } = useCartStore.getState();
       const isValid = await validateCartInventory();
       
       if (!isValid) {
+        newWindow?.close();
         return; // Validation already shows error toast
       }
 
@@ -44,6 +61,7 @@ const Cart = () => {
           .maybeSingle();
 
         if (!profile?.phone_number) {
+          newWindow?.close();
           setShowPhoneModal(true);
           return;
         }
@@ -79,12 +97,19 @@ const Cart = () => {
           }]);
         }
         
-        window.open(checkoutUrl, '_blank');
+        // Redirect the already-open window to checkout URL
+        if (newWindow) {
+          newWindow.location.href = checkoutUrl;
+        }
         
         // Clear cart after successful checkout (both logged-in and guest users)
         clearCart();
+      } else {
+        newWindow?.close();
+        toast.error("Failed to create checkout");
       }
     } catch (error) {
+      newWindow?.close();
       console.error('Checkout failed:', error);
       toast.error("Failed to create checkout. Please try again.");
     }
