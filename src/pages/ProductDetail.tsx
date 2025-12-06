@@ -181,7 +181,7 @@ const ProductDetail = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <main className="pt-32 pb-20 container mx-auto px-4">
+        <main className="pt-40 pb-20 container mx-auto px-4">
           <ProductDetailSkeleton />
         </main>
         <Footer />
@@ -193,7 +193,7 @@ const ProductDetail = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <main className="pt-32 pb-20 container mx-auto px-4 text-center">
+        <main className="pt-40 pb-20 container mx-auto px-4 text-center">
           <h1 className="text-3xl font-heading font-bold mb-4">Product Not Found</h1>
           <p className="text-muted-foreground">This mythic treasure has vanished into the underworld.</p>
         </main>
@@ -204,7 +204,10 @@ const ProductDetail = () => {
 
   const { node } = product;
   const image = node.images.edges[0]?.node;
-  const price = node.priceRange.minVariantPrice;
+  const firstVariant = node.variants.edges[0]?.node;
+  const price = firstVariant?.price || node.priceRange.minVariantPrice;
+  const compareAtPrice = firstVariant?.compareAtPrice;
+  const isOnSale = compareAtPrice && parseFloat(compareAtPrice.amount) > parseFloat(price.amount);
 
   // Available ring sizes (16 to 22)
   const availableSizes = Array.from({ length: 7 }, (_, i) => (16 + i).toString());
@@ -233,7 +236,7 @@ const ProductDetail = () => {
       )}
       <Navigation />
 
-      <main className="pt-32 pb-20 container mx-auto px-4">
+      <main className="pt-40 pb-20 container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Image Gallery with Zoom */}
           <div className="space-y-4">
@@ -293,9 +296,21 @@ const ProductDetail = () => {
                 />
               </div>
             </div>
-            <p className="text-3xl font-bold text-primary mb-6">
-              E£{parseFloat(price.amount).toFixed(2)}
-            </p>
+            <div className="flex items-center gap-3 mb-6">
+              <p className="text-3xl font-bold text-primary">
+                E£{parseFloat(price.amount).toFixed(0)}
+              </p>
+              {isOnSale && compareAtPrice && (
+                <p className="text-xl text-muted-foreground line-through">
+                  E£{parseFloat(compareAtPrice.amount).toFixed(0)}
+                </p>
+              )}
+              {isOnSale && (
+                <span className="px-2 py-1 bg-destructive text-destructive-foreground text-sm font-semibold rounded">
+                  SALE
+                </span>
+              )}
+            </div>
 
             <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
               {node.description}

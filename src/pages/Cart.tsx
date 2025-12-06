@@ -99,7 +99,7 @@ const Cart = () => {
         onSuccess={handleCheckout}
       />
       
-      <main className="pt-32 pb-20 container mx-auto px-4">
+      <main className="pt-40 pb-20 container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-4 mb-8">
             <Link to="/shop">

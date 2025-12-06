@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShoppingCart, Eye } from "lucide-react";
+import { ShoppingCart, Eye, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -59,7 +59,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 
   const image = node.images.edges[0]?.node;
   const secondImage = node.images.edges[1]?.node;
-  const price = node.priceRange.minVariantPrice;
+  const firstVariant = node.variants.edges[0]?.node;
+  const price = firstVariant?.price || node.priceRange.minVariantPrice;
+  const compareAtPrice = firstVariant?.compareAtPrice;
+  const isOnSale = compareAtPrice && parseFloat(compareAtPrice.amount) > parseFloat(price.amount);
   
   // Check if any variant is available for sale
   const hasAvailableVariant = node.variants.edges.some(v => v.node.availableForSale);
@@ -94,10 +97,15 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-            {/* Sold Out Badge */}
-            {isSoldOut && (
+            {/* Sale or Sold Out Badge */}
+            {isSoldOut ? (
               <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-muted text-muted-foreground border-0 shadow-lg">
                 Sold Out
+              </Badge>
+            ) : isOnSale && (
+              <Badge className="absolute top-4 left-4 px-3 py-1.5 bg-destructive text-destructive-foreground border-0 shadow-lg flex items-center gap-1">
+                <Tag className="h-3 w-3" />
+                SALE
               </Badge>
             )}
 
@@ -131,9 +139,16 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           </p>
 
           <div className="flex items-center justify-between gap-3">
-            <span className="text-2xl font-bold text-primary">
-              E£{parseFloat(price.amount).toFixed(2)}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-bold text-primary">
+                E£{parseFloat(price.amount).toFixed(0)}
+              </span>
+              {isOnSale && compareAtPrice && (
+                <span className="text-lg text-muted-foreground line-through">
+                  E£{parseFloat(compareAtPrice.amount).toFixed(0)}
+                </span>
+              )}
+            </div>
             <Button
               onClick={handleAddToCart}
               size="sm"

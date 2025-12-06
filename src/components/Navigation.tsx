@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { SearchDialog } from "@/components/SearchDialog";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -50,9 +51,12 @@ export const Navigation = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border/50 shadow-elevated">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+    <>
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <AnnouncementBanner />
+        <nav className="bg-background/95 backdrop-blur-lg border-b border-border/50 shadow-elevated">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between h-20">
           <Link to="/" className="flex items-center space-x-2 group">
             <h1 className="text-2xl md:text-3xl font-heading font-bold text-gradient group-hover:scale-105 transition-transform">
               HADES
@@ -187,7 +191,9 @@ export const Navigation = () => {
             </Sheet>
           </div>
         </div>
+          </div>
+        </nav>
       </div>
-    </nav>
+    </>
   );
 };

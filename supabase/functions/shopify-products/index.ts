@@ -45,6 +45,10 @@ const ALLOWED_QUERIES = {
                     amount
                     currencyCode
                   }
+                  compareAtPrice {
+                    amount
+                    currencyCode
+                  }
                   availableForSale
                   selectedOptions {
                     name
@@ -94,6 +98,10 @@ const ALLOWED_QUERIES = {
               id
               title
               price {
+                amount
+                currencyCode
+              }
+              compareAtPrice {
                 amount
                 currencyCode
               }
@@ -212,6 +220,10 @@ const ALLOWED_QUERIES = {
                     id
                     title
                     price {
+                      amount
+                      currencyCode
+                    }
+                    compareAtPrice {
                       amount
                       currencyCode
                     }

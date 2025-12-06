@@ -13,7 +13,7 @@ const Wishlist = () => {
         <div className="min-h-screen bg-background flex flex-col">
             <Navigation />
 
-            <main className="flex-grow container mx-auto px-4 pt-32 pb-20">
+            <main className="flex-grow container mx-auto px-4 pt-40 pb-20">
                 <div className="flex items-center gap-3 mb-8">
                     <Heart className="h-8 w-8 text-primary" />
                     <h1 className="text-4xl font-heading font-bold">Your Wishlist</h1>
