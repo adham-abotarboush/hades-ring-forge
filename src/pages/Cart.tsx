@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 
 const Cart = () => {
   const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set());
   const { 
     items, 
     isLoading,
@@ -19,10 +20,26 @@ const Cart = () => {
     removeItem, 
     createCheckout,
     clearCart,
+    validateAndUpdateQuantity,
   } = useCartStore();
   
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => sum + (parseFloat(item.price.amount) * item.quantity), 0);
+
+  const handleQuantityChange = async (variantId: string, newQuantity: number) => {
+    if (updatingItems.has(variantId)) return;
+    
+    setUpdatingItems(prev => new Set(prev).add(variantId));
+    try {
+      await validateAndUpdateQuantity(variantId, newQuantity);
+    } finally {
+      setUpdatingItems(prev => {
+        const next = new Set(prev);
+        next.delete(variantId);
+        return next;
+      });
+    }
+  };
 
   const handleCheckout = async () => {
     // Open window IMMEDIATELY (synchronously) - Safari/iOS allows this
@@ -197,16 +214,24 @@ const Cart = () => {
                           variant="outline"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
+                          onClick={() => handleQuantityChange(item.variantId, item.quantity - 1)}
+                          disabled={updatingItems.has(item.variantId)}
                         >
                           <Minus className="h-4 w-4" />
                         </Button>
-                        <span className="w-12 text-center font-semibold">{item.quantity}</span>
+                        <span className="w-12 text-center font-semibold">
+                          {updatingItems.has(item.variantId) ? (
+                            <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+                          ) : (
+                            item.quantity
+                          )}
+                        </span>
                         <Button
                           variant="outline"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
+                          onClick={() => handleQuantityChange(item.variantId, item.quantity + 1)}
+                          disabled={updatingItems.has(item.variantId)}
                         >
                           <Plus className="h-4 w-4" />
                         </Button>
