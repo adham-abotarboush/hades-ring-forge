@@ -196,13 +196,8 @@ const Shop = () => {
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold mb-6">
             The Underworld Collection
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-6">
-            Explore our collection of handcrafted rings, each inspired by the legends and deities of the ancient underworld
-          </p>
-          
-          {/* Spoon Rings Notice */}
-          <p className="text-sm text-muted-foreground">
-            <span className="italic">Please Note:</span> All our rings are handcrafted <span className="font-medium">spoon rings</span>, not silver rings.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            Explore our collection of handcrafted spoon rings, each inspired by the legends and deities of the ancient underworld
           </p>
         </div>
 
