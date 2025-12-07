@@ -7,6 +7,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ShopifyProduct } from "@/lib/shopify";
 import { WishlistButton } from "@/components/WishlistButton";
 import { useNavigate } from "react-router-dom";
+import { useCartStore } from "@/stores/cartStore";
+import { toast } from "sonner";
 
 interface QuickViewModalProps {
     product: ShopifyProduct | null;
@@ -14,13 +16,16 @@ interface QuickViewModalProps {
     onClose: () => void;
 }
 
-const RING_SIZES = ["6", "7", "8", "9", "10", "11", "12"];
+// Ring sizes 17-22
+const RING_SIZES = ["17", "18", "19", "20", "21", "22"];
 
 export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps) {
-    const [selectedSize, setSelectedSize] = useState<string>("");
+    const [selectedSize, setSelectedSize] = useState<string>("17");
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const navigate = useNavigate();
+    const validateAndAddItem = useCartStore(state => state.validateAndAddItem);
+    const setCartOpen = useCartStore(state => state.setCartOpen);
 
     if (!product) return null;
 
@@ -34,15 +39,31 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
     const isInStock = node.variants.edges.some(v => v.node.availableForSale);
 
     const handleAddToCart = async () => {
-        if (!selectedSize) return;
+        if (!firstVariant || isAddingToCart) return;
 
         setIsAddingToCart(true);
-        // Simulate adding to cart - would integrate with actual cart logic
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setIsAddingToCart(false);
-        onClose();
-        // Navigate to product page for checkout
-        navigate(`/product/${node.handle}`);
+        try {
+            const cartItem = {
+                product,
+                variantId: firstVariant.id,
+                variantTitle: `Size ${selectedSize}`,
+                price: firstVariant.price,
+                quantity: 1,
+                selectedOptions: [{ name: "Ring Size", value: selectedSize }]
+            };
+
+            const success = await validateAndAddItem(cartItem);
+            
+            if (success) {
+                toast.success("Added to cart!", {
+                    position: "top-center",
+                });
+                onClose();
+                setCartOpen(true);
+            }
+        } finally {
+            setIsAddingToCart(false);
+        }
     };
 
     const handleViewDetails = () => {
@@ -173,7 +194,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                         <div className="space-y-3">
                             <Button
                                 onClick={handleAddToCart}
-                                disabled={!selectedSize || !isInStock || isAddingToCart}
+                                disabled={!isInStock || isAddingToCart}
                                 className="w-full h-12 text-base"
                             >
                                 {isAddingToCart ? (
@@ -184,7 +205,7 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                                 ) : (
                                     <>
                                         <ShoppingCart className="mr-2 h-5 w-5" />
-                                        {!selectedSize ? 'Select a Size' : 'Add to Cart'}
+                                        Add to Cart
                                     </>
                                 )}
                             </Button>

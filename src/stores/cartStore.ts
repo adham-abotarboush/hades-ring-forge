@@ -31,6 +31,9 @@ interface CartStore {
   setCartOpen: (open: boolean) => void;
   createCheckout: () => Promise<void>;
   validateCartInventory: () => Promise<boolean>;
+  validateAndAddItem: (item: CartItem) => Promise<boolean>;
+  validateAndUpdateQuantity: (variantId: string, quantity: number) => Promise<boolean>;
+  getItemInventory: (productId: string) => Promise<number | null>;
   syncWithDatabase: (userId: string) => Promise<void>;
   loadFromDatabase: (userId: string) => Promise<void>;
   saveToDatabase: (userId: string) => Promise<void>;
@@ -67,6 +70,111 @@ export const useCartStore = create<CartStore>()(
         set({
           pendingOperations: get().pendingOperations.filter(op => op.variantId !== variantId)
         });
+      },
+
+      // Get current inventory for a product
+      getItemInventory: async (productId: string) => {
+        try {
+          const products = await fetchProductsByIds([productId]);
+          if (products.length === 0) return null;
+          return products[0].node.totalInventory ?? null;
+        } catch (error) {
+          console.error('Failed to fetch inventory:', error);
+          return null;
+        }
+      },
+
+      // Validate inventory before adding item
+      validateAndAddItem: async (item: CartItem) => {
+        const { items, addItem, getItemInventory } = get();
+        
+        try {
+          const inventory = await getItemInventory(item.product.node.id);
+          
+          if (inventory === null) {
+            // Can't verify - allow optimistically
+            return addItem(item);
+          }
+          
+          if (inventory === 0) {
+            toast.error("This product is sold out", {
+              position: "top-center",
+            });
+            return false;
+          }
+          
+          // Check total quantity including existing cart items
+          const existingItem = items.find(i => i.product.node.id === item.product.node.id);
+          const existingQuantity = existingItem?.quantity || 0;
+          const requestedTotal = existingQuantity + item.quantity;
+          
+          if (requestedTotal > inventory) {
+            if (existingQuantity >= inventory) {
+              toast.error(`Maximum quantity reached`, {
+                description: `You already have ${existingQuantity} in cart. Only ${inventory} available.`,
+                position: "top-center",
+              });
+              return false;
+            }
+            
+            const canAdd = inventory - existingQuantity;
+            toast.warning(`Limited stock available`, {
+              description: `Only ${canAdd} more can be added. Added ${canAdd} instead of ${item.quantity}.`,
+              position: "top-center",
+            });
+            return addItem({ ...item, quantity: canAdd });
+          }
+          
+          return addItem(item);
+        } catch (error) {
+          console.error('Inventory validation failed:', error);
+          // Allow on error - will be caught at checkout
+          return addItem(item);
+        }
+      },
+
+      // Validate inventory before updating quantity
+      validateAndUpdateQuantity: async (variantId: string, quantity: number) => {
+        const { items, updateQuantity, removeItem, getItemInventory } = get();
+        
+        if (quantity <= 0) {
+          removeItem(variantId);
+          return true;
+        }
+        
+        const item = items.find(i => i.variantId === variantId);
+        if (!item) return false;
+        
+        try {
+          const inventory = await getItemInventory(item.product.node.id);
+          
+          if (inventory === null) {
+            // Can't verify - allow optimistically
+            return updateQuantity(variantId, quantity);
+          }
+          
+          if (inventory === 0) {
+            toast.error("This product is now sold out", {
+              description: "Removing from your cart.",
+              position: "top-center",
+            });
+            removeItem(variantId);
+            return false;
+          }
+          
+          if (quantity > inventory) {
+            toast.error(`Only ${inventory} available`, {
+              description: `Quantity set to maximum available.`,
+              position: "top-center",
+            });
+            return updateQuantity(variantId, inventory);
+          }
+          
+          return updateQuantity(variantId, quantity);
+        } catch (error) {
+          console.error('Inventory validation failed:', error);
+          return updateQuantity(variantId, quantity);
+        }
       },
 
       addItem: (item) => {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShoppingCart, Eye, Flame } from "lucide-react";
+import { ShoppingCart, Eye, Flame, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,11 +17,17 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product }: ProductCardProps) => {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
-  const addItem = useCartStore(state => state.addItem);
+  const [isAdding, setIsAdding] = useState(false);
   const setCartOpen = useCartStore(state => state.setCartOpen);
+  const validateAndAddItem = useCartStore(state => state.validateAndAddItem);
   const { node } = product;
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isAdding) return;
+    
     const firstVariant = node.variants.edges[0]?.node;
     if (!firstVariant) return;
 
@@ -34,20 +40,25 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       selectedOptions: [{ name: "Ring Size", value: "17" }]
     };
 
-    const success = addItem(cartItem);
+    setIsAdding(true);
+    try {
+      const success = await validateAndAddItem(cartItem);
 
-    if (success) {
-      toast.success(
-        <div
-          onClick={() => setCartOpen(true)}
-          className="cursor-pointer w-full"
-        >
-          Added Size 17 to cart! Click to view
-        </div>,
-        {
-          position: "top-center",
-        }
-      );
+      if (success) {
+        toast.success(
+          <div
+            onClick={() => setCartOpen(true)}
+            className="cursor-pointer w-full"
+          >
+            Added Size 17 to cart! Click to view
+          </div>,
+          {
+            position: "top-center",
+          }
+        );
+      }
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -149,13 +160,17 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             <Button
               onClick={handleAddToCart}
               size="sm"
-              disabled={isSoldOut}
+              disabled={isSoldOut || isAdding}
               className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold group/btn disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={isSoldOut ? "Sold Out" : `Add ${node.title} size 17 to cart`}
               title="Adds size 17 to cart"
             >
-              <ShoppingCart className="h-4 w-4 mr-2 group-hover/btn:rotate-12 transition-transform" />
-              {isSoldOut ? "Sold Out" : "Size 17"}
+              {isAdding ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <ShoppingCart className="h-4 w-4 mr-2 group-hover/btn:rotate-12 transition-transform" />
+              )}
+              {isSoldOut ? "Sold Out" : isAdding ? "Adding..." : "Size 17"}
             </Button>
           </div>
         </CardContent>

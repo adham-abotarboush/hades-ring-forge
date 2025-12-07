@@ -20,6 +20,7 @@ import { Link } from "react-router-dom";
 
 export const CartDrawer = () => {
   const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set());
   const {
     items,
     isLoading,
@@ -30,7 +31,23 @@ export const CartDrawer = () => {
     createCheckout,
     clearCart,
     isItemPending,
+    validateAndUpdateQuantity,
   } = useCartStore();
+
+  const handleQuantityChange = async (variantId: string, newQuantity: number) => {
+    if (updatingItems.has(variantId)) return;
+    
+    setUpdatingItems(prev => new Set(prev).add(variantId));
+    try {
+      await validateAndUpdateQuantity(variantId, newQuantity);
+    } finally {
+      setUpdatingItems(prev => {
+        const next = new Set(prev);
+        next.delete(variantId);
+        return next;
+      });
+    }
+  };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => sum + (parseFloat(item.price.amount) * item.quantity), 0);
@@ -223,17 +240,25 @@ export const CartDrawer = () => {
                                 variant="outline"
                                 size="icon"
                                 className="h-6 w-6"
-                                onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
+                                onClick={() => handleQuantityChange(item.variantId, item.quantity - 1)}
+                                disabled={updatingItems.has(item.variantId)}
                                 aria-label="Decrease quantity"
                               >
                                 <Minus className="h-3 w-3" />
                               </Button>
-                              <span className="w-8 text-center text-sm">{item.quantity}</span>
+                              <span className="w-8 text-center text-sm">
+                                {updatingItems.has(item.variantId) ? (
+                                  <Loader2 className="h-3 w-3 animate-spin mx-auto" />
+                                ) : (
+                                  item.quantity
+                                )}
+                              </span>
                               <Button
                                 variant="outline"
                                 size="icon"
                                 className="h-6 w-6"
-                                onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
+                                onClick={() => handleQuantityChange(item.variantId, item.quantity + 1)}
+                                disabled={updatingItems.has(item.variantId)}
                                 aria-label="Increase quantity"
                               >
                                 <Plus className="h-3 w-3" />

@@ -71,8 +71,10 @@ const ProductDetail = () => {
     return prod.node.variants.edges.some(v => v.node.availableForSale);
   };
 
-  const handleAddToCart = () => {
-    if (!product) return;
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+
+  const handleAddToCart = async () => {
+    if (!product || isAddingToCart) return;
 
     // Use the first variant for cart (size will be stored in selectedOptions)
     const selectedVariant = product.node.variants.edges[0]?.node;
@@ -96,12 +98,17 @@ const ProductDetail = () => {
       selectedOptions: [{ name: "Ring Size", value: selectedSize }]
     };
 
-    const success = addItem(cartItem);
+    setIsAddingToCart(true);
+    try {
+      const success = await useCartStore.getState().validateAndAddItem(cartItem);
 
-    if (success) {
-      toast.success(`Added ${quantity} item(s) to cart!`, {
-        position: "top-center",
-      });
+      if (success) {
+        toast.success(`Added to cart!`, {
+          position: "top-center",
+        });
+      }
+    } finally {
+      setIsAddingToCart(false);
     }
   };
 
@@ -169,7 +176,9 @@ const ProductDetail = () => {
     }
   };
 
-  const incrementQuantity = () => setQuantity(prev => prev + 1);
+  // Limit quantity based on available inventory
+  const maxQuantity = product?.node?.totalInventory ?? 99;
+  const incrementQuantity = () => setQuantity(prev => Math.min(prev + 1, maxQuantity));
   const decrementQuantity = () => setQuantity(prev => Math.max(1, prev - 1));
 
   if (loading) {
@@ -403,10 +412,14 @@ const ProductDetail = () => {
                 size="lg"
                 variant="outline"
                 className="w-full sm:w-auto"
-                disabled={!selectedVariant || !isAvailable}
+                disabled={!selectedVariant || !isAvailable || isAddingToCart}
               >
-                <ShoppingCart className="h-5 w-5 mr-2" />
-                Add to Cart
+                {isAddingToCart ? (
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                ) : (
+                  <ShoppingCart className="h-5 w-5 mr-2" />
+                )}
+                {isAddingToCart ? 'Adding...' : 'Add to Cart'}
               </Button>
 
               <Button
