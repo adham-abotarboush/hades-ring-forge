@@ -262,7 +262,11 @@ const cartCreateVariablesSchema = z.object({
   input: z.object({
     lines: z.array(z.object({
       quantity: z.number().min(1).max(100),
-      merchandiseId: z.string()
+      merchandiseId: z.string(),
+      attributes: z.array(z.object({
+        key: z.string(),
+        value: z.string()
+      })).optional()
     })).min(1).max(50)
   })
 });

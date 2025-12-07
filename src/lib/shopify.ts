@@ -194,10 +194,16 @@ export async function createStorefrontCheckout(items: CartItem[]): Promise<strin
       }
     }
 
-    // Format cart lines for Shopify
+    // Format cart lines for Shopify with size attributes
     const lines = items.map(item => ({
       quantity: item.quantity,
       merchandiseId: item.variantId,
+      attributes: item.selectedOptions
+        .filter(opt => opt.name && opt.value)
+        .map(opt => ({
+          key: opt.name,
+          value: opt.value
+        }))
     }));
 
     // Create cart with initial items and buyer identity
