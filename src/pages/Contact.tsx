@@ -130,8 +130,7 @@ const Contact = () => {
                     <div>
                       <h3 className="font-semibold mb-1">Address</h3>
                       <p className="text-muted-foreground">
-                        <strong>HQ:</strong> New Cairo, Egypt<br />
-                        <strong>Shipping From:</strong> Borg El Arab, Alexandria
+                        New Cairo, Egypt
                       </p>
                     </div>
                   </div>
