@@ -201,12 +201,9 @@ const Shop = () => {
           </p>
           
           {/* Spoon Rings Notice */}
-          <div className="inline-flex items-center gap-2 px-4 py-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-            <span className="text-amber-500 text-lg">🥄</span>
-            <p className="text-sm text-amber-200">
-              <strong>Please Note:</strong> All our rings are handcrafted <strong>spoon rings</strong>, not silver rings. Each piece is uniquely shaped from vintage spoons.
-            </p>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            <span className="italic">Please Note:</span> All our rings are handcrafted <span className="font-medium">spoon rings</span>, not silver rings.
+          </p>
         </div>
 
         {/* Sort & Filter Controls */}
