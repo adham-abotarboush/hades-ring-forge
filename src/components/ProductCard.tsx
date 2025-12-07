@@ -28,10 +28,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     const cartItem = {
       product,
       variantId: firstVariant.id,
-      variantTitle: firstVariant.title,
+      variantTitle: "Size 16",
       price: firstVariant.price,
       quantity: 1,
-      selectedOptions: firstVariant.selectedOptions || []
+      selectedOptions: [{ name: "Ring Size", value: "16" }]
     };
 
     const success = addItem(cartItem);
@@ -42,7 +42,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           onClick={() => setCartOpen(true)}
           className="cursor-pointer w-full"
         >
-          Added to cart! Click to view
+          Added Size 16 to cart! Click to view
         </div>,
         {
           position: "top-center",
@@ -151,10 +151,11 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               size="sm"
               disabled={isSoldOut}
               className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-gold group/btn disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label={isSoldOut ? "Sold Out" : `Add ${node.title} to cart`}
+              aria-label={isSoldOut ? "Sold Out" : `Add ${node.title} size 16 to cart`}
+              title="Adds size 16 to cart"
             >
               <ShoppingCart className="h-4 w-4 mr-2 group-hover/btn:rotate-12 transition-transform" />
-              {isSoldOut ? "Sold Out" : "Add"}
+              {isSoldOut ? "Sold Out" : "Add (16)"}
             </Button>
           </div>
         </CardContent>
