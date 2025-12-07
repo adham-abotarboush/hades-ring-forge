@@ -30,7 +30,7 @@ const ProductDetail = () => {
   const product = getProductByHandle(handle || "");
   const loading = isLoading;
   
-  const [selectedSize, setSelectedSize] = useState<string>("16");
+  const [selectedSize, setSelectedSize] = useState<string>("17");
   const [quantity, setQuantity] = useState<number>(1);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const addItem = useCartStore(state => state.addItem);
@@ -204,8 +204,8 @@ const ProductDetail = () => {
   const compareAtPrice = firstVariant?.compareAtPrice;
   const isOnSale = compareAtPrice && parseFloat(compareAtPrice.amount) > parseFloat(price.amount);
 
-  // Available ring sizes (16 to 22)
-  const availableSizes = Array.from({ length: 7 }, (_, i) => (16 + i).toString());
+  // Available ring sizes (17 to 22)
+  const availableSizes = Array.from({ length: 6 }, (_, i) => (17 + i).toString());
 
   // Get the first available variant for the selected size
   const selectedVariant = node.variants.edges[0]?.node;
