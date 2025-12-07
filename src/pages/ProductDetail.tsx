@@ -422,18 +422,27 @@ const ProductDetail = () => {
             
             {/* Stock Badge */}
             {isSoldOut ? (
-              <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-muted text-muted-foreground rounded-md text-sm font-medium">
+              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-muted/80 text-muted-foreground rounded-lg text-sm font-medium border border-border">
+                <span className="w-2 h-2 rounded-full bg-muted-foreground"></span>
                 Sold Out
               </div>
             ) : totalInventory === 1 ? (
-              <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-destructive text-destructive-foreground rounded-md text-sm font-medium animate-pulse">
-                <Flame className="h-4 w-4" />
-                Only 1 Left!
+              <div className="mt-6 inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-destructive/90 to-destructive text-destructive-foreground rounded-lg text-base font-semibold shadow-lg shadow-destructive/25 border border-destructive/50">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive-foreground opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive-foreground"></span>
+                </span>
+                <Flame className="h-5 w-5 animate-pulse" />
+                <span>Only 1 Left — Order Now!</span>
               </div>
             ) : isAlmostSoldOut && (
-              <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-destructive text-destructive-foreground rounded-md text-sm font-medium animate-pulse">
-                <Flame className="h-4 w-4" />
-                Almost Sold Out - Only {totalInventory} Left!
+              <div className="mt-6 inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-amber-600/90 to-orange-600 text-white rounded-lg text-base font-semibold shadow-lg shadow-orange-600/25 border border-orange-500/50">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                </span>
+                <Flame className="h-5 w-5" />
+                <span>Hurry! Only {totalInventory} Left in Stock</span>
               </div>
             )}
           </div>
