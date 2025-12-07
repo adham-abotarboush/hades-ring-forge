@@ -273,7 +273,7 @@ export const CartDrawer = () => {
                     )}
                   </Button>
 
-                  <Link to="/cart" onClick={() => setCartOpen(false)}>
+                  <Link to="/cart" onClick={() => setCartOpen(false)} className="mt-2 block">
                     <Button variant="outline" className="w-full">
                       View Full Cart
                     </Button>
