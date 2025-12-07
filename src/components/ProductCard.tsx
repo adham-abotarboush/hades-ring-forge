@@ -155,7 +155,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               title="Adds size 16 to cart"
             >
               <ShoppingCart className="h-4 w-4 mr-2 group-hover/btn:rotate-12 transition-transform" />
-              {isSoldOut ? "Sold Out" : "Add (16)"}
+              {isSoldOut ? "Sold Out" : "Size 16"}
             </Button>
           </div>
         </CardContent>
