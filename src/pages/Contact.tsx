@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Mail, MapPin, Phone, Music } from "lucide-react";
+import { Mail, MapPin, Music } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { z } from "zod";
@@ -124,13 +124,6 @@ const Contact = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-start space-x-4">
-                    <Phone className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
-                    <div>
-                      <h3 className="font-semibold mb-1">Phone</h3>
-                      <p className="text-muted-foreground">01022671067</p>
-                    </div>
-                  </div>
 
                   <div className="flex items-start space-x-4">
                     <MapPin className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
