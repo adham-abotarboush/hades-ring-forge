@@ -144,8 +144,8 @@ All colors MUST be HSL.
   }
   
   .hover-lift:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-gold-lg);
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px hsl(var(--primary) / 0.15);
   }
   
   .text-gradient {
