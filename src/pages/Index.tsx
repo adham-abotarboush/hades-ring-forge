@@ -77,7 +77,7 @@ const Index = () => {
                 <div className="flex justify-center mb-3">
                   <Users className="h-8 w-8 text-primary" />
                 </div>
-                <p className="text-sm font-medium text-muted-foreground">5K+ Happy Owners</p>
+                <p className="text-sm font-medium text-muted-foreground">200+ Happy Owners</p>
               </div>
             </div>
           </div>
