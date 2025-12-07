@@ -19,7 +19,7 @@ const Index = () => {
     <div className="min-h-screen bg-background page-transition">
       <SEO
         title="Hades Ring Forge"
-        description="Handcrafted rings from recycled forks, inspired by Greek mythology and the realm of Hades. Each piece tells an ancient story."
+        description="Handcrafted rings inspired by Greek mythology and the realm of Hades. Each piece tells an ancient story."
       />
       <Navigation />
 
@@ -160,7 +160,7 @@ const Index = () => {
             <div className="group text-center p-10 rounded-2xl bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/60 hover:bg-card/50 transition-all duration-500 hover-lift hover:shadow-gold">
               <div className="text-7xl mb-8 group-hover:scale-125 transition-transform duration-500">♻️</div>
               <h3 className="text-3xl md:text-4xl font-heading font-bold mb-5 group-hover:text-primary transition-colors">Sustainable</h3>
-              <p className="text-muted-foreground leading-relaxed text-lg">Crafted from recycled forks, giving new life to old metal with environmental consciousness</p>
+              <p className="text-muted-foreground leading-relaxed text-lg">Crafted with care and environmental consciousness, giving new life to materials</p>
             </div>
 
             <div className="group text-center p-10 rounded-2xl bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/60 hover:bg-card/50 transition-all duration-500 hover-lift hover:shadow-gold">
