@@ -119,6 +119,9 @@ const ProductDetail = () => {
       return;
     }
 
+    // Open window synchronously BEFORE any async operations (Safari popup blocker fix)
+    const newWindow = window.open('about:blank', '_blank');
+
     setIsCheckingOut(true);
 
     const cartItem = {
@@ -134,6 +137,7 @@ const ProductDetail = () => {
 
     if (!success) {
       setIsCheckingOut(false);
+      newWindow?.close();
       return;
     }
 
@@ -142,20 +146,24 @@ const ProductDetail = () => {
       const isValid = await useCartStore.getState().validateCartInventory();
       if (!isValid) {
         setIsCheckingOut(false);
+        newWindow?.close();
         return;
       }
 
       await useCartStore.getState().createCheckout();
       const checkoutUrl = useCartStore.getState().checkoutUrl;
-      if (checkoutUrl) {
-        window.open(checkoutUrl, '_blank');
+      if (checkoutUrl && newWindow) {
+        newWindow.location.href = checkoutUrl;
         // Clear cart after successful checkout
         useCartStore.getState().clearCart();
+      } else {
+        newWindow?.close();
       }
     } catch (error) {
       toast.error("Failed to create checkout", {
         position: "top-center",
       });
+      newWindow?.close();
     } finally {
       setIsCheckingOut(false);
     }
