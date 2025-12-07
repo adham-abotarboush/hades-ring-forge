@@ -34,7 +34,7 @@ const About = () => {
 
   const stats = [
     { number: "500+", label: "Rings Forged" },
-    { number: "1000+", label: "Forks Recycled" },
+    { number: "100%", label: "Handcrafted" },
     { number: "5K+", label: "Happy Customers" },
     { number: "0", label: "Waste to Landfill" },
   ];

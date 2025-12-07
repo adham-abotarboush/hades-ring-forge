@@ -10,7 +10,7 @@ interface SEOProps {
 
 export const SEO = ({ 
   title, 
-  description = "Handcrafted rings from recycled forks, inspired by Greek mythology and the realm of Hades. Each piece tells an ancient story.", 
+  description = "Handcrafted rings inspired by Greek mythology and the realm of Hades. Each piece tells an ancient story.", 
   image = "https://lovable.dev/opengraph-image-p98pqg.png", 
   url = "https://hades-ring-forge.lovable.app", 
   type = "website" 

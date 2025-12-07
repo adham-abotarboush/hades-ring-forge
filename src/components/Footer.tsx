@@ -10,7 +10,7 @@ export const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-3xl font-heading font-bold text-gradient mb-4">HADES</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Forging mythic rings from recycled forks, inspired by ancient Greek legends and the eternal flames of the underworld.
+              Forging mythic rings inspired by ancient Greek legends and the eternal flames of the underworld.
             </p>
           </div>
 
