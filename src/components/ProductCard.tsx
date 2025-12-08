@@ -101,7 +101,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
                 <ProgressiveImage
                   src={image.url}
                   alt={image.altText || node.title}
-                  className="group-hover:scale-110 transition-all duration-700 ease-out"
+                  className="md:group-hover:scale-110 transition-all duration-700 ease-out"
                   containerClassName="absolute inset-0"
                   rootMargin="200px"
                 />
@@ -109,7 +109,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
                   <ProgressiveImage
                     src={secondImage.url}
                     alt={secondImage.altText || node.title}
-                    className="group-hover:scale-110 transition-all duration-700 ease-out opacity-0 group-hover:opacity-100"
+                    className="md:group-hover:scale-110 transition-all duration-700 ease-out opacity-0 md:group-hover:opacity-100"
                     containerClassName="absolute inset-0"
                     rootMargin="200px"
                   />
@@ -118,7 +118,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             ) : (
               <div className="w-full h-full flex items-center justify-center text-6xl">⚡</div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 md:group-hover:opacity-100 transition-opacity duration-500" />
 
             {/* Sold Out Badge Only */}
             {isSoldOut && (
