@@ -38,7 +38,7 @@ const PRICE_PRESETS = [
 
 const Shop = () => {
   const { products, collections, isLoading: loading } = useProducts();
-  const [sortBy, setSortBy] = useState<SortOption>("newest");
+  const [sortBy, setSortBy] = useState<SortOption>("featured");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, MAX_PRICE]);
   const [showInStock, setShowInStock] = useState(false);
   const [selectedCollection, setSelectedCollection] = useState<string>("all");
@@ -87,8 +87,16 @@ const Shop = () => {
         // For now, we'll just reverse the order
         result.reverse();
         break;
+      case "featured":
       default:
-        // "featured" - keep original order
+        // "featured" - prioritize available products
+        result.sort((a, b) => {
+          const aAvailable = a.node.variants?.edges?.some(v => v.node.availableForSale) ?? false;
+          const bAvailable = b.node.variants?.edges?.some(v => v.node.availableForSale) ?? false;
+          if (aAvailable && !bAvailable) return -1;
+          if (!aAvailable && bAvailable) return 1;
+          return 0;
+        });
         break;
     }
 
