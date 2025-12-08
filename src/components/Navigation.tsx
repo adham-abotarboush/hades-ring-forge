@@ -103,7 +103,7 @@ export const Navigation = () => {
           </Link>
 
           {/* Desktop Navigation - Centered */}
-          <div className="hidden md:flex items-center space-x-8 absolute left-1/2 -translate-x-1/2">
+          <div className="hidden lg:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -122,7 +122,7 @@ export const Navigation = () => {
 
           <div className="flex items-center space-x-4">
             <SearchDialog />
-            <Link to="/wishlist" className="hidden md:flex items-center justify-center w-10 h-10 rounded-full hover:bg-muted transition-colors" aria-label="Wishlist">
+            <Link to="/wishlist" className="hidden lg:flex items-center justify-center w-10 h-10 rounded-full hover:bg-muted transition-colors" aria-label="Wishlist">
               <Heart className="h-5 w-5" />
             </Link>
             <div className="flex items-center gap-3">
@@ -135,7 +135,7 @@ export const Navigation = () => {
                       <Button
                         variant="default"
                         size="sm"
-                        className="hidden md:flex items-center gap-1.5 h-9 px-3 bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-200"
+                        className="hidden lg:flex items-center gap-1.5 h-9 px-3 bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-200"
                         onClick={handleQuickCheckout}
                         disabled={isCheckingOut}
                         aria-label="Fast Checkout"
@@ -162,7 +162,7 @@ export const Navigation = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hidden md:flex" aria-label="User Menu">
+                  <Button variant="ghost" size="icon" className="hidden lg:flex" aria-label="User Menu">
                     <User className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -182,7 +182,7 @@ export const Navigation = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link to="/auth" className="hidden md:block">
+              <Link to="/auth" className="hidden lg:block">
                 <Button variant="ghost" size="sm" aria-label="Sign In">
                   <User className="h-4 w-4 mr-2" />
                   Sign In
@@ -192,7 +192,7 @@ export const Navigation = () => {
 
             {/* Mobile Menu */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild className="md:hidden">
+              <SheetTrigger asChild className="lg:hidden">
                 <Button variant="ghost" size="icon" aria-label="Open Menu">
                   <Menu className="h-5 w-5" />
                 </Button>
