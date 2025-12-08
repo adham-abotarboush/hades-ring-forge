@@ -125,34 +125,35 @@ export const Navigation = () => {
             <Link to="/wishlist" className="hidden md:flex items-center justify-center w-10 h-10 rounded-full hover:bg-muted transition-colors" aria-label="Wishlist">
               <Heart className="h-5 w-5" />
             </Link>
-            <CartDrawer />
-            
-            {/* Quick Checkout Button */}
-            {totalItems > 0 && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="default"
-                      size="icon"
-                      className="hidden md:flex relative"
-                      onClick={handleQuickCheckout}
-                      disabled={isCheckingOut}
-                      aria-label="Quick Checkout"
-                    >
-                      {isCheckingOut ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <CreditCard className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Quick Checkout ({totalItems} items)</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
+            <div className="flex items-center gap-1">
+              <CartDrawer />
+              {/* Fast Checkout Button */}
+              {totalItems > 0 && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="default"
+                        size="icon"
+                        className="hidden md:flex h-9 w-9"
+                        onClick={handleQuickCheckout}
+                        disabled={isCheckingOut}
+                        aria-label="Fast Checkout"
+                      >
+                        {isCheckingOut ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <CreditCard className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Fast Checkout ({totalItems} items)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
 
             {/* User Menu */}
             {user ? (
