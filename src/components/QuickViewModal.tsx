@@ -52,14 +52,24 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                 selectedOptions: [{ name: "Ring Size", value: selectedSize }]
             };
 
-            const success = await validateAndAddItem(cartItem);
+            const result = await validateAndAddItem(cartItem);
             
-            if (success) {
-                toast.success("Added to cart!", {
-                    position: "top-center",
-                });
+            if (result.success) {
+                if (result.message && result.type === 'warning') {
+                    toast.warning(result.message, {
+                        position: "top-center",
+                    });
+                } else {
+                    toast.success("Added to cart!", {
+                        position: "top-center",
+                    });
+                }
                 onClose();
                 setCartOpen(true);
+            } else if (result.message) {
+                toast.error(result.message, {
+                    position: "top-center",
+                });
             }
         } finally {
             setIsAddingToCart(false);

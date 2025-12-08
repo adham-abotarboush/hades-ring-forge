@@ -17,10 +17,12 @@ import { PhoneNumberModal } from "./PhoneNumberModal";
 import { orderDataSchema } from "@/lib/validation";
 import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 import { Link } from "react-router-dom";
+import { StockWarning } from "./cart/StockWarning";
 
 export const CartDrawer = () => {
   const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set());
+  const [itemWarnings, setItemWarnings] = useState<Record<string, { message: string; type: 'error' | 'warning' }>>({})
   const {
     items,
     isLoading,
@@ -37,9 +39,32 @@ export const CartDrawer = () => {
   const handleQuantityChange = async (variantId: string, newQuantity: number) => {
     if (updatingItems.has(variantId)) return;
     
+    // Clear any previous warning for this item
+    setItemWarnings(prev => {
+      const next = { ...prev };
+      delete next[variantId];
+      return next;
+    });
+    
     setUpdatingItems(prev => new Set(prev).add(variantId));
     try {
-      await validateAndUpdateQuantity(variantId, newQuantity);
+      const result = await validateAndUpdateQuantity(variantId, newQuantity);
+      
+      if (result.message && result.type) {
+        setItemWarnings(prev => ({
+          ...prev,
+          [variantId]: { message: result.message!, type: result.type! }
+        }));
+        
+        // Auto-clear warning after 4 seconds
+        setTimeout(() => {
+          setItemWarnings(prev => {
+            const next = { ...prev };
+            delete next[variantId];
+            return next;
+          });
+        }, 4000);
+      }
     } finally {
       setUpdatingItems(prev => {
         const next = new Set(prev);
@@ -261,15 +286,24 @@ export const CartDrawer = () => {
                                 disabled={updatingItems.has(item.variantId)}
                                 aria-label="Increase quantity"
                               >
-                                <Plus className="h-3 w-3" />
-                              </Button>
-                            </div>
+                              <Plus className="h-3 w-3" />
+                            </Button>
                           </div>
+                          
+                          {/* Inline stock warning */}
+                          {itemWarnings[item.variantId] && (
+                            <StockWarning
+                              message={itemWarnings[item.variantId].message}
+                              type={itemWarnings[item.variantId].type}
+                              className="mt-2"
+                            />
+                          )}
                         </div>
-                      );
-                    })}
-                  </div>
+                      </div>
+                    );
+                  })}
                 </div>
+              </div>
 
                 <div className="flex-shrink-0 space-y-4 pt-4 border-t border-border bg-card">
                   <div className="flex justify-between items-center">

@@ -9,10 +9,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { PhoneNumberModal } from "@/components/PhoneNumberModal";
 import { orderDataSchema } from "@/lib/validation";
 import { Link } from "react-router-dom";
+import { StockWarning } from "@/components/cart/StockWarning";
 
 const Cart = () => {
   const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set());
+  const [itemWarnings, setItemWarnings] = useState<Record<string, { message: string; type: 'error' | 'warning' }>>({})
   const { 
     items, 
     isLoading,
@@ -29,9 +31,32 @@ const Cart = () => {
   const handleQuantityChange = async (variantId: string, newQuantity: number) => {
     if (updatingItems.has(variantId)) return;
     
+    // Clear any previous warning for this item
+    setItemWarnings(prev => {
+      const next = { ...prev };
+      delete next[variantId];
+      return next;
+    });
+    
     setUpdatingItems(prev => new Set(prev).add(variantId));
     try {
-      await validateAndUpdateQuantity(variantId, newQuantity);
+      const result = await validateAndUpdateQuantity(variantId, newQuantity);
+      
+      if (result.message && result.type) {
+        setItemWarnings(prev => ({
+          ...prev,
+          [variantId]: { message: result.message!, type: result.type! }
+        }));
+        
+        // Auto-clear warning after 4 seconds
+        setTimeout(() => {
+          setItemWarnings(prev => {
+            const next = { ...prev };
+            delete next[variantId];
+            return next;
+          });
+        }, 4000);
+      }
     } finally {
       setUpdatingItems(prev => {
         const next = new Set(prev);
@@ -240,6 +265,15 @@ const Cart = () => {
                       <p className="text-sm text-muted-foreground mt-2">
                         Subtotal: E£{(parseFloat(item.price.amount) * item.quantity).toFixed(2)}
                       </p>
+                      
+                      {/* Inline stock warning */}
+                      {itemWarnings[item.variantId] && (
+                        <StockWarning
+                          message={itemWarnings[item.variantId].message}
+                          type={itemWarnings[item.variantId].type}
+                          className="mt-2"
+                        />
+                      )}
                     </div>
                   </div>
                 ))}

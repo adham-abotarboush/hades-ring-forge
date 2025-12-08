@@ -31,8 +31,8 @@ interface CartStore {
   setCartOpen: (open: boolean) => void;
   createCheckout: () => Promise<void>;
   validateCartInventory: () => Promise<boolean>;
-  validateAndAddItem: (item: CartItem) => Promise<boolean>;
-  validateAndUpdateQuantity: (variantId: string, quantity: number) => Promise<boolean>;
+  validateAndAddItem: (item: CartItem) => Promise<{ success: boolean; message?: string; type?: 'error' | 'warning' }>;
+  validateAndUpdateQuantity: (variantId: string, quantity: number) => Promise<{ success: boolean; message?: string; type?: 'error' | 'warning'; maxQuantity?: number }>;
   getItemInventory: (productId: string) => Promise<number | null>;
   syncWithDatabase: (userId: string) => Promise<void>;
   loadFromDatabase: (userId: string) => Promise<void>;
@@ -93,14 +93,16 @@ export const useCartStore = create<CartStore>()(
           
           if (inventory === null) {
             // Can't verify - allow optimistically
-            return addItem(item);
+            addItem(item);
+            return { success: true };
           }
           
           if (inventory === 0) {
-            toast.error("This product is sold out", {
-              position: "top-center",
-            });
-            return false;
+            return { 
+              success: false, 
+              message: "Sorry, this item is sold out", 
+              type: 'error' as const 
+            };
           }
           
           // Check total quantity including existing cart items
@@ -110,26 +112,29 @@ export const useCartStore = create<CartStore>()(
           
           if (requestedTotal > inventory) {
             if (existingQuantity >= inventory) {
-              toast.error(`Maximum quantity reached`, {
-                description: `You already have ${existingQuantity} in cart. Only ${inventory} available.`,
-                position: "top-center",
-              });
-              return false;
+              return { 
+                success: false, 
+                message: `Maximum reached! Only ${inventory} available`, 
+                type: 'error' as const 
+              };
             }
             
             const canAdd = inventory - existingQuantity;
-            toast.warning(`Limited stock available`, {
-              description: `Only ${canAdd} more can be added. Added ${canAdd} instead of ${item.quantity}.`,
-              position: "top-center",
-            });
-            return addItem({ ...item, quantity: canAdd });
+            addItem({ ...item, quantity: canAdd });
+            return { 
+              success: true, 
+              message: `Only ${canAdd} added (limited stock)`, 
+              type: 'warning' as const 
+            };
           }
           
-          return addItem(item);
+          addItem(item);
+          return { success: true };
         } catch (error) {
           console.error('Inventory validation failed:', error);
           // Allow on error - will be caught at checkout
-          return addItem(item);
+          addItem(item);
+          return { success: true };
         }
       },
 
@@ -139,41 +144,48 @@ export const useCartStore = create<CartStore>()(
         
         if (quantity <= 0) {
           removeItem(variantId);
-          return true;
+          return { success: true };
         }
         
         const item = items.find(i => i.variantId === variantId);
-        if (!item) return false;
+        if (!item) return { success: false };
         
         try {
           const inventory = await getItemInventory(item.product.node.id);
           
           if (inventory === null) {
             // Can't verify - allow optimistically
-            return updateQuantity(variantId, quantity);
+            updateQuantity(variantId, quantity);
+            return { success: true };
           }
           
           if (inventory === 0) {
-            toast.error("This product is now sold out", {
-              description: "Removing from your cart.",
-              position: "top-center",
-            });
             removeItem(variantId);
-            return false;
+            return { 
+              success: false, 
+              message: "Sold out! Removed from cart", 
+              type: 'error' as const 
+            };
           }
           
           if (quantity > inventory) {
-            toast.error(`Only ${inventory} available`, {
-              description: `Quantity set to maximum available.`,
-              position: "top-center",
-            });
-            return updateQuantity(variantId, inventory);
+            updateQuantity(variantId, inventory);
+            return { 
+              success: true, 
+              message: inventory === 1 
+                ? "Only 1 left in stock!" 
+                : `Only ${inventory} available`,
+              type: 'warning' as const,
+              maxQuantity: inventory
+            };
           }
           
-          return updateQuantity(variantId, quantity);
+          updateQuantity(variantId, quantity);
+          return { success: true };
         } catch (error) {
           console.error('Inventory validation failed:', error);
-          return updateQuantity(variantId, quantity);
+          updateQuantity(variantId, quantity);
+          return { success: true };
         }
       },
 
