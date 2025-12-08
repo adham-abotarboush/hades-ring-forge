@@ -23,6 +23,7 @@ import { SocialShareButtons } from "@/components/SocialShareButtons";
 import { RecentlyViewed } from "@/components/RecentlyViewed";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useProducts } from "@/contexts/ProductsContext";
+import { StockWarning } from "@/components/cart/StockWarning";
 
 const ProductDetail = () => {
   const { handle } = useParams();
@@ -33,6 +34,7 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState<string>("17");
   const [quantity, setQuantity] = useState<number>(1);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [quantityWarning, setQuantityWarning] = useState<string | null>(null);
   const addItem = useCartStore(state => state.addItem);
   const addToCartRef = useRef<HTMLDivElement>(null);
   const [isStickyVisible, setIsStickyVisible] = useState(false);
@@ -188,8 +190,23 @@ const ProductDetail = () => {
 
   // Limit quantity based on available inventory
   const maxQuantity = product?.node?.totalInventory ?? 99;
-  const incrementQuantity = () => setQuantity(prev => Math.min(prev + 1, maxQuantity));
-  const decrementQuantity = () => setQuantity(prev => Math.max(1, prev - 1));
+  
+  const incrementQuantity = () => {
+    setQuantity(prev => {
+      if (prev >= maxQuantity) {
+        setQuantityWarning(maxQuantity === 1 ? "Only 1 left in stock!" : `Only ${maxQuantity} available`);
+        setTimeout(() => setQuantityWarning(null), 4000);
+        return prev;
+      }
+      setQuantityWarning(null);
+      return prev + 1;
+    });
+  };
+  
+  const decrementQuantity = () => {
+    setQuantityWarning(null);
+    setQuantity(prev => Math.max(1, prev - 1));
+  };
 
   if (loading) {
     return (
@@ -414,6 +431,13 @@ const ProductDetail = () => {
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
+              
+              {/* Stock warning */}
+              {quantityWarning && (
+                <div className="mt-3">
+                  <StockWarning message={quantityWarning} type="warning" />
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3" ref={addToCartRef}>
