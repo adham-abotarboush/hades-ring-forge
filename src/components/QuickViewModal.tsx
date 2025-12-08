@@ -135,11 +135,11 @@ export function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps
                         <h2 className="text-2xl font-heading font-bold mb-2">{node.title}</h2>
                         <div className="flex items-center gap-2 mb-4">
                             <p className="text-3xl font-bold text-primary">
-                                E£{parseFloat(price.amount).toFixed(0)}
+                                EGP {parseFloat(price.amount).toFixed(0)}
                             </p>
                             {isOnSale && compareAtPrice && (
                                 <p className="text-xl text-muted-foreground line-through">
-                                    E£{parseFloat(compareAtPrice.amount).toFixed(0)}
+                                    EGP {parseFloat(compareAtPrice.amount).toFixed(0)}
                                 </p>
                             )}
                             {isOnSale && (

@@ -30,10 +30,10 @@ type SortOption = "featured" | "price-low" | "price-high" | "newest" | "title";
 
 const PRICE_PRESETS = [
   { label: "All", min: 0, max: MAX_PRICE },
-  { label: "Under E£200", min: 0, max: 200 },
-  { label: "E£200 - E£400", min: 200, max: 400 },
-  { label: "E£400 - E£600", min: 400, max: 600 },
-  { label: "E£600+", min: 600, max: MAX_PRICE },
+  { label: "Under EGP 200", min: 0, max: 200 },
+  { label: "EGP 200 - 400", min: 200, max: 400 },
+  { label: "EGP 400 - 600", min: 400, max: 600 },
+  { label: "EGP 600+", min: 600, max: MAX_PRICE },
 ];
 
 const Shop = () => {
@@ -130,12 +130,12 @@ const Shop = () => {
         <div className="flex items-center gap-3 text-sm">
           <div className="flex-1 bg-muted/50 rounded-lg px-3 py-2 text-center">
             <span className="text-muted-foreground text-xs block">Min</span>
-            <span className="font-semibold">E£{priceRange[0]}</span>
+            <span className="font-semibold">EGP {priceRange[0]}</span>
           </div>
           <span className="text-muted-foreground">—</span>
           <div className="flex-1 bg-muted/50 rounded-lg px-3 py-2 text-center">
             <span className="text-muted-foreground text-xs block">Max</span>
-            <span className="font-semibold">E£{priceRange[1]}</span>
+            <span className="font-semibold">EGP {priceRange[1]}</span>
           </div>
         </div>
       </div>

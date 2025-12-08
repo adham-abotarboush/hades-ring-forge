@@ -51,7 +51,7 @@ export const StickyAddToCart = ({ product, onAddToCart, isCheckingOut, isVisible
                 <div className="flex-1 min-w-0">
                     <h4 className="font-heading font-semibold truncate text-sm">{node.title}</h4>
                     <p className="text-primary font-bold text-sm">
-                        E£{parseFloat(price.amount).toFixed(2)}
+                        EGP {parseFloat(price.amount).toFixed(2)}
                     </p>
                 </div>
 
