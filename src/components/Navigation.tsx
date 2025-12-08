@@ -53,7 +53,13 @@ export const Navigation = () => {
       const checkoutUrl = useCartStore.getState().checkoutUrl;
       if (checkoutUrl && newWindow) {
         newWindow.location.href = checkoutUrl;
-        // Cart will be cleared via webhook when order is completed
+        // Clear cart after successful checkout redirect
+        clearCart();
+        // Clear from database if user is logged in
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from('cart_items').delete().eq('user_id', user.id);
+        }
         toast.success("Redirecting to checkout...");
       } else if (newWindow) {
         newWindow.close();
