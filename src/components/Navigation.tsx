@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, User, LogOut, UserCircle, Heart } from "lucide-react";
+import { Menu, User, LogOut, UserCircle, Heart, CreditCard, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CartDrawer } from "@/components/CartDrawer";
@@ -16,6 +16,8 @@ import {
 import { toast } from "sonner";
 import { SearchDialog } from "@/components/SearchDialog";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { useCartStore } from "@/stores/cartStore";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -29,6 +31,42 @@ export const Navigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const { items, createCheckout, clearCart } = useCartStore();
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleQuickCheckout = async () => {
+    if (items.length === 0) {
+      toast.error("Your cart is empty");
+      return;
+    }
+
+    // Open window immediately for Safari compatibility
+    const newWindow = window.open('about:blank', '_blank');
+    if (newWindow) {
+      newWindow.document.write('<html><head><title>Redirecting to checkout...</title></head><body style="background:#0a0a0a;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;"><p>Preparing your checkout...</p></body></html>');
+    }
+
+    setIsCheckingOut(true);
+    try {
+      await createCheckout();
+      const checkoutUrl = useCartStore.getState().checkoutUrl;
+      if (checkoutUrl && newWindow) {
+        newWindow.location.href = checkoutUrl;
+        clearCart();
+        toast.success("Redirecting to checkout...");
+      } else if (newWindow) {
+        newWindow.close();
+        toast.error("Failed to create checkout");
+      }
+    } catch (error) {
+      console.error('Quick checkout failed:', error);
+      if (newWindow) newWindow.close();
+      toast.error("Checkout failed. Please try again.");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
   const [user, setUser] = useState<SupabaseUser | null>(null);
 
   useEffect(() => {
@@ -88,6 +126,33 @@ export const Navigation = () => {
               <Heart className="h-5 w-5" />
             </Link>
             <CartDrawer />
+            
+            {/* Quick Checkout Button */}
+            {totalItems > 0 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="default"
+                      size="icon"
+                      className="hidden md:flex relative"
+                      onClick={handleQuickCheckout}
+                      disabled={isCheckingOut}
+                      aria-label="Quick Checkout"
+                    >
+                      {isCheckingOut ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <CreditCard className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Quick Checkout ({totalItems} items)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
 
             {/* User Menu */}
             {user ? (
