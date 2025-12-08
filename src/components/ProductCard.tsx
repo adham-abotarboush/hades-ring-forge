@@ -159,11 +159,13 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-primary">
-                EGP {parseFloat(price.amount).toFixed(0)}
+                <span className="text-sm font-medium opacity-70 mr-0.5">EGP</span>
+                {parseFloat(price.amount).toFixed(0)}
               </span>
               {isOnSale && compareAtPrice && (
-                <span className="text-lg text-muted-foreground line-through">
-                  EGP {parseFloat(compareAtPrice.amount).toFixed(0)}
+                <span className="text-base text-muted-foreground line-through">
+                  <span className="text-xs mr-0.5">EGP</span>
+                  {parseFloat(compareAtPrice.amount).toFixed(0)}
                 </span>
               )}
             </div>
