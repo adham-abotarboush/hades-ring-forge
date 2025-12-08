@@ -77,9 +77,16 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
       .slice(0, count);
   };
 
-  // Helper to get featured products
+  // Helper to get featured products (prioritize available items)
   const getFeaturedProducts = (count: number = 6) => {
-    return products.slice(0, count);
+    const sorted = [...products].sort((a, b) => {
+      const aAvailable = a.node.variants?.edges?.some(v => v.node.availableForSale) ?? false;
+      const bAvailable = b.node.variants?.edges?.some(v => v.node.availableForSale) ?? false;
+      if (aAvailable && !bAvailable) return -1;
+      if (!aAvailable && bAvailable) return 1;
+      return 0;
+    });
+    return sorted.slice(0, count);
   };
 
   // Only show loading for products, not collections
