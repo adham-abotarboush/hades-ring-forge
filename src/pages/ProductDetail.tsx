@@ -100,10 +100,20 @@ const ProductDetail = () => {
 
     setIsAddingToCart(true);
     try {
-      const success = await useCartStore.getState().validateAndAddItem(cartItem);
+      const result = await useCartStore.getState().validateAndAddItem(cartItem);
 
-      if (success) {
-        toast.success(`Added to cart!`, {
+      if (result.success) {
+        if (result.message && result.type === 'warning') {
+          toast.warning(result.message, {
+            position: "top-center",
+          });
+        } else {
+          toast.success(`Added to cart!`, {
+            position: "top-center",
+          });
+        }
+      } else if (result.message) {
+        toast.error(result.message, {
           position: "top-center",
         });
       }

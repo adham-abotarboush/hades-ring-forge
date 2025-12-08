@@ -42,20 +42,30 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 
     setIsAdding(true);
     try {
-      const success = await validateAndAddItem(cartItem);
+      const result = await validateAndAddItem(cartItem);
 
-      if (success) {
-        toast.success(
-          <div
-            onClick={() => setCartOpen(true)}
-            className="cursor-pointer w-full"
-          >
-            Added Size 17 to cart! Click to view
-          </div>,
-          {
+      if (result.success) {
+        if (result.message && result.type === 'warning') {
+          toast.warning(result.message, {
             position: "top-center",
-          }
-        );
+          });
+        } else {
+          toast.success(
+            <div
+              onClick={() => setCartOpen(true)}
+              className="cursor-pointer w-full"
+            >
+              Added Size 17 to cart! Click to view
+            </div>,
+            {
+              position: "top-center",
+            }
+          );
+        }
+      } else if (result.message) {
+        toast.error(result.message, {
+          position: "top-center",
+        });
       }
     } finally {
       setIsAdding(false);
