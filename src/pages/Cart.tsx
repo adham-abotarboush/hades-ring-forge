@@ -217,7 +217,8 @@ const Cart = () => {
                         {item.selectedOptions.map(option => option.value).join(' • ')}
                       </p>
                       <p className="font-bold text-primary text-lg">
-                        EGP {parseFloat(item.price.amount).toFixed(2)}
+                        <span className="text-sm font-medium opacity-70 mr-0.5">EGP</span>
+                        {parseFloat(item.price.amount).toFixed(0)}
                       </p>
                     </div>
                     
@@ -263,7 +264,7 @@ const Cart = () => {
                       </div>
                       
                       <p className="text-sm text-muted-foreground mt-2">
-                        Subtotal: EGP {(parseFloat(item.price.amount) * item.quantity).toFixed(2)}
+                        Subtotal: <span className="text-xs">EGP</span> {(parseFloat(item.price.amount) * item.quantity).toFixed(0)}
                       </p>
                       
                       {/* Inline stock warning */}
@@ -287,7 +288,7 @@ const Cart = () => {
                   <div className="space-y-4 mb-6">
                     <div className="flex justify-between text-muted-foreground">
                       <span>Items ({totalItems})</span>
-                      <span>EGP {totalPrice.toFixed(2)}</span>
+                      <span><span className="text-xs">EGP</span> {totalPrice.toFixed(0)}</span>
                     </div>
                     <div className="flex justify-between text-muted-foreground">
                       <span>Shipping</span>
@@ -298,7 +299,8 @@ const Cart = () => {
                       <div className="flex justify-between items-center mb-4">
                         <span className="text-xl font-heading font-bold">Total</span>
                         <span className="text-2xl font-bold text-primary">
-                          EGP {totalPrice.toFixed(2)}
+                          <span className="text-base font-medium opacity-70 mr-1">EGP</span>
+                          {totalPrice.toFixed(0)}
                         </span>
                       </div>
                     </div>

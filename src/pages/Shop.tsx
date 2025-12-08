@@ -130,12 +130,12 @@ const Shop = () => {
         <div className="flex items-center gap-3 text-sm">
           <div className="flex-1 bg-muted/50 rounded-lg px-3 py-2 text-center">
             <span className="text-muted-foreground text-xs block">Min</span>
-            <span className="font-semibold">EGP {priceRange[0]}</span>
+            <span className="font-semibold"><span className="text-xs font-normal opacity-70">EGP</span> {priceRange[0]}</span>
           </div>
           <span className="text-muted-foreground">—</span>
           <div className="flex-1 bg-muted/50 rounded-lg px-3 py-2 text-center">
             <span className="text-muted-foreground text-xs block">Max</span>
-            <span className="font-semibold">EGP {priceRange[1]}</span>
+            <span className="font-semibold"><span className="text-xs font-normal opacity-70">EGP</span> {priceRange[1]}</span>
           </div>
         </div>
       </div>

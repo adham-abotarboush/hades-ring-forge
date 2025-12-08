@@ -65,7 +65,8 @@ export const RecentlyViewed = ({ currentProductHandle, maxItems = 4 }: RecentlyV
                                     {item.title}
                                 </h3>
                                 <p className="text-primary font-bold mt-1">
-                                    EGP {parseFloat(item.price).toFixed(2)}
+                                    <span className="text-xs font-medium opacity-70 mr-0.5">EGP</span>
+                                    {parseFloat(item.price).toFixed(0)}
                                 </p>
                             </CardContent>
                         </Card>

@@ -238,12 +238,14 @@ export const CartDrawer = () => {
                             </p>
                             <div className="flex items-center gap-2">
                               <p className="font-semibold text-primary">
-                                EGP {parseFloat(item.price.amount).toFixed(0)}
+                                <span className="text-xs font-medium opacity-70 mr-0.5">EGP</span>
+                                {parseFloat(item.price.amount).toFixed(0)}
                               </p>
                               {item.product.node.variants.edges[0]?.node.compareAtPrice && 
                                parseFloat(item.product.node.variants.edges[0].node.compareAtPrice.amount) > parseFloat(item.price.amount) && (
-                                <p className="text-sm text-muted-foreground line-through">
-                                  EGP {parseFloat(item.product.node.variants.edges[0].node.compareAtPrice.amount).toFixed(0)}
+                                <p className="text-xs text-muted-foreground line-through">
+                                  <span className="mr-0.5">EGP</span>
+                                  {parseFloat(item.product.node.variants.edges[0].node.compareAtPrice.amount).toFixed(0)}
                                 </p>
                               )}
                             </div>
@@ -309,7 +311,8 @@ export const CartDrawer = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-xl font-bold text-primary">
-                      EGP {totalPrice.toFixed(2)}
+                      <span className="text-sm font-medium opacity-70 mr-1">EGP</span>
+                      {totalPrice.toFixed(0)}
                     </span>
                   </div>
 
