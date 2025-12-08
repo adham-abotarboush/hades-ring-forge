@@ -128,19 +128,20 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             )}
 
             {/* Quick View Button - hidden on mobile */}
-            <div className="absolute inset-0 hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute inset-0 hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={handleQuickView}
-                className="gap-2 bg-background/90 backdrop-blur-sm hover:bg-background shadow-lg"
+                className="gap-2 bg-background/90 backdrop-blur-sm hover:bg-background shadow-lg pointer-events-auto"
               >
                 <Eye className="h-4 w-4" />
                 Quick View
               </Button>
             </div>
 
-            <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            {/* Wishlist button - always visible on mobile, hover on desktop */}
+            <div className="absolute top-4 right-4 z-10 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
               <WishlistButton product={product} />
             </div>
           </div>
