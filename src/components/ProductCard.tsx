@@ -159,11 +159,11 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-primary">
-                E£{parseFloat(price.amount).toFixed(0)}
+                EGP {parseFloat(price.amount).toFixed(0)}
               </span>
               {isOnSale && compareAtPrice && (
                 <span className="text-lg text-muted-foreground line-through">
-                  E£{parseFloat(compareAtPrice.amount).toFixed(0)}
+                  EGP {parseFloat(compareAtPrice.amount).toFixed(0)}
                 </span>
               )}
             </div>

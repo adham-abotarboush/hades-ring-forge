@@ -334,11 +334,11 @@ const ProductDetail = () => {
             </div>
             <div className="flex items-center gap-3 mb-6">
               <p className="text-3xl font-bold text-primary">
-                E£{parseFloat(price.amount).toFixed(0)}
+                EGP {parseFloat(price.amount).toFixed(0)}
               </p>
               {isOnSale && compareAtPrice && (
                 <p className="text-xl text-muted-foreground line-through">
-                  E£{parseFloat(compareAtPrice.amount).toFixed(0)}
+                  EGP {parseFloat(compareAtPrice.amount).toFixed(0)}
                 </p>
               )}
               {isOnSale && (
