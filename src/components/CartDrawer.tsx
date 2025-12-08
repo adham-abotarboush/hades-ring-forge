@@ -160,7 +160,13 @@ export const CartDrawer = () => {
         }
         setCartOpen(false);
         
-        // Cart will be cleared via webhook when order is completed
+        // Clear cart after successful checkout redirect
+        clearCart();
+        
+        // Also clear from database if user is logged in
+        if (user) {
+          await supabase.from('cart_items').delete().eq('user_id', user.id);
+        }
       } else {
         newWindow?.close();
         toast.error("Failed to create checkout");
