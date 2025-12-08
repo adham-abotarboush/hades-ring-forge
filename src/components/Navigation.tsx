@@ -125,9 +125,34 @@ export const Navigation = () => {
             <Link to="/wishlist" className="hidden lg:flex items-center justify-center w-10 h-10 rounded-full hover:bg-muted transition-colors" aria-label="Wishlist">
               <Heart className="h-5 w-5" />
             </Link>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <CartDrawer />
               {/* Fast Checkout Button */}
+              {totalItems > 0 && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="default"
+                        size="icon"
+                        className="flex lg:hidden h-9 w-9 bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-200"
+                        onClick={handleQuickCheckout}
+                        disabled={isCheckingOut}
+                        aria-label="Fast Checkout"
+                      >
+                        {isCheckingOut ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <CreditCard className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Fast Checkout ({totalItems} items)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
               {totalItems > 0 && (
                 <TooltipProvider>
                   <Tooltip>
