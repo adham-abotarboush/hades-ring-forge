@@ -144,8 +144,7 @@ const Cart = () => {
           newWindow.location.href = checkoutUrl;
         }
         
-        // Clear cart after successful checkout (both logged-in and guest users)
-        clearCart();
+        // Cart will be cleared via webhook when order is completed
       } else {
         newWindow?.close();
         toast.error("Failed to create checkout");

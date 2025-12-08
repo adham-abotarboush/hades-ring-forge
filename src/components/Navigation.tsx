@@ -53,7 +53,7 @@ export const Navigation = () => {
       const checkoutUrl = useCartStore.getState().checkoutUrl;
       if (checkoutUrl && newWindow) {
         newWindow.location.href = checkoutUrl;
-        clearCart();
+        // Cart will be cleared via webhook when order is completed
         toast.success("Redirecting to checkout...");
       } else if (newWindow) {
         newWindow.close();
