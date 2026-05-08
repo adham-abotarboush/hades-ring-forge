@@ -15,6 +15,8 @@ import Policies from "./pages/Policies";
 import Wishlist from "./pages/Wishlist";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import Collections from "./pages/Collections";
+import CollectionDetail from "./pages/CollectionDetail";
 import NotFound from "./pages/NotFound";
 import { useCartSync } from "./hooks/useCartSync";
 import { ProductsProvider } from "./contexts/ProductsContext";
@@ -49,6 +51,8 @@ const AppContent = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/collections" element={<Collections />} />
+          <Route path="/collections/:handle" element={<CollectionDetail />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/policies" element={<Policies />} />

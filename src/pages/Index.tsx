@@ -142,6 +142,77 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Collections Showcase */}
+      <section className="py-32 container mx-auto px-4 relative">
+        <div className="absolute inset-0 opacity-15 blur-3xl" style={{ background: "linear-gradient(135deg, hsl(38 90% 12%) 0%, hsl(330 80% 8%) 100%)" }} />
+
+        <div className="relative z-10">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full shadow-lg">
+              <Sparkles className="h-5 w-5 text-primary animate-pulse" />
+              <span className="text-sm font-bold tracking-widest uppercase text-primary">The Two Realms</span>
+            </div>
+            <h2 className="text-5xl md:text-6xl lg:text-8xl font-heading font-bold mb-6 tracking-tighter leading-none">
+              Choose Your <span className="text-gradient bg-clip-text text-transparent">Myth</span>
+            </h2>
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-light leading-relaxed">
+              Two collections. Two destinies. Both forged from the same ancient legend.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* Hades Card */}
+            <Link to="/collections/hades" className="group block">
+              <div className="relative rounded-2xl overflow-hidden border border-primary/20 hover:border-primary/60 transition-all duration-500 hover-lift hover:shadow-gold-lg min-h-[340px] flex flex-col">
+                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(38_90%_8%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,hsl(38_90%_20%_/_0.25),transparent_70%)]" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent" />
+                <div className="relative z-10 p-8 md:p-10 flex flex-col justify-between h-full">
+                  <div>
+                    <div className="text-5xl mb-4">⚡</div>
+                    <h3 className="text-4xl md:text-5xl font-heading font-bold mb-3 tracking-tighter group-hover:text-primary transition-colors duration-300">Hades</h3>
+                    <p className="text-muted-foreground leading-relaxed">Dark, commanding rings forged in the fires beneath Olympus.</p>
+                  </div>
+                  <div className="mt-8 flex items-center gap-2 text-primary font-medium group-hover:gap-3 transition-all duration-300">
+                    <span>Explore the Underworld</span>
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+            {/* Persephone Card */}
+            <Link to="/collections/persephone" className="group block">
+              <div className="relative rounded-2xl overflow-hidden border border-[hsl(330_80%_60%_/_0.2)] hover:border-[hsl(330_80%_60%_/_0.6)] transition-all duration-500 hover-lift min-h-[340px] flex flex-col" style={{ ["--tw-shadow" as string]: "0 20px 60px -15px hsl(330 80% 60% / 0.35)" }}>
+                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(330_80%_6%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,hsl(330_80%_18%_/_0.25),transparent_70%)]" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[hsl(330_80%_60%)] to-transparent" />
+                <div className="relative z-10 p-8 md:p-10 flex flex-col justify-between h-full">
+                  <div>
+                    <div className="text-5xl mb-4">🌸</div>
+                    <h3 className="text-4xl md:text-5xl font-heading font-bold mb-3 tracking-tighter group-hover:text-[hsl(330_80%_70%)] transition-colors duration-300">Persephone</h3>
+                    <p className="text-muted-foreground leading-relaxed">Rings where pomegranate blossoms meet eternal shadow.</p>
+                  </div>
+                  <div className="mt-8 flex items-center gap-2 font-medium text-[hsl(330_80%_65%)] group-hover:gap-3 transition-all duration-300">
+                    <span>Bloom in the Darkness</span>
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+
+          <div className="text-center mt-12">
+            <Link to="/collections">
+              <Button size="lg" variant="outline" className="border-primary/50 text-foreground hover:bg-primary/10 hover:border-primary group text-lg px-8 py-6 h-auto">
+                View All Collections
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-32 container mx-auto px-4 relative">
         <div className="absolute inset-0 bg-gradient-forge opacity-30 blur-3xl" />

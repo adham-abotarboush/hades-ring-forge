@@ -22,6 +22,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "Shop", path: "/shop" },
+  { name: "Collections", path: "/collections" },
   { name: "Blog", path: "/blog" },
   { name: "About", path: "/about" },
   { name: "Contact", path: "/contact" },
