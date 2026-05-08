@@ -8,7 +8,6 @@ import { ArrowRight, Flame, Sparkles, Shield, Award, Users } from "lucide-react"
 import heroImage from "@/assets/hero-forge.jpg";
 import { SEO } from "@/components/SEO";
 import { TestimonialCarousel } from "@/components/TestimonialCarousel";
-import { BlogSection } from "@/components/BlogSection";
 import { useProducts } from "@/contexts/ProductsContext";
 
 const Index = () => {
@@ -251,9 +250,6 @@ const Index = () => {
 
       {/* Testimonials */}
       <TestimonialCarousel />
-
-      {/* Blog Section */}
-      <BlogSection />
 
       <Footer />
     </div>
