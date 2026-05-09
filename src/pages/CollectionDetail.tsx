@@ -16,9 +16,9 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Sparkles, X, SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, X, SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 import { SEO } from "@/components/SEO";
-import { GreekMeander, GreekDivider, LaurelFrame } from "@/components/GreekOrnaments";
+import { GreekMeander } from "@/components/GreekOrnaments";
 import {
   Sheet,
   SheetContent,
@@ -130,31 +130,10 @@ const DEFAULT_THEME = COLLECTION_THEMES.hades;
 
 const REALM_HANDLES = ["hades", "persephone"] as const;
 
-// Tier order: Premium first (most prestigious), then Pro, then Basic.
-// Each entry mirrors the PDF's Premium → Mid → Low structure within each realm.
-const TIERS = [
-  {
-    handle: "premium-tier",
-    label: "Premium",
-    subtitle: "Hero Pieces — Singular & Named",
-    icon: "👑",
-    accent: "hsl(45 90% 60%)",
-  },
-  {
-    handle: "pro-tier",
-    label: "Pro",
-    subtitle: "Refined Mid-Tier Forge",
-    icon: "⚜️",
-    accent: "hsl(170 60% 55%)",
-  },
-  {
-    handle: "basic-tier",
-    label: "Basic",
-    subtitle: "Approachable Mythic Pieces",
-    icon: "🔱",
-    accent: "hsl(210 25% 75%)",
-  },
-] as const;
+// Tier handles, used to look up which tier each product belongs to so the
+// product card can render with tier-specific styling.
+const TIER_HANDLES = ["premium-tier", "pro-tier", "basic-tier"] as const;
+type TierHandle = (typeof TIER_HANDLES)[number];
 
 const CollectionDetail = () => {
   const { handle } = useParams<{ handle: string }>();
@@ -178,23 +157,23 @@ const CollectionDetail = () => {
     staleTime: 1000 * 60 * 10,
   });
 
-  // For realm pages (Hades/Persephone), fetch the tier collections so we can
-  // group products by tier (Premium / Pro / Basic) within the realm.
+  // For realm pages (Hades/Persephone), fetch the tier collections so each
+  // product card can render with tier-specific styling.
   const { data: tierCollections } = useQuery({
     queryKey: ["tier-collections-for-realm"],
     queryFn: () =>
-      Promise.all(TIERS.map((t) => fetchCollectionByHandle(t.handle, 100))),
+      Promise.all(TIER_HANDLES.map((h) => fetchCollectionByHandle(h, 100))),
     enabled: isRealm,
     staleTime: 1000 * 60 * 10,
   });
 
   const productTierMap = useMemo(() => {
-    const map = new Map<string, (typeof TIERS)[number]>();
+    const map = new Map<string, TierHandle>();
     if (!tierCollections) return map;
-    TIERS.forEach((tier, idx) => {
+    TIER_HANDLES.forEach((handle, idx) => {
       const col = tierCollections[idx];
       col?.node.products.edges.forEach((p) => {
-        if (!map.has(p.node.id)) map.set(p.node.id, tier);
+        if (!map.has(p.node.id)) map.set(p.node.id, handle);
       });
     });
     return map;
@@ -246,21 +225,6 @@ const CollectionDetail = () => {
 
     return result;
   }, [products, priceRange, showInStock, sortBy]);
-
-  const groupedByTier = useMemo(() => {
-    const groups: Record<string, ShopifyProduct[]> = {
-      "premium-tier": [],
-      "pro-tier": [],
-      "basic-tier": [],
-      untiered: [],
-    };
-    filteredProducts.forEach((p) => {
-      const tier = productTierMap.get(p.node.id);
-      if (tier) groups[tier.handle].push(p);
-      else groups.untiered.push(p);
-    });
-    return groups;
-  }, [filteredProducts, productTierMap]);
 
   const hasActiveFilters =
     priceRange[0] > 0 || priceRange[1] < MAX_PRICE || showInStock;
@@ -350,82 +314,54 @@ const CollectionDetail = () => {
       />
       <Navigation />
 
-      <main className="pt-40 pb-20">
-        {/* Hero Section */}
-        <div className="relative overflow-hidden mb-16">
-          {/* Layered background — radial ember/leaf glow + diagonal gradient */}
+      <main className="pt-28 pb-20">
+        {/* Compact Hero — just enough to set the realm tone */}
+        <div className="relative overflow-hidden mb-8">
           <div
-            className="absolute inset-0 opacity-40 blur-3xl"
-            style={{ background: `linear-gradient(135deg, ${theme.gradientFrom} 0%, ${theme.gradientTo} 100%)` }}
-          />
-          <div
-            className="absolute inset-0 opacity-30"
+            className="absolute inset-0 opacity-25"
             style={{
-              background: `radial-gradient(ellipse at 50% 0%, ${theme.accent}26, transparent 65%)`,
+              background: `radial-gradient(ellipse at 50% 0%, ${theme.accent}33, transparent 70%)`,
             }}
           />
-          {/* Top Greek meander border */}
-          <div className="absolute top-0 left-0 right-0">
-            <GreekMeander color={theme.accent} height={16} opacity={0.45} />
-          </div>
 
-          <div className="relative z-10 container mx-auto px-4 text-center animate-fade-in-up pt-16 pb-14">
+          <div className="relative z-10 container mx-auto px-4 pt-6 pb-5">
             {/* Breadcrumb */}
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-start mb-4">
               <Link
                 to="/collections"
-                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors group"
+                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors group"
               >
-                <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform" />
+                <ArrowLeft className="h-3 w-3 group-hover:-translate-x-0.5 transition-transform" />
                 All Collections
               </Link>
             </div>
 
-            <div
-              className="inline-flex items-center gap-2 mb-8 px-6 py-3 backdrop-blur-sm border rounded-full shadow-lg"
-              style={{
-                backgroundColor: theme.accentMuted,
-                borderColor: theme.accentBorder,
-              }}
-            >
-              <Sparkles className="h-4 w-4 animate-pulse" style={{ color: theme.accent }} />
-              <p className="text-sm font-semibold tracking-[0.3em]" style={{ color: theme.accent }}>
-                {theme.badge.toUpperCase()}
-              </p>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl md:text-4xl drop-shadow-[0_0_12px_currentColor]" style={{ color: theme.accent }}>
+                  {theme.icon}
+                </span>
+                <div>
+                  <p
+                    className="text-[10px] md:text-xs font-semibold tracking-[0.35em] uppercase mb-0.5"
+                    style={{ color: theme.accent, opacity: 0.9 }}
+                  >
+                    {theme.badge}
+                  </p>
+                  <h1
+                    className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold tracking-tighter leading-none"
+                    style={{ textShadow: `0 0 30px ${theme.accent}40` }}
+                  >
+                    {collectionTitle}
+                  </h1>
+                </div>
+              </div>
             </div>
-
-            <LaurelFrame color={theme.accent} className="mb-6">
-              <div className="text-7xl">{theme.icon}</div>
-            </LaurelFrame>
-
-            <h1
-              className="text-5xl md:text-7xl lg:text-9xl font-heading font-bold mb-2 tracking-tighter leading-none"
-              style={{
-                textShadow: `0 0 60px ${theme.accent}33`,
-              }}
-            >
-              {collectionTitle}
-            </h1>
-
-            <p
-              className="text-base md:text-lg font-medium mb-6 tracking-[0.4em] uppercase"
-              style={{ color: theme.accent }}
-            >
-              {theme.heroTagline}
-            </p>
-
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-light mb-4">
-              {collection?.node.description || theme.heroDesc}
-            </p>
-
-            <p className="text-sm md:text-base italic" style={{ color: theme.accent }}>
-              — {theme.cta} —
-            </p>
           </div>
 
-          {/* Bottom Greek meander border (mirrored) */}
-          <div className="absolute bottom-0 left-0 right-0 rotate-180">
-            <GreekMeander color={theme.accent} height={16} opacity={0.45} />
+          {/* Thin meander divider beneath the title */}
+          <div className="container mx-auto px-4">
+            <GreekMeander color={theme.accent} height={10} opacity={0.45} />
           </div>
         </div>
 
@@ -520,120 +456,26 @@ const CollectionDetail = () => {
                     </Button>
                   )}
                 </div>
-              ) : isRealm ? (
-                <div className="space-y-20">
-                  {TIERS.map((tier) => {
-                    const tierProducts = groupedByTier[tier.handle];
-                    if (!tierProducts.length) return null;
-                    return (
-                      <section
-                        key={tier.handle}
-                        className="animate-fade-in-up"
-                        aria-labelledby={`tier-${tier.handle}`}
-                      >
-                        <div className="mb-8">
-                          <GreekDivider color={tier.accent} icon={tier.icon} className="mb-5" />
-                          <div className="text-center">
-                            <Link
-                              to={`/collections/${tier.handle}`}
-                              className="group inline-flex flex-col items-center"
-                            >
-                              <p
-                                className="text-xs font-semibold tracking-[0.4em] mb-2"
-                                style={{ color: tier.accent, opacity: 0.85 }}
-                              >
-                                TIER · {tierProducts.length}{" "}
-                                {tierProducts.length === 1 ? "PIECE" : "PIECES"}
-                              </p>
-                              <h2
-                                id={`tier-${tier.handle}`}
-                                className="text-4xl md:text-5xl font-heading font-bold tracking-tighter leading-none mb-2 transition-colors"
-                                style={{ color: tier.accent }}
-                              >
-                                {tier.label}
-                              </h2>
-                              <p className="text-sm md:text-base text-muted-foreground font-light italic max-w-md">
-                                {tier.subtitle}
-                              </p>
-                              <span
-                                className="mt-3 text-xs uppercase tracking-widest opacity-0 group-hover:opacity-80 transition-opacity"
-                                style={{ color: tier.accent }}
-                              >
-                                View full {tier.label} tier →
-                              </span>
-                            </Link>
-                          </div>
-                        </div>
-
-                        <div
-                          className={`grid grid-cols-1 sm:grid-cols-2 ${
-                            filtersOpen ? "lg:grid-cols-2 xl:grid-cols-3" : "lg:grid-cols-3 xl:grid-cols-4"
-                          } gap-6 lg:gap-8`}
-                        >
-                          {tierProducts.map((product, index) => (
-                            <div
-                              key={product.node.id}
-                              className="animate-fade-in-up"
-                              style={{ animationDelay: `${index * 0.05}s` }}
-                            >
-                              <ProductCard product={product} />
-                            </div>
-                          ))}
-                        </div>
-                      </section>
-                    );
-                  })}
-
-                  {groupedByTier.untiered.length > 0 && (
-                    <section className="animate-fade-in-up">
-                      <div className="mb-8">
-                        <GreekDivider color={theme.accent} className="mb-5" />
-                        <div className="text-center">
-                          <p
-                            className="text-xs font-semibold tracking-[0.4em] mb-2"
-                            style={{ color: theme.accent, opacity: 0.85 }}
-                          >
-                            ADDITIONAL · {groupedByTier.untiered.length}{" "}
-                            {groupedByTier.untiered.length === 1 ? "PIECE" : "PIECES"}
-                          </p>
-                          <h2 className="text-3xl md:text-4xl font-heading font-bold tracking-tighter leading-none mb-2">
-                            More from this Realm
-                          </h2>
-                        </div>
-                      </div>
-                      <div
-                        className={`grid grid-cols-1 sm:grid-cols-2 ${
-                          filtersOpen ? "lg:grid-cols-2 xl:grid-cols-3" : "lg:grid-cols-3 xl:grid-cols-4"
-                        } gap-6 lg:gap-8`}
-                      >
-                        {groupedByTier.untiered.map((product, index) => (
-                          <div
-                            key={product.node.id}
-                            className="animate-fade-in-up"
-                            style={{ animationDelay: `${index * 0.05}s` }}
-                          >
-                            <ProductCard product={product} />
-                          </div>
-                        ))}
-                      </div>
-                    </section>
-                  )}
-                </div>
               ) : (
                 <div
                   className={`grid grid-cols-1 sm:grid-cols-2 ${
                     filtersOpen ? "lg:grid-cols-2 xl:grid-cols-3" : "lg:grid-cols-3 xl:grid-cols-4"
                   } gap-6 lg:gap-8`}
                 >
-                  {filteredProducts.map((product, index) => (
-                    <div
-                      key={product.node.id}
-                      className="animate-fade-in-up"
-                      style={{ animationDelay: `${index * 0.05}s` }}
-                    >
-                      <ProductCard product={product} />
-                    </div>
-                  ))}
+                  {filteredProducts.map((product, index) => {
+                    const productTier = isRealm
+                      ? productTierMap.get(product.node.id)
+                      : undefined;
+                    return (
+                      <div
+                        key={product.node.id}
+                        className="animate-fade-in-up"
+                        style={{ animationDelay: `${index * 0.05}s` }}
+                      >
+                        <ProductCard product={product} tier={productTier} />
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
