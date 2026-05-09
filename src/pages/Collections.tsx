@@ -130,6 +130,105 @@ const Collections = () => {
           </Link>
         </div>
 
+        {/* Shop by Tier */}
+        <div className="mt-28 animate-fade-in-up">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 mb-6 px-6 py-3 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full shadow-lg">
+              <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+              <p className="text-sm font-semibold text-primary tracking-wider">SHOP BY TIER</p>
+            </div>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-4 tracking-tighter leading-none">
+              Choose Your <span className="text-gradient bg-clip-text text-transparent">Caliber</span>
+            </h2>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
+              From approachable everyday pieces to singular hero rings — find the level that fits your story.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {/* Basic Tier */}
+            <Link to="/collections/basic-tier" className="group block">
+              <div className="relative h-full rounded-2xl overflow-hidden border border-[hsl(210_25%_60%_/_0.2)] hover:border-[hsl(210_25%_60%_/_0.6)] transition-all duration-500 hover-lift min-h-[320px] flex flex-col">
+                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(210_20%_10%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(210_25%_30%_/_0.3),transparent_60%)]" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[hsl(210_25%_70%)] to-transparent" />
+                <div className="relative z-10 flex flex-col justify-between h-full p-8">
+                  <div>
+                    <div className="text-4xl mb-4">🔹</div>
+                    <div className="inline-block mb-3 px-3 py-1 bg-[hsl(210_25%_60%_/_0.15)] border border-[hsl(210_25%_60%_/_0.3)] rounded-full">
+                      <span className="text-xs font-bold tracking-widest uppercase text-[hsl(210_25%_75%)]">Entry</span>
+                    </div>
+                    <h3 className="text-3xl font-heading font-bold mb-3 tracking-tighter group-hover:text-[hsl(210_25%_75%)] transition-colors">
+                      Basic Tier
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Approachable everyday pieces — the same forge, lighter on the wallet.
+                    </p>
+                  </div>
+                  <div className="mt-6 flex items-center gap-2 text-[hsl(210_25%_75%)] font-medium group-hover:gap-3 transition-all duration-300 text-sm">
+                    <span>Explore Basic</span>
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+            {/* Pro Tier */}
+            <Link to="/collections/pro-tier" className="group block">
+              <div className="relative h-full rounded-2xl overflow-hidden border border-[hsl(170_60%_50%_/_0.2)] hover:border-[hsl(170_60%_50%_/_0.6)] transition-all duration-500 hover-lift min-h-[320px] flex flex-col">
+                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(170_50%_8%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(170_60%_25%_/_0.3),transparent_60%)]" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[hsl(170_60%_55%)] to-transparent" />
+                <div className="relative z-10 flex flex-col justify-between h-full p-8">
+                  <div>
+                    <div className="text-4xl mb-4">🔸</div>
+                    <div className="inline-block mb-3 px-3 py-1 bg-[hsl(170_60%_50%_/_0.15)] border border-[hsl(170_60%_50%_/_0.3)] rounded-full">
+                      <span className="text-xs font-bold tracking-widest uppercase text-[hsl(170_60%_60%)]">Mid-Tier</span>
+                    </div>
+                    <h3 className="text-3xl font-heading font-bold mb-3 tracking-tighter group-hover:text-[hsl(170_60%_60%)] transition-colors">
+                      Pro Tier
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Refined detail and deeper finishes — for those who walk between realms.
+                    </p>
+                  </div>
+                  <div className="mt-6 flex items-center gap-2 text-[hsl(170_60%_60%)] font-medium group-hover:gap-3 transition-all duration-300 text-sm">
+                    <span>Explore Pro</span>
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+            {/* Premium Tier */}
+            <Link to="/collections/premium-tier" className="group block">
+              <div className="relative h-full rounded-2xl overflow-hidden border border-[hsl(45_90%_55%_/_0.25)] hover:border-[hsl(45_90%_55%_/_0.7)] transition-all duration-500 hover-lift min-h-[320px] flex flex-col">
+                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(45_70%_10%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(45_90%_30%_/_0.35),transparent_60%)]" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[hsl(45_90%_60%)] to-transparent" />
+                <div className="relative z-10 flex flex-col justify-between h-full p-8">
+                  <div>
+                    <div className="text-4xl mb-4">👑</div>
+                    <div className="inline-block mb-3 px-3 py-1 bg-[hsl(45_90%_55%_/_0.15)] border border-[hsl(45_90%_55%_/_0.3)] rounded-full">
+                      <span className="text-xs font-bold tracking-widest uppercase text-[hsl(45_90%_65%)]">Hero Pieces</span>
+                    </div>
+                    <h3 className="text-3xl font-heading font-bold mb-3 tracking-tighter group-hover:text-[hsl(45_90%_65%)] transition-colors">
+                      Premium Tier
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      One-of-one statement rings — singular, named, the crown of the forge.
+                    </p>
+                  </div>
+                  <div className="mt-6 flex items-center gap-2 text-[hsl(45_90%_65%)] font-medium group-hover:gap-3 transition-all duration-300 text-sm">
+                    <span>Explore Premium</span>
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
+
         {/* Myth quote */}
         <div className="text-center mt-20 animate-fade-in-up">
           <div className="max-w-2xl mx-auto px-8 py-6 border border-border/40 rounded-2xl bg-card/20 backdrop-blur-sm">

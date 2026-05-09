@@ -13,8 +13,6 @@ import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Policies from "./pages/Policies";
 import Wishlist from "./pages/Wishlist";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
 import Collections from "./pages/Collections";
 import CollectionDetail from "./pages/CollectionDetail";
 import NotFound from "./pages/NotFound";
@@ -53,8 +51,6 @@ const AppContent = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/collections" element={<Collections />} />
           <Route path="/collections/:handle" element={<CollectionDetail />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/policies" element={<Policies />} />
           <Route path="/refund-policy" element={<Policies />} />
           <Route path="/exchange-policy" element={<Policies />} />

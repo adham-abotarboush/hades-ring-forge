@@ -1,20 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { ProductCard } from "@/components/ProductCard";
-import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
 import { Link } from "react-router-dom";
-import { ArrowRight, Flame, Sparkles, Shield, Award, Users } from "lucide-react";
+import { ArrowRight, Sparkles, Shield, Award, Users } from "lucide-react";
 import heroImage from "@/assets/hero-forge.jpg";
 import { SEO } from "@/components/SEO";
 import { TestimonialCarousel } from "@/components/TestimonialCarousel";
-import { BlogSection } from "@/components/BlogSection";
-import { useProducts } from "@/contexts/ProductsContext";
 
 const Index = () => {
-  const { getFeaturedProducts, isLoading: loading } = useProducts();
-  const featuredProducts = getFeaturedProducts(6);
-
   return (
     <div className="min-h-screen bg-background page-transition">
       <SEO
@@ -88,57 +81,6 @@ const Index = () => {
           <div className="w-6 h-10 border-2 border-primary/30 rounded-full flex justify-center p-2">
             <div className="w-1 h-2 bg-primary rounded-full animate-pulse" />
           </div>
-        </div>
-      </section>
-
-      {/* Best Sellers Section */}
-      <section className="py-32 container mx-auto px-4 relative">
-        <div className="absolute inset-0 bg-gradient-forge opacity-20 blur-3xl" />
-
-        <div className="relative z-10">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full shadow-lg">
-              <Flame className="h-5 w-5 text-primary animate-pulse" />
-              <span className="text-sm font-bold tracking-widest uppercase text-primary">Most Forged</span>
-            </div>
-            <h2 className="text-5xl md:text-6xl lg:text-8xl font-heading font-bold mb-8 tracking-tighter leading-none">
-              Legendary <span className="text-gradient bg-clip-text text-transparent">Bestsellers</span>
-            </h2>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-light leading-relaxed">
-              The most sought-after rings from the depths of the Underworld
-            </p>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <ProductCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-16">
-                {featuredProducts.slice(0, 6).map((product, index) => (
-                  <div
-                    key={product.node.id}
-                    className="animate-fade-in-up hover-lift"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <ProductCard product={product} />
-                  </div>
-                ))}
-              </div>
-
-              <div className="text-center">
-                <Link to="/shop">
-                  <Button size="lg" variant="outline" className="border-primary/50 text-foreground hover:bg-primary/10 hover:border-primary group text-lg px-8 py-6 h-auto">
-                    View All Rings
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-              </div>
-            </>
-          )}
         </div>
       </section>
 
@@ -251,9 +193,6 @@ const Index = () => {
 
       {/* Testimonials */}
       <TestimonialCarousel />
-
-      {/* Blog Section */}
-      <BlogSection />
 
       <Footer />
     </div>
