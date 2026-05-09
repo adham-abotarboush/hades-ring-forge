@@ -14,7 +14,13 @@ import { QuickViewModal } from "@/components/QuickViewModal";
 interface ProductCardProps {
   product: ShopifyProduct;
   tier?: "premium-tier" | "pro-tier" | "basic-tier";
+  realm?: "hades" | "persephone";
 }
+
+const REALM_META: Record<NonNullable<ProductCardProps["realm"]>, { color: string; icon: string; label: string }> = {
+  hades: { color: "hsl(0 75% 55%)", icon: "🔥", label: "Hades" },
+  persephone: { color: "hsl(130 55% 55%)", icon: "🌿", label: "Persephone" },
+};
 
 const TIER_STYLES: Record<
   NonNullable<ProductCardProps["tier"]>,
@@ -49,7 +55,7 @@ const TIER_STYLES: Record<
   },
 };
 
-export const ProductCard = ({ product, tier }: ProductCardProps) => {
+export const ProductCard = ({ product, tier, realm }: ProductCardProps) => {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const setCartOpen = useCartStore(state => state.setCartOpen);
@@ -203,10 +209,21 @@ export const ProductCard = ({ product, tier }: ProductCardProps) => {
         </Link>
 
         <CardContent className="p-6 flex-1 flex flex-col">
-          {tierStyle && (
-            <div className="flex items-center gap-1.5 mb-2 text-[10px] font-bold tracking-[0.3em] uppercase" style={{ color: tierStyle.color }}>
-              <span>{tierStyle.icon}</span>
-              <span>{tierStyle.label} Tier</span>
+          {(tierStyle || realm) && (
+            <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-2 text-[10px] font-bold tracking-[0.3em] uppercase">
+              {tierStyle && (
+                <span className="flex items-center gap-1.5" style={{ color: tierStyle.color }}>
+                  <span>{tierStyle.icon}</span>
+                  <span>{tierStyle.label}</span>
+                </span>
+              )}
+              {tierStyle && realm && <span className="text-muted-foreground/60">·</span>}
+              {realm && (
+                <span className="flex items-center gap-1.5" style={{ color: REALM_META[realm].color }}>
+                  <span>{REALM_META[realm].icon}</span>
+                  <span>{REALM_META[realm].label}</span>
+                </span>
+              )}
             </div>
           )}
           <Link to={`/product/${node.handle}`}>
