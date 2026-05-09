@@ -10,49 +10,50 @@ import { ArrowRight, Sparkles, Shield, Award, Users } from "lucide-react";
 import heroImage from "@/assets/hero-forge.jpg";
 import { SEO } from "@/components/SEO";
 import { TestimonialCarousel } from "@/components/TestimonialCarousel";
-import { GreekMeander, GreekDivider } from "@/components/GreekOrnaments";
+import { GreekDivider } from "@/components/GreekOrnaments";
 import { fetchCollectionByHandle, ShopifyProduct } from "@/lib/shopify";
-import { useProductTierMap, TierHandle, TIER_HANDLES } from "@/hooks/useProductTierMap";
+import { useProductTierMap, TierHandle, tierRank } from "@/hooks/useProductTierMap";
 
 const HADES = "hsl(0 75% 55%)";
 const PERSEPHONE = "hsl(130 55% 55%)";
 
-const SAMPLE_COUNT = 4;
+const SHOWCASE_COUNT = 8;
 
-// Pick a curated handful: prefer in-stock, then diversify across tiers
-// (one Premium + one Pro + one Basic), then fill the rest with whatever's left.
-function smartSample(
-  products: ShopifyProduct[],
+type Realm = "hades" | "persephone";
+type ShowcaseItem = { product: ShopifyProduct; realm: Realm };
+
+// Build the merged showcase: rank each realm by tier (Premium → Pro → Basic,
+// in-stock first), then interleave the two realms so Premium pairs with
+// Premium, Pro with Pro, and so on. The result is a single grid that reads
+// as one curated showcase, not two separate collections.
+function buildShowcase(
+  hades: ShopifyProduct[],
+  persephone: ShopifyProduct[],
   tierMap: Map<string, TierHandle>,
-  count: number,
-): ShopifyProduct[] {
-  const inStock = products.filter((p) =>
-    p.node.variants.edges.some((v) => v.node.availableForSale),
-  );
-  const pool = inStock.length >= count ? inStock : products;
+  total: number,
+): ShowcaseItem[] {
+  const sortByTierThenStock = (a: ShopifyProduct, b: ShopifyProduct) => {
+    const aRank = tierRank(tierMap.get(a.node.id));
+    const bRank = tierRank(tierMap.get(b.node.id));
+    if (aRank !== bRank) return aRank - bRank;
+    const aOk = a.node.variants.edges.some((v) => v.node.availableForSale);
+    const bOk = b.node.variants.edges.some((v) => v.node.availableForSale);
+    if (aOk && !bOk) return -1;
+    if (!aOk && bOk) return 1;
+    return 0;
+  };
 
-  const picked: ShopifyProduct[] = [];
-  const used = new Set<string>();
+  const sortedHades = [...hades].sort(sortByTierThenStock);
+  const sortedPersephone = [...persephone].sort(sortByTierThenStock);
 
-  for (const tierHandle of TIER_HANDLES) {
-    const candidate = pool.find(
-      (p) => tierMap.get(p.node.id) === tierHandle && !used.has(p.node.id),
-    );
-    if (candidate) {
-      picked.push(candidate);
-      used.add(candidate.node.id);
-    }
+  const items: ShowcaseItem[] = [];
+  const max = Math.max(sortedHades.length, sortedPersephone.length);
+  for (let i = 0; i < max && items.length < total; i++) {
+    if (i < sortedHades.length) items.push({ product: sortedHades[i], realm: "hades" });
+    if (items.length >= total) break;
+    if (i < sortedPersephone.length) items.push({ product: sortedPersephone[i], realm: "persephone" });
   }
-
-  for (const p of pool) {
-    if (picked.length >= count) break;
-    if (!used.has(p.node.id)) {
-      picked.push(p);
-      used.add(p.node.id);
-    }
-  }
-
-  return picked.slice(0, count);
+  return items;
 }
 
 function useRealmCollection(handle: string) {
@@ -67,14 +68,17 @@ const Index = () => {
   const tierMap = useProductTierMap();
   const { data: hadesCollection, isLoading: hadesLoading } = useRealmCollection("hades");
   const { data: persephoneCollection, isLoading: persephoneLoading } = useRealmCollection("persephone");
+  const showcaseLoading = hadesLoading || persephoneLoading;
 
-  const hadesSample = useMemo(
-    () => smartSample(hadesCollection?.node.products.edges ?? [], tierMap, SAMPLE_COUNT),
-    [hadesCollection, tierMap],
-  );
-  const persephoneSample = useMemo(
-    () => smartSample(persephoneCollection?.node.products.edges ?? [], tierMap, SAMPLE_COUNT),
-    [persephoneCollection, tierMap],
+  const showcase = useMemo(
+    () =>
+      buildShowcase(
+        hadesCollection?.node.products.edges ?? [],
+        persephoneCollection?.node.products.edges ?? [],
+        tierMap,
+        SHOWCASE_COUNT,
+      ),
+    [hadesCollection, persephoneCollection, tierMap],
   );
 
   return (
@@ -153,158 +157,67 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Collections Showcase */}
-      <section className="py-32 container mx-auto px-4 relative">
-        <div className="absolute inset-0 opacity-15 blur-3xl" style={{ background: "linear-gradient(135deg, hsl(38 90% 12%) 0%, hsl(330 80% 8%) 100%)" }} />
+      {/* Unified Showcase — both realms in one grid */}
+      <section className="py-28 container mx-auto px-4 relative">
+        {/* Twin radial atmosphere — red on the left, green on the right, blending in the middle */}
+        <div
+          className="absolute inset-0 opacity-20 blur-3xl pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse at 15% 30%, ${HADES}55, transparent 55%), radial-gradient(ellipse at 85% 70%, ${PERSEPHONE}55, transparent 55%)`,
+          }}
+        />
 
         <div className="relative z-10">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full shadow-lg">
-              <Sparkles className="h-5 w-5 text-primary animate-pulse" />
-              <span className="text-sm font-bold tracking-widest uppercase text-primary">The Two Realms</span>
+          <div className="text-center mb-12 animate-fade-in-up">
+            <div className="inline-flex items-center gap-3 mb-5 px-5 py-2 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full shadow-lg">
+              <span style={{ color: HADES }}>🔥</span>
+              <span className="text-xs font-bold tracking-[0.35em] uppercase text-primary">One Forge · Two Myths</span>
+              <span style={{ color: PERSEPHONE }}>🌿</span>
             </div>
-            <h2 className="text-5xl md:text-6xl lg:text-8xl font-heading font-bold mb-6 tracking-tighter leading-none">
-              Choose Your <span className="text-gradient bg-clip-text text-transparent">Myth</span>
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold mb-5 tracking-tighter leading-none">
+              Today at <span className="text-gradient bg-clip-text text-transparent">the Forge</span>
             </h2>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-light leading-relaxed">
-              Two collections. Two destinies. Both forged from the same ancient legend.
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
+              Pieces from <span style={{ color: HADES }}>Hades</span> and <span style={{ color: PERSEPHONE }}>Persephone</span>, ordered by their place in the forge — Premium, Pro, then Basic.
             </p>
+            <div className="max-w-sm mx-auto mt-7 text-muted-foreground/60">
+              <GreekDivider color="hsl(45 90% 60%)" />
+            </div>
           </div>
 
-          <div className="max-w-md mx-auto mb-12 text-muted-foreground/60">
-            <GreekDivider color="hsl(45 90% 60%)" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {/* Hades — Red */}
-            <Link to="/collections/hades" className="group block">
-              <div
-                className="relative rounded-2xl overflow-hidden border transition-all duration-500 hover-lift min-h-[380px] flex flex-col"
-                style={{ borderColor: `${HADES}33` }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = `${HADES}99`;
-                  e.currentTarget.style.boxShadow = `0 20px 60px -15px ${HADES}55`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = `${HADES}33`;
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(0_60%_8%)]" />
-                <div
-                  className="absolute inset-0"
-                  style={{ background: `radial-gradient(ellipse at bottom left, ${HADES}33, transparent 65%)` }}
-                />
-                <div className="absolute top-0 left-0 right-0">
-                  <GreekMeander color={HADES} height={12} opacity={0.55} />
-                </div>
-                <div className="relative z-10 p-8 md:p-10 pt-12 flex flex-col justify-between h-full">
-                  <div>
-                    <div className="text-6xl mb-4 drop-shadow-[0_0_15px_hsl(0_75%_55%_/_0.5)]">🔥</div>
-                    <p
-                      className="text-xs font-bold tracking-[0.4em] uppercase mb-3"
-                      style={{ color: HADES, opacity: 0.85 }}
-                    >
-                      The Underworld
-                    </p>
-                    <h3
-                      className="text-4xl md:text-5xl font-heading font-bold mb-3 tracking-tighter transition-colors duration-300"
-                      style={{ textShadow: `0 0 30px ${HADES}55` }}
-                    >
-                      Hades
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      Forged in ember and shadow — rings that carry the weight of eternity beneath Olympus.
-                    </p>
-                  </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-14">
+            {showcaseLoading
+              ? Array.from({ length: SHOWCASE_COUNT }).map((_, i) => <ProductCardSkeleton key={i} />)
+              : showcase.map(({ product, realm }, index) => (
                   <div
-                    className="mt-8 flex items-center gap-2 font-medium group-hover:gap-3 transition-all duration-300"
-                    style={{ color: HADES }}
+                    key={product.node.id}
+                    className="animate-fade-in-up"
+                    style={{ animationDelay: `${index * 0.06}s` }}
                   >
-                    <span>Enter the Underworld</span>
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    <ProductCard product={product} tier={tierMap.get(product.node.id)} realm={realm} />
                   </div>
-                </div>
-              </div>
-            </Link>
-
-            {/* Persephone — Green */}
-            <Link to="/collections/persephone" className="group block">
-              <div
-                className="relative rounded-2xl overflow-hidden border transition-all duration-500 hover-lift min-h-[380px] flex flex-col"
-                style={{ borderColor: `${PERSEPHONE}33` }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = `${PERSEPHONE}99`;
-                  e.currentTarget.style.boxShadow = `0 20px 60px -15px ${PERSEPHONE}55`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = `${PERSEPHONE}33`;
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(140_50%_8%)]" />
-                <div
-                  className="absolute inset-0"
-                  style={{ background: `radial-gradient(ellipse at bottom right, ${PERSEPHONE}33, transparent 65%)` }}
-                />
-                <div className="absolute top-0 left-0 right-0">
-                  <GreekMeander color={PERSEPHONE} height={12} opacity={0.55} />
-                </div>
-                <div className="relative z-10 p-8 md:p-10 pt-12 flex flex-col justify-between h-full">
-                  <div>
-                    <div className="text-6xl mb-4 drop-shadow-[0_0_15px_hsl(130_55%_55%_/_0.5)]">🌿</div>
-                    <p
-                      className="text-xs font-bold tracking-[0.4em] uppercase mb-3"
-                      style={{ color: PERSEPHONE, opacity: 0.85 }}
-                    >
-                      Queen of Spring
-                    </p>
-                    <h3
-                      className="text-4xl md:text-5xl font-heading font-bold mb-3 tracking-tighter transition-colors duration-300"
-                      style={{ textShadow: `0 0 30px ${PERSEPHONE}55` }}
-                    >
-                      Persephone
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      Where verdant bloom meets eternal shadow — rings born of spring's defiance.
-                    </p>
-                  </div>
-                  <div
-                    className="mt-8 flex items-center gap-2 font-medium group-hover:gap-3 transition-all duration-300"
-                    style={{ color: PERSEPHONE }}
-                  >
-                    <span>Walk the Verdant Path</span>
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </div>
-            </Link>
+                ))}
           </div>
 
+          {/* Realm doors — slim, side by side, replace the old huge cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+            <RealmDoor
+              to="/collections/hades"
+              color={HADES}
+              icon="🔥"
+              eyebrow="The Underworld"
+              label="Enter Hades"
+            />
+            <RealmDoor
+              to="/collections/persephone"
+              color={PERSEPHONE}
+              icon="🌿"
+              eyebrow="Queen of Spring"
+              label="Walk Persephone"
+            />
+          </div>
         </div>
       </section>
-
-      {/* Realm Sample — Hades */}
-      <RealmSample
-        title="From the Underworld"
-        eyebrow="Hades · Lord of Shadow"
-        handle="hades"
-        color={HADES}
-        products={hadesSample}
-        loading={hadesLoading}
-        ctaLabel="Enter the Underworld"
-      />
-
-      {/* Realm Sample — Persephone */}
-      <RealmSample
-        title="From Spring's Bloom"
-        eyebrow="Persephone · Queen of Verdant Light"
-        handle="persephone"
-        color={PERSEPHONE}
-        products={persephoneSample}
-        loading={persephoneLoading}
-        ctaLabel="Walk the Verdant Path"
-      />
 
       {/* Features Section */}
       <section className="py-32 container mx-auto px-4 relative">
@@ -350,87 +263,59 @@ const Index = () => {
   );
 };
 
-const RealmSample = ({
-  title,
-  eyebrow,
-  handle,
+const RealmDoor = ({
+  to,
   color,
-  products,
-  loading,
-  ctaLabel,
+  icon,
+  eyebrow,
+  label,
 }: {
-  title: string;
-  eyebrow: string;
-  handle: string;
+  to: string;
   color: string;
-  products: ShopifyProduct[];
-  loading: boolean;
-  ctaLabel: string;
-}) => {
-  const tierMap = useProductTierMap();
-  const isEmpty = !loading && products.length === 0;
-  if (isEmpty) return null;
-
-  return (
-    <section className="py-20 md:py-24 container mx-auto px-4 relative">
+  icon: string;
+  eyebrow: string;
+  label: string;
+}) => (
+  <Link to={to} className="group block">
+    <div
+      className="relative rounded-xl overflow-hidden border transition-all duration-300 hover-lift flex items-center gap-4 p-5"
+      style={{ borderColor: `${color}33` }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = `${color}99`;
+        e.currentTarget.style.boxShadow = `0 12px 40px -12px ${color}55`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = `${color}33`;
+        e.currentTarget.style.boxShadow = "none";
+      }}
+    >
       <div
-        className="absolute inset-x-0 top-1/3 -bottom-10 opacity-15 blur-3xl pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at center, ${color}, transparent 70%)` }}
+        className="absolute inset-0 opacity-30"
+        style={{ background: `linear-gradient(135deg, transparent, ${color}22)` }}
       />
-
-      <div className="relative z-10">
-        <div className="max-w-md mx-auto mb-6 text-muted-foreground/60">
-          <GreekDivider color={color} />
-        </div>
-
-        <div className="text-center mb-12">
+      <div className="relative z-10 flex items-center gap-4 w-full">
+        <span
+          className="text-3xl drop-shadow-[0_0_8px_currentColor]"
+          style={{ color }}
+        >
+          {icon}
+        </span>
+        <div className="flex-1">
           <p
-            className="text-xs md:text-sm font-semibold tracking-[0.4em] uppercase mb-3"
+            className="text-[10px] font-bold tracking-[0.35em] uppercase mb-0.5"
             style={{ color, opacity: 0.85 }}
           >
             {eyebrow}
           </p>
-          <h2
-            className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold tracking-tighter leading-none mb-4"
-            style={{ textShadow: `0 0 30px ${color}40` }}
-          >
-            {title}
-          </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto font-light">
-            A glimpse of the realm — one piece from each tier of the forge.
-          </p>
+          <p className="text-base md:text-lg font-heading font-semibold tracking-tight">{label}</p>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-10">
-          {loading
-            ? Array.from({ length: SAMPLE_COUNT }).map((_, i) => <ProductCardSkeleton key={i} />)
-            : products.map((product, index) => (
-                <div
-                  key={product.node.id}
-                  className="animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.08}s` }}
-                >
-                  <ProductCard product={product} tier={tierMap.get(product.node.id)} />
-                </div>
-              ))}
-        </div>
-
-        <div className="text-center">
-          <Link to={`/collections/${handle}`}>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-2 text-foreground group text-base px-8 py-5 h-auto transition-all duration-300"
-              style={{ borderColor: `${color}80` }}
-            >
-              {ctaLabel}
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </Link>
-        </div>
+        <ArrowRight
+          className="h-5 w-5 group-hover:translate-x-1 transition-transform"
+          style={{ color }}
+        />
       </div>
-    </section>
-  );
-};
+    </div>
+  </Link>
+);
 
 export default Index;
