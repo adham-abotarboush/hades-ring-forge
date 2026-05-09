@@ -143,23 +143,10 @@ export const ProductCard = ({ product, tier }: ProductCardProps) => {
         }
       >
         {tierStyle && (
-          <>
-            {/* Tier ribbon — diagonal corner flag */}
-            <div className="absolute top-0 right-0 z-20 pointer-events-none overflow-hidden w-24 h-24">
-              <div
-                className="absolute top-[18px] right-[-32px] w-[120px] py-1 text-center rotate-45 shadow-md text-[10px] font-bold tracking-[0.25em] uppercase text-background"
-                style={{ background: tierStyle.ribbon }}
-              >
-                {tierStyle.label}
-              </div>
-            </div>
-
-            {/* Tier accent strip along the top */}
-            <div
-              className="absolute top-0 left-0 right-0 h-[3px] z-10 pointer-events-none"
-              style={{ background: tierStyle.ribbon }}
-            />
-          </>
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px] z-10 pointer-events-none"
+            style={{ background: tierStyle.ribbon }}
+          />
         )}
 
         <Link to={`/product/${node.handle}`}>
