@@ -13,9 +13,43 @@ import { QuickViewModal } from "@/components/QuickViewModal";
 
 interface ProductCardProps {
   product: ShopifyProduct;
+  tier?: "premium-tier" | "pro-tier" | "basic-tier";
 }
 
-export const ProductCard = ({ product }: ProductCardProps) => {
+const TIER_STYLES: Record<
+  NonNullable<ProductCardProps["tier"]>,
+  {
+    color: string;
+    label: string;
+    icon: string;
+    glow: string;
+    ribbon: string;
+  }
+> = {
+  "premium-tier": {
+    color: "hsl(45 90% 60%)",
+    label: "Premium",
+    icon: "👑",
+    glow: "0 0 40px -10px hsl(45 90% 55% / 0.55)",
+    ribbon: "linear-gradient(135deg, hsl(45 90% 55%), hsl(35 85% 45%))",
+  },
+  "pro-tier": {
+    color: "hsl(170 60% 55%)",
+    label: "Pro",
+    icon: "⚜️",
+    glow: "0 0 30px -10px hsl(170 60% 50% / 0.45)",
+    ribbon: "linear-gradient(135deg, hsl(170 60% 50%), hsl(190 60% 40%))",
+  },
+  "basic-tier": {
+    color: "hsl(210 25% 75%)",
+    label: "Basic",
+    icon: "🔱",
+    glow: "0 0 24px -10px hsl(210 25% 70% / 0.35)",
+    ribbon: "linear-gradient(135deg, hsl(210 25% 70%), hsl(210 20% 55%))",
+  },
+};
+
+export const ProductCard = ({ product, tier }: ProductCardProps) => {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const setCartOpen = useCartStore(state => state.setCartOpen);
@@ -91,9 +125,43 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   const totalInventory = node.totalInventory ?? 0;
   const isAlmostSoldOut = !isSoldOut && totalInventory > 0 && totalInventory <= 5;
 
+  const tierStyle = tier ? TIER_STYLES[tier] : null;
+
   return (
     <>
-      <Card className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all duration-500 hover-lift h-full flex flex-col">
+      <Card
+        className={`group overflow-hidden bg-card transition-all duration-500 hover-lift h-full flex flex-col relative ${
+          tierStyle ? "" : "border-border hover:border-primary/50"
+        }`}
+        style={
+          tierStyle
+            ? {
+                borderColor: `${tierStyle.color}55`,
+                boxShadow: tierStyle.glow,
+              }
+            : undefined
+        }
+      >
+        {tierStyle && (
+          <>
+            {/* Tier ribbon — diagonal corner flag */}
+            <div className="absolute top-0 right-0 z-20 pointer-events-none overflow-hidden w-24 h-24">
+              <div
+                className="absolute top-[18px] right-[-32px] w-[120px] py-1 text-center rotate-45 shadow-md text-[10px] font-bold tracking-[0.25em] uppercase text-background"
+                style={{ background: tierStyle.ribbon }}
+              >
+                {tierStyle.label}
+              </div>
+            </div>
+
+            {/* Tier accent strip along the top */}
+            <div
+              className="absolute top-0 left-0 right-0 h-[3px] z-10 pointer-events-none"
+              style={{ background: tierStyle.ribbon }}
+            />
+          </>
+        )}
+
         <Link to={`/product/${node.handle}`}>
           <div className="relative aspect-square overflow-hidden bg-gradient-forge">
             {image ? (
@@ -148,8 +216,24 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         </Link>
 
         <CardContent className="p-6 flex-1 flex flex-col">
+          {tierStyle && (
+            <div className="flex items-center gap-1.5 mb-2 text-[10px] font-bold tracking-[0.3em] uppercase" style={{ color: tierStyle.color }}>
+              <span>{tierStyle.icon}</span>
+              <span>{tierStyle.label} Tier</span>
+            </div>
+          )}
           <Link to={`/product/${node.handle}`}>
-            <h3 className="text-xl font-heading font-semibold mb-3 group-hover:text-primary transition-colors duration-300 leading-tight">
+            <h3
+              className={`text-xl font-heading font-semibold mb-3 transition-colors duration-300 leading-tight ${
+                tierStyle ? "" : "group-hover:text-primary"
+              }`}
+              onMouseEnter={(e) => {
+                if (tierStyle) e.currentTarget.style.color = tierStyle.color;
+              }}
+              onMouseLeave={(e) => {
+                if (tierStyle) e.currentTarget.style.color = "";
+              }}
+            >
               {node.title}
             </h3>
           </Link>
@@ -159,7 +243,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-primary">
+              <span
+                className="text-2xl font-bold"
+                style={tierStyle ? { color: tierStyle.color } : { color: "hsl(var(--primary))" }}
+              >
                 <span className="text-sm font-medium opacity-70 mr-0.5">EGP</span>
                 {parseFloat(price.amount).toFixed(0)}
               </span>
