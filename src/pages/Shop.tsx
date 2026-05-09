@@ -23,6 +23,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useProducts } from "@/contexts/ProductsContext";
+import { useProductTierMap } from "@/hooks/useProductTierMap";
 
 const MAX_PRICE = 1000;
 
@@ -38,6 +39,7 @@ const PRICE_PRESETS = [
 
 const Shop = () => {
   const { products, collections, isLoading: loading } = useProducts();
+  const productTierMap = useProductTierMap();
   const [sortBy, setSortBy] = useState<SortOption>("featured");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, MAX_PRICE]);
   const [showInStock, setShowInStock] = useState(false);
@@ -318,7 +320,7 @@ const Shop = () => {
                     className="animate-fade-in-up"
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
-                    <ProductCard product={product} />
+                    <ProductCard product={product} tier={productTierMap.get(product.node.id)} />
                   </div>
                 ))}
               </div>

@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
 import { fetchCollectionByHandle, ShopifyProduct } from "@/lib/shopify";
+import { useProductTierMap } from "@/hooks/useProductTierMap";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -130,11 +131,6 @@ const DEFAULT_THEME = COLLECTION_THEMES.hades;
 
 const REALM_HANDLES = ["hades", "persephone"] as const;
 
-// Tier handles, used to look up which tier each product belongs to so the
-// product card can render with tier-specific styling.
-const TIER_HANDLES = ["premium-tier", "pro-tier", "basic-tier"] as const;
-type TierHandle = (typeof TIER_HANDLES)[number];
-
 const CollectionDetail = () => {
   const { handle } = useParams<{ handle: string }>();
   const theme = (handle && COLLECTION_THEMES[handle]) ?? DEFAULT_THEME;
@@ -157,27 +153,9 @@ const CollectionDetail = () => {
     staleTime: 1000 * 60 * 10,
   });
 
-  // For realm pages (Hades/Persephone), fetch the tier collections so each
-  // product card can render with tier-specific styling.
-  const { data: tierCollections } = useQuery({
-    queryKey: ["tier-collections-for-realm"],
-    queryFn: () =>
-      Promise.all(TIER_HANDLES.map((h) => fetchCollectionByHandle(h, 100))),
-    enabled: isRealm,
-    staleTime: 1000 * 60 * 10,
-  });
-
-  const productTierMap = useMemo(() => {
-    const map = new Map<string, TierHandle>();
-    if (!tierCollections) return map;
-    TIER_HANDLES.forEach((handle, idx) => {
-      const col = tierCollections[idx];
-      col?.node.products.edges.forEach((p) => {
-        if (!map.has(p.node.id)) map.set(p.node.id, handle);
-      });
-    });
-    return map;
-  }, [tierCollections]);
+  // For realm pages (Hades/Persephone), look up each product's tier so the
+  // card can render tier-specific styling.
+  const productTierMap = useProductTierMap(isRealm);
 
   const products: ShopifyProduct[] = collection?.node.products.edges ?? [];
 
