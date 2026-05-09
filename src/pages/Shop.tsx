@@ -23,7 +23,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useProducts } from "@/contexts/ProductsContext";
-import { useProductTierMap } from "@/hooks/useProductTierMap";
+import { useProductTierMap, tierRank } from "@/hooks/useProductTierMap";
 
 const MAX_PRICE = 1000;
 
@@ -91,8 +91,11 @@ const Shop = () => {
         break;
       case "featured":
       default:
-        // "featured" - prioritize available products
+        // "featured" - tier first (Premium → Pro → Basic), then in-stock
         result.sort((a, b) => {
+          const aRank = tierRank(productTierMap.get(a.node.id));
+          const bRank = tierRank(productTierMap.get(b.node.id));
+          if (aRank !== bRank) return aRank - bRank;
           const aAvailable = a.node.variants?.edges?.some(v => v.node.availableForSale) ?? false;
           const bAvailable = b.node.variants?.edges?.some(v => v.node.availableForSale) ?? false;
           if (aAvailable && !bAvailable) return -1;
@@ -103,7 +106,7 @@ const Shop = () => {
     }
 
     return result;
-  }, [products, priceRange, showInStock, sortBy]);
+  }, [products, priceRange, showInStock, sortBy, productTierMap]);
 
   const clearFilters = () => {
     setPriceRange([0, MAX_PRICE]);

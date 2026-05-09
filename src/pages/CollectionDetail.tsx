@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
 import { fetchCollectionByHandle, ShopifyProduct } from "@/lib/shopify";
-import { useProductTierMap } from "@/hooks/useProductTierMap";
+import { useProductTierMap, tierRank } from "@/hooks/useProductTierMap";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -193,6 +193,11 @@ const CollectionDetail = () => {
       case "featured":
       default:
         result.sort((a, b) => {
+          // Primary: tier rank (Premium → Pro → Basic → untiered)
+          const aRank = tierRank(productTierMap.get(a.node.id));
+          const bRank = tierRank(productTierMap.get(b.node.id));
+          if (aRank !== bRank) return aRank - bRank;
+          // Secondary: in-stock first
           const aOk = a.node.variants?.edges?.some((v) => v.node.availableForSale) ?? false;
           const bOk = b.node.variants?.edges?.some((v) => v.node.availableForSale) ?? false;
           if (aOk && !bOk) return -1;
@@ -202,7 +207,7 @@ const CollectionDetail = () => {
     }
 
     return result;
-  }, [products, priceRange, showInStock, sortBy]);
+  }, [products, priceRange, showInStock, sortBy, productTierMap]);
 
   const hasActiveFilters =
     priceRange[0] > 0 || priceRange[1] < MAX_PRICE || showInStock;
