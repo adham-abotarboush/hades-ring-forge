@@ -6,6 +6,10 @@ import { ArrowRight, Sparkles, Shield, Award, Users } from "lucide-react";
 import heroImage from "@/assets/hero-forge.jpg";
 import { SEO } from "@/components/SEO";
 import { TestimonialCarousel } from "@/components/TestimonialCarousel";
+import { GreekMeander, GreekDivider } from "@/components/GreekOrnaments";
+
+const HADES = "hsl(0 75% 55%)";
+const PERSEPHONE = "hsl(130 55% 55%)";
 
 const Index = () => {
   return (
@@ -102,41 +106,109 @@ const Index = () => {
             </p>
           </div>
 
+          <div className="max-w-md mx-auto mb-12 text-muted-foreground/60">
+            <GreekDivider color="hsl(45 90% 60%)" />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {/* Hades Card */}
+            {/* Hades — Red */}
             <Link to="/collections/hades" className="group block">
-              <div className="relative rounded-2xl overflow-hidden border border-primary/20 hover:border-primary/60 transition-all duration-500 hover-lift hover:shadow-gold-lg min-h-[340px] flex flex-col">
-                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(38_90%_8%)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,hsl(38_90%_20%_/_0.25),transparent_70%)]" />
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent" />
-                <div className="relative z-10 p-8 md:p-10 flex flex-col justify-between h-full">
+              <div
+                className="relative rounded-2xl overflow-hidden border transition-all duration-500 hover-lift min-h-[380px] flex flex-col"
+                style={{ borderColor: `${HADES}33` }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = `${HADES}99`;
+                  e.currentTarget.style.boxShadow = `0 20px 60px -15px ${HADES}55`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = `${HADES}33`;
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(0_60%_8%)]" />
+                <div
+                  className="absolute inset-0"
+                  style={{ background: `radial-gradient(ellipse at bottom left, ${HADES}33, transparent 65%)` }}
+                />
+                <div className="absolute top-0 left-0 right-0">
+                  <GreekMeander color={HADES} height={12} opacity={0.55} />
+                </div>
+                <div className="relative z-10 p-8 md:p-10 pt-12 flex flex-col justify-between h-full">
                   <div>
-                    <div className="text-5xl mb-4">⚡</div>
-                    <h3 className="text-4xl md:text-5xl font-heading font-bold mb-3 tracking-tighter group-hover:text-primary transition-colors duration-300">Hades</h3>
-                    <p className="text-muted-foreground leading-relaxed">Dark, commanding rings forged in the fires beneath Olympus.</p>
+                    <div className="text-6xl mb-4 drop-shadow-[0_0_15px_hsl(0_75%_55%_/_0.5)]">🔥</div>
+                    <p
+                      className="text-xs font-bold tracking-[0.4em] uppercase mb-3"
+                      style={{ color: HADES, opacity: 0.85 }}
+                    >
+                      The Underworld
+                    </p>
+                    <h3
+                      className="text-4xl md:text-5xl font-heading font-bold mb-3 tracking-tighter transition-colors duration-300"
+                      style={{ textShadow: `0 0 30px ${HADES}55` }}
+                    >
+                      Hades
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Forged in ember and shadow — rings that carry the weight of eternity beneath Olympus.
+                    </p>
                   </div>
-                  <div className="mt-8 flex items-center gap-2 text-primary font-medium group-hover:gap-3 transition-all duration-300">
-                    <span>Explore the Underworld</span>
+                  <div
+                    className="mt-8 flex items-center gap-2 font-medium group-hover:gap-3 transition-all duration-300"
+                    style={{ color: HADES }}
+                  >
+                    <span>Enter the Underworld</span>
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </div>
             </Link>
 
-            {/* Persephone Card */}
+            {/* Persephone — Green */}
             <Link to="/collections/persephone" className="group block">
-              <div className="relative rounded-2xl overflow-hidden border border-[hsl(330_80%_60%_/_0.2)] hover:border-[hsl(330_80%_60%_/_0.6)] transition-all duration-500 hover-lift min-h-[340px] flex flex-col" style={{ ["--tw-shadow" as string]: "0 20px 60px -15px hsl(330 80% 60% / 0.35)" }}>
-                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(330_80%_6%)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,hsl(330_80%_18%_/_0.25),transparent_70%)]" />
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[hsl(330_80%_60%)] to-transparent" />
-                <div className="relative z-10 p-8 md:p-10 flex flex-col justify-between h-full">
+              <div
+                className="relative rounded-2xl overflow-hidden border transition-all duration-500 hover-lift min-h-[380px] flex flex-col"
+                style={{ borderColor: `${PERSEPHONE}33` }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = `${PERSEPHONE}99`;
+                  e.currentTarget.style.boxShadow = `0 20px 60px -15px ${PERSEPHONE}55`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = `${PERSEPHONE}33`;
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(140_50%_8%)]" />
+                <div
+                  className="absolute inset-0"
+                  style={{ background: `radial-gradient(ellipse at bottom right, ${PERSEPHONE}33, transparent 65%)` }}
+                />
+                <div className="absolute top-0 left-0 right-0">
+                  <GreekMeander color={PERSEPHONE} height={12} opacity={0.55} />
+                </div>
+                <div className="relative z-10 p-8 md:p-10 pt-12 flex flex-col justify-between h-full">
                   <div>
-                    <div className="text-5xl mb-4">🌸</div>
-                    <h3 className="text-4xl md:text-5xl font-heading font-bold mb-3 tracking-tighter group-hover:text-[hsl(330_80%_70%)] transition-colors duration-300">Persephone</h3>
-                    <p className="text-muted-foreground leading-relaxed">Rings where pomegranate blossoms meet eternal shadow.</p>
+                    <div className="text-6xl mb-4 drop-shadow-[0_0_15px_hsl(130_55%_55%_/_0.5)]">🌿</div>
+                    <p
+                      className="text-xs font-bold tracking-[0.4em] uppercase mb-3"
+                      style={{ color: PERSEPHONE, opacity: 0.85 }}
+                    >
+                      Queen of Spring
+                    </p>
+                    <h3
+                      className="text-4xl md:text-5xl font-heading font-bold mb-3 tracking-tighter transition-colors duration-300"
+                      style={{ textShadow: `0 0 30px ${PERSEPHONE}55` }}
+                    >
+                      Persephone
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Where verdant bloom meets eternal shadow — rings born of spring's defiance.
+                    </p>
                   </div>
-                  <div className="mt-8 flex items-center gap-2 font-medium text-[hsl(330_80%_65%)] group-hover:gap-3 transition-all duration-300">
-                    <span>Bloom in the Darkness</span>
+                  <div
+                    className="mt-8 flex items-center gap-2 font-medium group-hover:gap-3 transition-all duration-300"
+                    style={{ color: PERSEPHONE }}
+                  >
+                    <span>Walk the Verdant Path</span>
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>

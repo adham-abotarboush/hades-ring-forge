@@ -4,71 +4,135 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { GreekMeander, GreekDivider } from "@/components/GreekOrnaments";
+
+const HADES = "hsl(0 75% 55%)";
+const PERSEPHONE = "hsl(130 55% 55%)";
 
 const Collections = () => {
   return (
     <div className="min-h-screen bg-background page-transition">
       <SEO
         title="Collections — Hades Ring Forge"
-        description="Explore two realms of handcrafted rings. The dark power of Hades and the blooming grace of Persephone, forged in one place."
+        description="Explore two realms of handcrafted rings. The fire of Hades and the bloom of Persephone, forged in one place."
       />
       <Navigation />
 
       <main className="pt-40 pb-20 container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-20 animate-fade-in-up">
+        <div className="text-center mb-16 animate-fade-in-up">
           <div className="inline-flex items-center gap-2 mb-6 px-6 py-3 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full shadow-lg">
             <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-            <p className="text-sm font-semibold text-primary tracking-wider">HANDCRAFTED COLLECTIONS</p>
+            <p className="text-sm font-semibold text-primary tracking-[0.3em]">HANDCRAFTED COLLECTIONS</p>
           </div>
           <h1 className="text-5xl md:text-6xl lg:text-8xl font-heading font-bold mb-6 tracking-tighter leading-none">
             Two Realms,{" "}
             <span className="text-gradient bg-clip-text text-transparent">One Forge</span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-light leading-relaxed">
-            Choose your myth. Each collection carries a distinct soul — the iron will of the Underworld's lord, or the blooming grace of its queen.
+            Choose your myth. Each realm carries a distinct soul — the fire of the Underworld's lord, or the verdant grace of its queen.
           </p>
+          <div className="max-w-md mx-auto mt-10 text-muted-foreground/70">
+            <GreekDivider color="hsl(45 90% 60%)" />
+          </div>
         </div>
 
-        {/* Collection Cards */}
+        {/* Realm Cards — Hades (red) & Persephone (green) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-
-          {/* Hades Collection Card */}
+          {/* Hades — Red */}
           <Link to="/collections/hades" className="group block">
-            <div className="relative rounded-3xl overflow-hidden border border-primary/20 hover:border-primary/60 transition-all duration-500 hover-lift hover:shadow-[0_20px_60px_-15px_hsl(38_90%_55%_/_0.4)] min-h-[520px] flex flex-col">
-              {/* Background gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(38_90%_8%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(38_90%_20%_/_0.3),transparent_60%)]" />
+            <div
+              className="relative rounded-3xl overflow-hidden border transition-all duration-500 hover-lift min-h-[560px] flex flex-col"
+              style={{
+                borderColor: `${HADES}33`,
+                boxShadow: `0 0 0 transparent`,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = `${HADES}99`;
+                e.currentTarget.style.boxShadow = `0 25px 70px -15px ${HADES}66`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = `${HADES}33`;
+                e.currentTarget.style.boxShadow = `0 0 0 transparent`;
+              }}
+            >
+              {/* Layered Hades atmosphere */}
+              <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(0_60%_8%)]" />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `radial-gradient(ellipse at top right, ${HADES}40, transparent 60%)`,
+                }}
+              />
+              <div
+                className="absolute inset-0 opacity-60"
+                style={{
+                  background: `radial-gradient(circle at 20% 100%, hsl(15 80% 30% / 0.4), transparent 50%)`,
+                }}
+              />
 
-              {/* Decorative Greek border top */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
+              {/* Greek meander top border */}
+              <div className="absolute top-0 left-0 right-0">
+                <GreekMeander color={HADES} height={14} opacity={0.6} />
+              </div>
 
               {/* Content */}
-              <div className="relative z-10 flex flex-col justify-between h-full p-10 md:p-14">
+              <div className="relative z-10 flex flex-col justify-between h-full p-10 md:p-14 pt-16">
                 <div>
-                  <div className="text-6xl mb-6">⚡</div>
-                  <div className="inline-block mb-4 px-4 py-1.5 bg-primary/15 border border-primary/30 rounded-full">
-                    <span className="text-xs font-bold tracking-widest uppercase text-primary">The Underworld</span>
+                  <div className="text-7xl mb-6 drop-shadow-[0_0_20px_hsl(0_75%_55%_/_0.5)]">🔥</div>
+                  <div
+                    className="inline-block mb-5 px-4 py-1.5 rounded-full border backdrop-blur-sm"
+                    style={{
+                      backgroundColor: `${HADES}22`,
+                      borderColor: `${HADES}55`,
+                    }}
+                  >
+                    <span
+                      className="text-xs font-bold tracking-[0.35em] uppercase"
+                      style={{ color: HADES }}
+                    >
+                      The Underworld
+                    </span>
                   </div>
-                  <h2 className="text-5xl md:text-6xl font-heading font-bold mb-5 tracking-tighter leading-none text-foreground group-hover:text-primary transition-colors duration-300">
+                  <h2
+                    className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold mb-4 tracking-tighter leading-none transition-colors duration-300"
+                    style={{ textShadow: `0 0 40px ${HADES}55` }}
+                  >
                     Hades
                   </h2>
+                  <p
+                    className="text-sm md:text-base font-medium mb-5 tracking-[0.4em] uppercase"
+                    style={{ color: HADES, opacity: 0.85 }}
+                  >
+                    Lord of the Underworld
+                  </p>
                   <p className="text-lg text-muted-foreground leading-relaxed max-w-sm">
-                    Forged in shadow and flame. Rings that carry the weight of eternity — dark, commanding, unyielding as the lord of the dead himself.
+                    Forged in ember and shadow. Rings that carry the weight of eternity — commanding, dark, and unyielding as the lord of the dead himself.
                   </p>
                 </div>
 
                 <div className="mt-10">
-                  <div className="flex flex-wrap gap-3 mb-8">
-                    {["Obsidian Dark", "Gold Accents", "Power & Dominion"].map((tag) => (
-                      <span key={tag} className="px-3 py-1 text-xs font-medium bg-primary/10 border border-primary/20 rounded-full text-primary/80">
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {["Crimson Ember", "Obsidian Forge", "Power & Dominion"].map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-3 py-1 text-xs font-medium rounded-full border"
+                        style={{
+                          backgroundColor: `${HADES}1A`,
+                          borderColor: `${HADES}40`,
+                          color: HADES,
+                        }}
+                      >
                         {tag}
                       </span>
                     ))}
                   </div>
                   <Button
                     variant="outline"
-                    className="border-primary/50 text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary group/btn text-base px-8 py-5 h-auto transition-all duration-300"
+                    className="border-2 text-foreground group/btn text-base px-8 py-5 h-auto transition-all duration-300"
+                    style={{
+                      borderColor: `${HADES}80`,
+                    }}
                   >
                     Enter the Underworld
                     <ArrowRight className="ml-2 h-5 w-5 group-hover/btn:translate-x-1 transition-transform" />
@@ -78,50 +142,102 @@ const Collections = () => {
             </div>
           </Link>
 
-          {/* Persephone Collection Card */}
+          {/* Persephone — Green */}
           <Link to="/collections/persephone" className="group block">
             <div
-              className="relative rounded-3xl overflow-hidden border border-[hsl(330_80%_60%_/_0.2)] hover:border-[hsl(330_80%_60%_/_0.6)] transition-all duration-500 hover-lift min-h-[520px] flex flex-col"
-              style={{ "--hover-shadow": "0 20px 60px -15px hsl(330 80% 60% / 0.4)" } as React.CSSProperties}
+              className="relative rounded-3xl overflow-hidden border transition-all duration-500 hover-lift min-h-[560px] flex flex-col"
+              style={{
+                borderColor: `${PERSEPHONE}33`,
+                boxShadow: `0 0 0 transparent`,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = `${PERSEPHONE}99`;
+                e.currentTarget.style.boxShadow = `0 25px 70px -15px ${PERSEPHONE}66`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = `${PERSEPHONE}33`;
+                e.currentTarget.style.boxShadow = `0 0 0 transparent`;
+              }}
             >
-              {/* Use inline style for hover shadow since CSS var can't be used in Tailwind class */}
-              <style>{`.persephone-card:hover { box-shadow: 0 20px 60px -15px hsl(330 80% 60% / 0.4); }`}</style>
+              {/* Layered Persephone atmosphere */}
+              <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(140_50%_8%)]" />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `radial-gradient(ellipse at top right, ${PERSEPHONE}40, transparent 60%)`,
+                }}
+              />
+              <div
+                className="absolute inset-0 opacity-60"
+                style={{
+                  background: `radial-gradient(circle at 80% 100%, hsl(110 50% 25% / 0.4), transparent 55%)`,
+                }}
+              />
 
-              {/* Background gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(330_80%_6%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(330_80%_18%_/_0.3),transparent_60%)]" />
-
-              {/* Decorative Greek border top */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[hsl(330_80%_60%)] to-transparent" />
+              {/* Greek meander top border */}
+              <div className="absolute top-0 left-0 right-0">
+                <GreekMeander color={PERSEPHONE} height={14} opacity={0.6} />
+              </div>
 
               {/* Content */}
-              <div className="relative z-10 flex flex-col justify-between h-full p-10 md:p-14">
+              <div className="relative z-10 flex flex-col justify-between h-full p-10 md:p-14 pt-16">
                 <div>
-                  <div className="text-6xl mb-6">🌸</div>
-                  <div className="inline-block mb-4 px-4 py-1.5 bg-[hsl(330_80%_60%_/_0.15)] border border-[hsl(330_80%_60%_/_0.3)] rounded-full">
-                    <span className="text-xs font-bold tracking-widest uppercase text-[hsl(330_80%_70%)]">Queen of the Underworld</span>
+                  <div className="text-7xl mb-6 drop-shadow-[0_0_20px_hsl(130_55%_55%_/_0.5)]">🌿</div>
+                  <div
+                    className="inline-block mb-5 px-4 py-1.5 rounded-full border backdrop-blur-sm"
+                    style={{
+                      backgroundColor: `${PERSEPHONE}22`,
+                      borderColor: `${PERSEPHONE}55`,
+                    }}
+                  >
+                    <span
+                      className="text-xs font-bold tracking-[0.35em] uppercase"
+                      style={{ color: PERSEPHONE }}
+                    >
+                      Queen of Spring
+                    </span>
                   </div>
-                  <h2 className="text-5xl md:text-6xl font-heading font-bold mb-5 tracking-tighter leading-none text-foreground group-hover:text-[hsl(330_80%_70%)] transition-colors duration-300">
+                  <h2
+                    className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold mb-4 tracking-tighter leading-none transition-colors duration-300"
+                    style={{ textShadow: `0 0 40px ${PERSEPHONE}55` }}
+                  >
                     Persephone
                   </h2>
+                  <p
+                    className="text-sm md:text-base font-medium mb-5 tracking-[0.4em] uppercase"
+                    style={{ color: PERSEPHONE, opacity: 0.85 }}
+                  >
+                    Bloom in the Darkness
+                  </p>
                   <p className="text-lg text-muted-foreground leading-relaxed max-w-sm">
-                    Where blossoms meet darkness. Rings born of spring's defiance — delicate yet eternal, as radiant as the pomegranate's crimson seeds.
+                    Where blossoms meet shadow. Rings born of spring's defiance — delicate yet eternal, as radiant as the pomegranate's verdant seeds.
                   </p>
                 </div>
 
                 <div className="mt-10">
-                  <div className="flex flex-wrap gap-3 mb-8">
-                    {["Pomegranate Rose", "Floral Motifs", "Grace & Mystery"].map((tag) => (
-                      <span key={tag} className="px-3 py-1 text-xs font-medium bg-[hsl(330_80%_60%_/_0.1)] border border-[hsl(330_80%_60%_/_0.2)] rounded-full text-[hsl(330_80%_70%_/_0.8)]">
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {["Verdant Bloom", "Olive Laurel", "Grace & Mystery"].map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-3 py-1 text-xs font-medium rounded-full border"
+                        style={{
+                          backgroundColor: `${PERSEPHONE}1A`,
+                          borderColor: `${PERSEPHONE}40`,
+                          color: PERSEPHONE,
+                        }}
+                      >
                         {tag}
                       </span>
                     ))}
                   </div>
                   <Button
                     variant="outline"
-                    className="border-[hsl(330_80%_60%_/_0.5)] text-foreground hover:bg-[hsl(330_80%_60%)] hover:text-white hover:border-[hsl(330_80%_60%)] group/btn text-base px-8 py-5 h-auto transition-all duration-300"
+                    className="border-2 text-foreground group/btn text-base px-8 py-5 h-auto transition-all duration-300"
+                    style={{
+                      borderColor: `${PERSEPHONE}80`,
+                    }}
                   >
-                    Bloom in the Darkness
+                    Walk the Verdant Path
                     <ArrowRight className="ml-2 h-5 w-5 group-hover/btn:translate-x-1 transition-transform" />
                   </Button>
                 </div>
@@ -131,11 +247,11 @@ const Collections = () => {
         </div>
 
         {/* Shop by Tier */}
-        <div className="mt-28 animate-fade-in-up">
+        <div className="mt-32 animate-fade-in-up">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 mb-6 px-6 py-3 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full shadow-lg">
               <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-              <p className="text-sm font-semibold text-primary tracking-wider">SHOP BY TIER</p>
+              <p className="text-sm font-semibold text-primary tracking-[0.3em]">SHOP BY TIER</p>
             </div>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-4 tracking-tighter leading-none">
               Choose Your <span className="text-gradient bg-clip-text text-transparent">Caliber</span>
@@ -143,98 +259,62 @@ const Collections = () => {
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
               From approachable everyday pieces to singular hero rings — find the level that fits your story.
             </p>
+            <div className="max-w-sm mx-auto mt-8 text-muted-foreground/60">
+              <GreekDivider color="hsl(45 90% 60%)" />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {/* Basic Tier */}
-            <Link to="/collections/basic-tier" className="group block">
-              <div className="relative h-full rounded-2xl overflow-hidden border border-[hsl(210_25%_60%_/_0.2)] hover:border-[hsl(210_25%_60%_/_0.6)] transition-all duration-500 hover-lift min-h-[320px] flex flex-col">
-                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(210_20%_10%)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(210_25%_30%_/_0.3),transparent_60%)]" />
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[hsl(210_25%_70%)] to-transparent" />
-                <div className="relative z-10 flex flex-col justify-between h-full p-8">
-                  <div>
-                    <div className="text-4xl mb-4">🔹</div>
-                    <div className="inline-block mb-3 px-3 py-1 bg-[hsl(210_25%_60%_/_0.15)] border border-[hsl(210_25%_60%_/_0.3)] rounded-full">
-                      <span className="text-xs font-bold tracking-widest uppercase text-[hsl(210_25%_75%)]">Entry</span>
-                    </div>
-                    <h3 className="text-3xl font-heading font-bold mb-3 tracking-tighter group-hover:text-[hsl(210_25%_75%)] transition-colors">
-                      Basic Tier
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Approachable everyday pieces — the same forge, lighter on the wallet.
-                    </p>
-                  </div>
-                  <div className="mt-6 flex items-center gap-2 text-[hsl(210_25%_75%)] font-medium group-hover:gap-3 transition-all duration-300 text-sm">
-                    <span>Explore Basic</span>
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </div>
-            </Link>
+            {/* Premium Tier — placed first as the hero tier */}
+            <TierCard
+              to="/collections/premium-tier"
+              color="hsl(45 90% 60%)"
+              accentBg="hsl(45 70% 10%)"
+              icon="👑"
+              eyebrow="Hero Pieces"
+              title="Premium Tier"
+              description="One-of-one statement rings — singular, named, the crown of the forge."
+              cta="Explore Premium"
+            />
 
             {/* Pro Tier */}
-            <Link to="/collections/pro-tier" className="group block">
-              <div className="relative h-full rounded-2xl overflow-hidden border border-[hsl(170_60%_50%_/_0.2)] hover:border-[hsl(170_60%_50%_/_0.6)] transition-all duration-500 hover-lift min-h-[320px] flex flex-col">
-                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(170_50%_8%)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(170_60%_25%_/_0.3),transparent_60%)]" />
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[hsl(170_60%_55%)] to-transparent" />
-                <div className="relative z-10 flex flex-col justify-between h-full p-8">
-                  <div>
-                    <div className="text-4xl mb-4">🔸</div>
-                    <div className="inline-block mb-3 px-3 py-1 bg-[hsl(170_60%_50%_/_0.15)] border border-[hsl(170_60%_50%_/_0.3)] rounded-full">
-                      <span className="text-xs font-bold tracking-widest uppercase text-[hsl(170_60%_60%)]">Mid-Tier</span>
-                    </div>
-                    <h3 className="text-3xl font-heading font-bold mb-3 tracking-tighter group-hover:text-[hsl(170_60%_60%)] transition-colors">
-                      Pro Tier
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Refined detail and deeper finishes — for those who walk between realms.
-                    </p>
-                  </div>
-                  <div className="mt-6 flex items-center gap-2 text-[hsl(170_60%_60%)] font-medium group-hover:gap-3 transition-all duration-300 text-sm">
-                    <span>Explore Pro</span>
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </div>
-            </Link>
+            <TierCard
+              to="/collections/pro-tier"
+              color="hsl(170 60% 55%)"
+              accentBg="hsl(170 50% 8%)"
+              icon="⚜️"
+              eyebrow="Mid-Tier"
+              title="Pro Tier"
+              description="Refined detail and deeper finishes — for those who walk between realms."
+              cta="Explore Pro"
+            />
 
-            {/* Premium Tier */}
-            <Link to="/collections/premium-tier" className="group block">
-              <div className="relative h-full rounded-2xl overflow-hidden border border-[hsl(45_90%_55%_/_0.25)] hover:border-[hsl(45_90%_55%_/_0.7)] transition-all duration-500 hover-lift min-h-[320px] flex flex-col">
-                <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-[hsl(45_70%_10%)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(45_90%_30%_/_0.35),transparent_60%)]" />
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[hsl(45_90%_60%)] to-transparent" />
-                <div className="relative z-10 flex flex-col justify-between h-full p-8">
-                  <div>
-                    <div className="text-4xl mb-4">👑</div>
-                    <div className="inline-block mb-3 px-3 py-1 bg-[hsl(45_90%_55%_/_0.15)] border border-[hsl(45_90%_55%_/_0.3)] rounded-full">
-                      <span className="text-xs font-bold tracking-widest uppercase text-[hsl(45_90%_65%)]">Hero Pieces</span>
-                    </div>
-                    <h3 className="text-3xl font-heading font-bold mb-3 tracking-tighter group-hover:text-[hsl(45_90%_65%)] transition-colors">
-                      Premium Tier
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      One-of-one statement rings — singular, named, the crown of the forge.
-                    </p>
-                  </div>
-                  <div className="mt-6 flex items-center gap-2 text-[hsl(45_90%_65%)] font-medium group-hover:gap-3 transition-all duration-300 text-sm">
-                    <span>Explore Premium</span>
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </div>
-            </Link>
+            {/* Basic Tier */}
+            <TierCard
+              to="/collections/basic-tier"
+              color="hsl(210 25% 75%)"
+              accentBg="hsl(210 20% 10%)"
+              icon="🔱"
+              eyebrow="Entry"
+              title="Basic Tier"
+              description="Approachable everyday pieces — the same forge, lighter on the wallet."
+              cta="Explore Basic"
+            />
           </div>
         </div>
 
         {/* Myth quote */}
-        <div className="text-center mt-20 animate-fade-in-up">
-          <div className="max-w-2xl mx-auto px-8 py-6 border border-border/40 rounded-2xl bg-card/20 backdrop-blur-sm">
-            <p className="text-muted-foreground italic font-light text-lg leading-relaxed">
+        <div className="text-center mt-24 animate-fade-in-up">
+          <div className="max-w-2xl mx-auto px-8 py-8 border border-border/40 rounded-2xl bg-card/20 backdrop-blur-sm relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 text-primary/30">
+              <GreekMeander color="hsl(45 90% 60%)" height={12} opacity={0.4} />
+            </div>
+            <p className="text-muted-foreground italic font-light text-lg leading-relaxed pt-4">
               "She had eaten the pomegranate seeds — and in doing so, became both spring and shadow, forever bound to two worlds."
             </p>
+            <div className="absolute bottom-0 left-0 right-0 rotate-180 text-primary/30">
+              <GreekMeander color="hsl(45 90% 60%)" height={12} opacity={0.4} />
+            </div>
           </div>
         </div>
       </main>
@@ -243,5 +323,88 @@ const Collections = () => {
     </div>
   );
 };
+
+const TierCard = ({
+  to,
+  color,
+  accentBg,
+  icon,
+  eyebrow,
+  title,
+  description,
+  cta,
+}: {
+  to: string;
+  color: string;
+  accentBg: string;
+  icon: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  cta: string;
+}) => (
+  <Link to={to} className="group block">
+    <div
+      className="relative h-full rounded-2xl overflow-hidden border transition-all duration-500 hover-lift min-h-[340px] flex flex-col"
+      style={{ borderColor: `${color}33` }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = `${color}99`;
+        e.currentTarget.style.boxShadow = `0 20px 50px -15px ${color}55`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = `${color}33`;
+        e.currentTarget.style.boxShadow = "none";
+      }}
+    >
+      <div
+        className="absolute inset-0"
+        style={{ background: `linear-gradient(135deg, hsl(var(--background)), hsl(var(--card)), ${accentBg})` }}
+      />
+      <div
+        className="absolute inset-0"
+        style={{ background: `radial-gradient(ellipse at top right, ${color}26, transparent 60%)` }}
+      />
+      <div className="absolute top-0 left-0 right-0">
+        <GreekMeander color={color} height={12} opacity={0.5} />
+      </div>
+
+      <div className="relative z-10 flex flex-col justify-between h-full p-8 pt-12">
+        <div>
+          <div className="text-5xl mb-4">{icon}</div>
+          <div
+            className="inline-block mb-3 px-3 py-1 rounded-full border"
+            style={{
+              backgroundColor: `${color}1A`,
+              borderColor: `${color}55`,
+            }}
+          >
+            <span
+              className="text-xs font-bold tracking-[0.35em] uppercase"
+              style={{ color }}
+            >
+              {eyebrow}
+            </span>
+          </div>
+          <h3
+            className="text-3xl md:text-4xl font-heading font-bold mb-3 tracking-tighter transition-colors"
+            style={{ color }}
+          >
+            {title}
+          </h3>
+          <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+            {description}
+          </p>
+        </div>
+        <div
+          className="mt-6 flex items-center gap-2 font-medium group-hover:gap-3 transition-all duration-300 text-sm"
+          style={{ color }}
+        >
+          <span>{cta}</span>
+          <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+        </div>
+      </div>
+    </div>
+  </Link>
+);
 
 export default Collections;

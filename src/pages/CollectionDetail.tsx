@@ -18,6 +18,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Sparkles, X, SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { GreekMeander, GreekDivider, LaurelFrame } from "@/components/GreekOrnaments";
 import {
   Sheet,
   SheetContent,
@@ -54,32 +55,32 @@ const COLLECTION_THEMES: Record<string, {
   cta: string;
 }> = {
   hades: {
-    accent: "hsl(38 90% 55%)",
-    accentMuted: "hsl(38 90% 55% / 0.15)",
-    accentBorder: "hsl(38 90% 55% / 0.3)",
-    accentHover: "hsl(38 90% 55%)",
-    gradientFrom: "hsl(20 70% 12%)",
-    gradientTo: "hsl(38 90% 20%)",
-    glow: "0 20px 60px -15px hsl(38 90% 55% / 0.35)",
-    icon: "⚡",
+    accent: "hsl(0 75% 55%)",
+    accentMuted: "hsl(0 75% 50% / 0.15)",
+    accentBorder: "hsl(0 75% 50% / 0.35)",
+    accentHover: "hsl(0 75% 50%)",
+    gradientFrom: "hsl(0 60% 8%)",
+    gradientTo: "hsl(15 70% 22%)",
+    glow: "0 20px 60px -15px hsl(0 75% 50% / 0.45)",
+    icon: "🔥",
     badge: "The Underworld",
     heroTagline: "Lord of the Underworld",
     heroDesc: "Forged in the fires beneath Olympus. Each piece carries the weight of eternity — commanding, dark, and unyielding as Hades himself.",
-    cta: "Rings of Shadow & Gold",
+    cta: "Rings of Ember & Shadow",
   },
   persephone: {
-    accent: "hsl(330 80% 65%)",
-    accentMuted: "hsl(330 80% 60% / 0.15)",
-    accentBorder: "hsl(330 80% 60% / 0.3)",
-    accentHover: "hsl(330 80% 60%)",
-    gradientFrom: "hsl(330 80% 6%)",
-    gradientTo: "hsl(330 80% 18%)",
-    glow: "0 20px 60px -15px hsl(330 80% 60% / 0.35)",
-    icon: "🌸",
-    badge: "Queen of the Underworld",
+    accent: "hsl(130 55% 55%)",
+    accentMuted: "hsl(130 55% 50% / 0.15)",
+    accentBorder: "hsl(130 55% 50% / 0.35)",
+    accentHover: "hsl(130 55% 50%)",
+    gradientFrom: "hsl(140 50% 6%)",
+    gradientTo: "hsl(110 50% 22%)",
+    glow: "0 20px 60px -15px hsl(130 55% 50% / 0.45)",
+    icon: "🌿",
+    badge: "Queen of Spring",
     heroTagline: "Bloom in the Darkness",
     heroDesc: "Rings born of spring's defiance — where pomegranate blossoms meet eternal shadow. Delicate yet timeless, as radiant as the seeds that bound her.",
-    cta: "Rings of Bloom & Mystery",
+    cta: "Rings of Bloom & Verdant Light",
   },
   "basic-tier": {
     accent: "hsl(210 25% 70%)",
@@ -127,9 +128,38 @@ const COLLECTION_THEMES: Record<string, {
 
 const DEFAULT_THEME = COLLECTION_THEMES.hades;
 
+const REALM_HANDLES = ["hades", "persephone"] as const;
+
+// Tier order: Premium first (most prestigious), then Pro, then Basic.
+// Each entry mirrors the PDF's Premium → Mid → Low structure within each realm.
+const TIERS = [
+  {
+    handle: "premium-tier",
+    label: "Premium",
+    subtitle: "Hero Pieces — Singular & Named",
+    icon: "👑",
+    accent: "hsl(45 90% 60%)",
+  },
+  {
+    handle: "pro-tier",
+    label: "Pro",
+    subtitle: "Refined Mid-Tier Forge",
+    icon: "⚜️",
+    accent: "hsl(170 60% 55%)",
+  },
+  {
+    handle: "basic-tier",
+    label: "Basic",
+    subtitle: "Approachable Mythic Pieces",
+    icon: "🔱",
+    accent: "hsl(210 25% 75%)",
+  },
+] as const;
+
 const CollectionDetail = () => {
   const { handle } = useParams<{ handle: string }>();
   const theme = (handle && COLLECTION_THEMES[handle]) ?? DEFAULT_THEME;
+  const isRealm = !!handle && (REALM_HANDLES as readonly string[]).includes(handle);
 
   const [sortBy, setSortBy] = useState<SortOption>("featured");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, MAX_PRICE]);
@@ -147,6 +177,28 @@ const CollectionDetail = () => {
     enabled: !!handle,
     staleTime: 1000 * 60 * 10,
   });
+
+  // For realm pages (Hades/Persephone), fetch the tier collections so we can
+  // group products by tier (Premium / Pro / Basic) within the realm.
+  const { data: tierCollections } = useQuery({
+    queryKey: ["tier-collections-for-realm"],
+    queryFn: () =>
+      Promise.all(TIERS.map((t) => fetchCollectionByHandle(t.handle, 100))),
+    enabled: isRealm,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const productTierMap = useMemo(() => {
+    const map = new Map<string, (typeof TIERS)[number]>();
+    if (!tierCollections) return map;
+    TIERS.forEach((tier, idx) => {
+      const col = tierCollections[idx];
+      col?.node.products.edges.forEach((p) => {
+        if (!map.has(p.node.id)) map.set(p.node.id, tier);
+      });
+    });
+    return map;
+  }, [tierCollections]);
 
   const products: ShopifyProduct[] = collection?.node.products.edges ?? [];
 
@@ -194,6 +246,21 @@ const CollectionDetail = () => {
 
     return result;
   }, [products, priceRange, showInStock, sortBy]);
+
+  const groupedByTier = useMemo(() => {
+    const groups: Record<string, ShopifyProduct[]> = {
+      "premium-tier": [],
+      "pro-tier": [],
+      "basic-tier": [],
+      untiered: [],
+    };
+    filteredProducts.forEach((p) => {
+      const tier = productTierMap.get(p.node.id);
+      if (tier) groups[tier.handle].push(p);
+      else groups.untiered.push(p);
+    });
+    return groups;
+  }, [filteredProducts, productTierMap]);
 
   const hasActiveFilters =
     priceRange[0] > 0 || priceRange[1] < MAX_PRICE || showInStock;
@@ -286,11 +353,23 @@ const CollectionDetail = () => {
       <main className="pt-40 pb-20">
         {/* Hero Section */}
         <div className="relative overflow-hidden mb-16">
+          {/* Layered background — radial ember/leaf glow + diagonal gradient */}
           <div
-            className="absolute inset-0 opacity-30 blur-3xl"
+            className="absolute inset-0 opacity-40 blur-3xl"
             style={{ background: `linear-gradient(135deg, ${theme.gradientFrom} 0%, ${theme.gradientTo} 100%)` }}
           />
-          <div className="relative z-10 container mx-auto px-4 text-center animate-fade-in-up py-12">
+          <div
+            className="absolute inset-0 opacity-30"
+            style={{
+              background: `radial-gradient(ellipse at 50% 0%, ${theme.accent}26, transparent 65%)`,
+            }}
+          />
+          {/* Top Greek meander border */}
+          <div className="absolute top-0 left-0 right-0">
+            <GreekMeander color={theme.accent} height={16} opacity={0.45} />
+          </div>
+
+          <div className="relative z-10 container mx-auto px-4 text-center animate-fade-in-up pt-16 pb-14">
             {/* Breadcrumb */}
             <div className="flex justify-center mb-8">
               <Link
@@ -303,31 +382,50 @@ const CollectionDetail = () => {
             </div>
 
             <div
-              className="inline-flex items-center gap-2 mb-6 px-6 py-3 backdrop-blur-sm border rounded-full shadow-lg"
+              className="inline-flex items-center gap-2 mb-8 px-6 py-3 backdrop-blur-sm border rounded-full shadow-lg"
               style={{
                 backgroundColor: theme.accentMuted,
                 borderColor: theme.accentBorder,
               }}
             >
               <Sparkles className="h-4 w-4 animate-pulse" style={{ color: theme.accent }} />
-              <p className="text-sm font-semibold tracking-wider" style={{ color: theme.accent }}>
+              <p className="text-sm font-semibold tracking-[0.3em]" style={{ color: theme.accent }}>
                 {theme.badge.toUpperCase()}
               </p>
             </div>
 
-            <div className="text-7xl mb-6">{theme.icon}</div>
+            <LaurelFrame color={theme.accent} className="mb-6">
+              <div className="text-7xl">{theme.icon}</div>
+            </LaurelFrame>
 
-            <h1 className="text-5xl md:text-7xl lg:text-9xl font-heading font-bold mb-6 tracking-tighter leading-none">
+            <h1
+              className="text-5xl md:text-7xl lg:text-9xl font-heading font-bold mb-2 tracking-tighter leading-none"
+              style={{
+                textShadow: `0 0 60px ${theme.accent}33`,
+              }}
+            >
               {collectionTitle}
             </h1>
+
+            <p
+              className="text-base md:text-lg font-medium mb-6 tracking-[0.4em] uppercase"
+              style={{ color: theme.accent }}
+            >
+              {theme.heroTagline}
+            </p>
 
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-light mb-4">
               {collection?.node.description || theme.heroDesc}
             </p>
 
-            <p className="text-base font-medium" style={{ color: theme.accent }}>
-              {theme.cta}
+            <p className="text-sm md:text-base italic" style={{ color: theme.accent }}>
+              — {theme.cta} —
             </p>
+          </div>
+
+          {/* Bottom Greek meander border (mirrored) */}
+          <div className="absolute bottom-0 left-0 right-0 rotate-180">
+            <GreekMeander color={theme.accent} height={16} opacity={0.45} />
           </div>
         </div>
 
@@ -420,6 +518,105 @@ const CollectionDetail = () => {
                       <X className="h-4 w-4 mr-2" />
                       Clear Filters
                     </Button>
+                  )}
+                </div>
+              ) : isRealm ? (
+                <div className="space-y-20">
+                  {TIERS.map((tier) => {
+                    const tierProducts = groupedByTier[tier.handle];
+                    if (!tierProducts.length) return null;
+                    return (
+                      <section
+                        key={tier.handle}
+                        className="animate-fade-in-up"
+                        aria-labelledby={`tier-${tier.handle}`}
+                      >
+                        <div className="mb-8">
+                          <GreekDivider color={tier.accent} icon={tier.icon} className="mb-5" />
+                          <div className="text-center">
+                            <Link
+                              to={`/collections/${tier.handle}`}
+                              className="group inline-flex flex-col items-center"
+                            >
+                              <p
+                                className="text-xs font-semibold tracking-[0.4em] mb-2"
+                                style={{ color: tier.accent, opacity: 0.85 }}
+                              >
+                                TIER · {tierProducts.length}{" "}
+                                {tierProducts.length === 1 ? "PIECE" : "PIECES"}
+                              </p>
+                              <h2
+                                id={`tier-${tier.handle}`}
+                                className="text-4xl md:text-5xl font-heading font-bold tracking-tighter leading-none mb-2 transition-colors"
+                                style={{ color: tier.accent }}
+                              >
+                                {tier.label}
+                              </h2>
+                              <p className="text-sm md:text-base text-muted-foreground font-light italic max-w-md">
+                                {tier.subtitle}
+                              </p>
+                              <span
+                                className="mt-3 text-xs uppercase tracking-widest opacity-0 group-hover:opacity-80 transition-opacity"
+                                style={{ color: tier.accent }}
+                              >
+                                View full {tier.label} tier →
+                              </span>
+                            </Link>
+                          </div>
+                        </div>
+
+                        <div
+                          className={`grid grid-cols-1 sm:grid-cols-2 ${
+                            filtersOpen ? "lg:grid-cols-2 xl:grid-cols-3" : "lg:grid-cols-3 xl:grid-cols-4"
+                          } gap-6 lg:gap-8`}
+                        >
+                          {tierProducts.map((product, index) => (
+                            <div
+                              key={product.node.id}
+                              className="animate-fade-in-up"
+                              style={{ animationDelay: `${index * 0.05}s` }}
+                            >
+                              <ProductCard product={product} />
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+                    );
+                  })}
+
+                  {groupedByTier.untiered.length > 0 && (
+                    <section className="animate-fade-in-up">
+                      <div className="mb-8">
+                        <GreekDivider color={theme.accent} className="mb-5" />
+                        <div className="text-center">
+                          <p
+                            className="text-xs font-semibold tracking-[0.4em] mb-2"
+                            style={{ color: theme.accent, opacity: 0.85 }}
+                          >
+                            ADDITIONAL · {groupedByTier.untiered.length}{" "}
+                            {groupedByTier.untiered.length === 1 ? "PIECE" : "PIECES"}
+                          </p>
+                          <h2 className="text-3xl md:text-4xl font-heading font-bold tracking-tighter leading-none mb-2">
+                            More from this Realm
+                          </h2>
+                        </div>
+                      </div>
+                      <div
+                        className={`grid grid-cols-1 sm:grid-cols-2 ${
+                          filtersOpen ? "lg:grid-cols-2 xl:grid-cols-3" : "lg:grid-cols-3 xl:grid-cols-4"
+                        } gap-6 lg:gap-8`}
+                      >
+                        {groupedByTier.untiered.map((product, index) => (
+                          <div
+                            key={product.node.id}
+                            className="animate-fade-in-up"
+                            style={{ animationDelay: `${index * 0.05}s` }}
+                          >
+                            <ProductCard product={product} />
+                          </div>
+                        ))}
+                      </div>
+                    </section>
                   )}
                 </div>
               ) : (
