@@ -5,6 +5,14 @@ import { fetchCollectionByHandle } from "@/lib/shopify";
 export const TIER_HANDLES = ["premium-tier", "pro-tier", "basic-tier"] as const;
 export type TierHandle = (typeof TIER_HANDLES)[number];
 
+// 0 (Premium) -> 1 (Pro) -> 2 (Basic) -> 3 (untiered).
+// Use as the primary key when sorting "featured" so the website shows
+// Premium rings first, then Pro, then Basic.
+export function tierRank(tier: TierHandle | undefined): number {
+  if (!tier) return TIER_HANDLES.length;
+  return TIER_HANDLES.indexOf(tier);
+}
+
 // Fetches the three tier collections in parallel and returns a map of
 // productId → tier handle. A product that appears in multiple tier
 // collections resolves to the most prestigious tier (Premium > Pro > Basic),
