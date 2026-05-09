@@ -1,5 +1,52 @@
 import { useId } from "react";
 
+// Layered black/silver/gold marble: soft radial veins (silver + gold) plus a
+// turbulence-noise overlay to suggest stone grain. Render absolute-positioned
+// inside any container to use as a tinted backdrop.
+export const MarbleBackground = ({
+  className = "",
+  intensity = 1,
+}: {
+  className?: string;
+  intensity?: number;
+}) => {
+  const id = useId();
+  return (
+    <div className={`absolute inset-0 pointer-events-none overflow-hidden ${className}`} aria-hidden="true">
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(ellipse 900px 600px at 12% 18%, hsl(45 65% 55% / ${0.06 * intensity}), transparent 65%),
+            radial-gradient(ellipse 700px 500px at 88% 28%, hsl(210 18% 80% / ${0.06 * intensity}), transparent 65%),
+            radial-gradient(ellipse 900px 600px at 50% 95%, hsl(45 70% 55% / ${0.04 * intensity}), transparent 65%),
+            radial-gradient(ellipse 600px 400px at 75% 65%, hsl(0 0% 100% / ${0.025 * intensity}), transparent 65%)
+          `,
+        }}
+      />
+      <svg
+        className="absolute inset-0 w-full h-full mix-blend-screen"
+        style={{ opacity: 0.08 * intensity }}
+        preserveAspectRatio="none"
+      >
+        <defs>
+          <filter id={`marble-${id}`}>
+            <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="2" seed="7" />
+            <feColorMatrix
+              type="matrix"
+              values="0 0 0 0 0.95
+                      0 0 0 0 0.85
+                      0 0 0 0 0.55
+                      0 0 0 1 0"
+            />
+          </filter>
+        </defs>
+        <rect width="100%" height="100%" filter={`url(#marble-${id})`} />
+      </svg>
+    </div>
+  );
+};
+
 type OrnamentProps = {
   className?: string;
   color?: string;

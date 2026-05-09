@@ -40,18 +40,18 @@ const TIER_STYLES: Record<
     ribbon: "linear-gradient(135deg, hsl(45 90% 55%), hsl(35 85% 45%))",
   },
   "pro-tier": {
-    color: "hsl(170 60% 55%)",
+    color: "hsl(210 15% 78%)",
     label: "Pro",
     icon: "⚜️",
-    glow: "0 0 30px -10px hsl(170 60% 50% / 0.45)",
-    ribbon: "linear-gradient(135deg, hsl(170 60% 50%), hsl(190 60% 40%))",
+    glow: "0 0 30px -10px hsl(210 15% 78% / 0.45)",
+    ribbon: "linear-gradient(135deg, hsl(210 15% 80%), hsl(220 15% 55%))",
   },
   "basic-tier": {
-    color: "hsl(210 25% 75%)",
+    color: "hsl(28 55% 55%)",
     label: "Basic",
-    icon: "🔱",
-    glow: "0 0 24px -10px hsl(210 25% 70% / 0.35)",
-    ribbon: "linear-gradient(135deg, hsl(210 25% 70%), hsl(210 20% 55%))",
+    icon: "🛡️",
+    glow: "0 0 24px -10px hsl(28 55% 50% / 0.4)",
+    ribbon: "linear-gradient(135deg, hsl(28 55% 55%), hsl(20 60% 40%))",
   },
 };
 
