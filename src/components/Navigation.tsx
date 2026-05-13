@@ -99,11 +99,11 @@ export const Navigation = () => {
       <div className="fixed top-0 left-0 right-0 z-50">
         <AnnouncementBanner />
         <nav className="bg-background/95 backdrop-blur-lg border-b border-border/50 shadow-elevated">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center space-x-2 group">
-            <img src="/favicon.svg" alt="Hades Logo" className="h-8 w-8 group-hover:scale-110 transition-transform" />
-            <h1 className="text-2xl md:text-3xl font-heading font-bold text-gradient group-hover:scale-105 transition-transform">
+          <div className="container mx-auto max-w-[100vw] px-3 sm:px-4">
+            <div className="flex h-16 items-center justify-between gap-2 sm:h-20 sm:gap-3">
+          <Link to="/" className="flex min-w-0 shrink items-center gap-1.5 group sm:space-x-2">
+            <img src="/favicon.svg" alt="Hades Logo" className="h-7 w-7 shrink-0 group-hover:scale-110 transition-transform sm:h-8 sm:w-8" />
+            <h1 className="truncate text-xl font-heading font-bold text-gradient group-hover:scale-105 transition-transform sm:text-2xl md:text-3xl">
               HADES
             </h1>
           </Link>
@@ -126,7 +126,7 @@ export const Navigation = () => {
             ))}
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-2 md:gap-4">
             <SearchDialog />
             <Link to="/wishlist" className="hidden lg:flex items-center justify-center w-10 h-10 rounded-full hover:bg-muted transition-colors" aria-label="Wishlist">
               <Heart className="h-5 w-5" />
@@ -235,7 +235,7 @@ export const Navigation = () => {
                       key={link.path}
                       to={link.path}
                       onClick={() => setIsOpen(false)}
-                      className={`text-2xl font-heading font-bold transition-all duration-300 hover:text-primary hover:translate-x-2 animate-fade-in-up ${location.pathname === link.path
+                      className={`text-2xl font-heading font-bold transition-colors duration-300 hover:text-primary motion-safe:md:hover:translate-x-2 animate-fade-in-up ${location.pathname === link.path
                         ? "text-primary"
                         : "text-foreground/80"
                         }`}

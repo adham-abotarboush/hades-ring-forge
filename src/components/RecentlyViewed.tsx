@@ -64,8 +64,8 @@ export const RecentlyViewed = ({ currentProductHandle, maxItems = 4 }: RecentlyV
                                 <h3 className="font-heading font-semibold text-sm md:text-base line-clamp-1 group-hover:text-primary transition-colors">
                                     {item.title}
                                 </h3>
-                                <p className="text-primary font-bold mt-1">
-                                    <span className="text-xs font-medium opacity-70 mr-0.5">EGP</span>
+                                <p className="mt-1 font-bold text-white transition-colors duration-300 group-hover:text-primary">
+                                    <span className="text-xs font-medium mr-0.5 opacity-90 transition-opacity group-hover:opacity-100">EGP</span>
                                     {parseFloat(item.price).toFixed(0)}
                                 </p>
                             </CardContent>

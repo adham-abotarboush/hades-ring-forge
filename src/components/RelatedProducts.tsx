@@ -1,6 +1,7 @@
 import { ProductCard } from "@/components/ProductCard";
 import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
 import { useProducts } from "@/contexts/ProductsContext";
+import { useProductTierMap } from "@/hooks/useProductTierMap";
 
 interface RelatedProductsProps {
     currentProductId: string;
@@ -8,6 +9,7 @@ interface RelatedProductsProps {
 
 export function RelatedProducts({ currentProductId }: RelatedProductsProps) {
     const { getRelatedProducts, isLoading } = useProducts();
+    const productTierMap = useProductTierMap();
     const products = getRelatedProducts(currentProductId, 4);
 
     if (isLoading) {
@@ -27,7 +29,11 @@ export function RelatedProducts({ currentProductId }: RelatedProductsProps) {
             <h2 className="text-3xl font-heading font-bold mb-8 text-center">You May Also Like</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {products.map((product) => (
-                    <ProductCard key={product.node.id} product={product} />
+                    <ProductCard
+                        key={product.node.id}
+                        product={product}
+                        tier={productTierMap.get(product.node.id)}
+                    />
                 ))}
             </div>
         </section>

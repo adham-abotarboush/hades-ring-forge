@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Shield, Award, Users } from "lucide-react";
+import { RealmDoor } from "@/components/RealmDoor";
 import heroImage from "@/assets/hero-forge.jpg";
 import { SEO } from "@/components/SEO";
 import { TestimonialCarousel } from "@/components/TestimonialCarousel";
@@ -19,13 +20,10 @@ const PERSEPHONE = "hsl(130 55% 55%)";
 
 const SHOWCASE_COUNT = 8;
 
-type Realm = "hades" | "persephone";
-type ShowcaseItem = { product: ShopifyProduct; realm: Realm };
+type ShowcaseItem = { product: ShopifyProduct; realm: "hades" | "persephone" };
 
-// Build the merged showcase: rank each realm by tier (Premium → Pro → Basic,
-// in-stock first), then interleave the two realms so Premium pairs with
-// Premium, Pro with Pro, and so on. The result is a single grid that reads
-// as one curated showcase, not two separate collections.
+// Build the merged showcase: rank each source list by tier and availability,
+// then interleave so the grid reads as one curated wall.
 function buildShowcase(
   hades: ShopifyProduct[],
   persephone: ShopifyProduct[],
@@ -98,35 +96,37 @@ const Index = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-background via-background/80 to-background/40" />
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 py-32">
+        <div className="relative z-10 container mx-auto max-w-[100vw] px-3 py-24 sm:px-4 sm:py-28 md:py-32">
           <div className="max-w-5xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 mt-16 mb-8 px-6 py-3 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full animate-fade-in shadow-lg">
-              <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-              <p className="text-sm font-semibold text-primary tracking-wider">HANDCRAFTED WITH ANCIENT TECHNIQUES</p>
+            <div className="inline-flex max-w-[min(100%,22rem)] flex-wrap items-center justify-center gap-2 mt-10 mb-6 px-4 py-2.5 sm:max-w-none sm:mt-16 sm:mb-8 sm:gap-2 sm:px-6 sm:py-3 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full animate-fade-in shadow-lg">
+              <Sparkles className="h-4 w-4 shrink-0 text-primary animate-pulse" />
+              <p className="text-left text-[11px] font-semibold uppercase leading-snug tracking-wide text-primary sm:text-center sm:text-sm sm:tracking-wider">
+                Handcrafted with ancient techniques
+              </p>
             </div>
 
-            <h1 className="text-6xl md:text-7xl lg:text-9xl font-heading font-bold mb-8 leading-[0.95] animate-fade-in-up tracking-tighter">
+            <h1 className="text-[clamp(2.35rem,10.5vw,4.5rem)] sm:text-6xl md:text-7xl lg:text-9xl font-heading font-bold mb-6 sm:mb-8 leading-[0.95] animate-fade-in-up tracking-tighter px-1">
               Hades <span className="text-gradient bg-clip-text text-transparent">Underworld</span>
             </h1>
 
-            <p className="text-2xl md:text-3xl lg:text-4xl text-foreground/90 font-light mb-12 animate-fade-in-delay-1 tracking-wide max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-2xl md:text-3xl lg:text-4xl text-foreground/90 font-light mb-8 sm:mb-12 animate-fade-in-delay-1 tracking-wide max-w-4xl mx-auto leading-relaxed px-2">
               You Had To Eat The Pomegranate
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-delay-2 mb-16">
-              <Link to="/shop">
-                <Button variant="hero" size="lg" className="text-lg px-10 py-7 h-auto group relative overflow-hidden">
-                  <span className="relative z-10 flex items-center gap-3">
-                    <Sparkles className="h-5 w-5" />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 animate-fade-in-delay-2 mb-12 sm:mb-16 px-2">
+              <Link to="/shop" className="w-full sm:w-auto">
+                <Button variant="hero" size="lg" className="w-full text-base px-8 py-6 h-auto sm:w-auto sm:text-lg sm:px-10 sm:py-7 group relative overflow-hidden">
+                  <span className="relative z-10 flex items-center justify-center gap-3">
+                    <Sparkles className="h-5 w-5 shrink-0" />
                     Explore Rings
-                    <ArrowRight className="h-5 w-5 group-hover:translate-x-2 transition-transform duration-300" />
+                    <ArrowRight className="h-5 w-5 shrink-0 motion-safe:md:group-hover:translate-x-2 transition-transform duration-300" />
                   </span>
                 </Button>
               </Link>
             </div>
 
             {/* Trust Indicators */}
-            <div className="grid grid-cols-3 gap-8 max-w-3xl mx-auto animate-fade-in-delay-2">
+            <div className="grid max-w-md grid-cols-1 gap-6 mx-auto animate-fade-in-delay-2 sm:max-w-3xl sm:grid-cols-3 sm:gap-8">
               <div className="text-center">
                 <div className="flex justify-center mb-3">
                   <Shield className="h-8 w-8 text-primary" />
@@ -158,7 +158,7 @@ const Index = () => {
       </section>
 
       {/* Unified Showcase — both realms in one grid */}
-      <section className="py-28 container mx-auto px-4 relative">
+      <section className="py-16 sm:py-24 md:py-28 container mx-auto max-w-[100vw] px-3 sm:px-4 relative">
         {/* Twin radial atmosphere — red on the left, green on the right, blending in the middle */}
         <div
           className="absolute inset-0 opacity-20 blur-3xl pointer-events-none"
@@ -169,23 +169,24 @@ const Index = () => {
 
         <div className="relative z-10">
           <div className="text-center mb-12 animate-fade-in-up">
-            <div className="inline-flex items-center gap-3 mb-5 px-5 py-2 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full shadow-lg">
-              <span style={{ color: HADES }}>🔥</span>
-              <span className="text-xs font-bold tracking-[0.35em] uppercase text-primary">One Forge · Two Myths</span>
-              <span style={{ color: PERSEPHONE }}>🌿</span>
+            <div className="inline-flex max-w-[min(100%,20rem)] flex-wrap items-center justify-center gap-2 mb-4 px-3 py-2 sm:max-w-none sm:mb-5 sm:gap-3 sm:px-5 sm:py-2 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full shadow-lg">
+              <span className="shrink-0" style={{ color: HADES }}>🔥</span>
+              <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-primary sm:text-xs sm:tracking-[0.35em]">One Forge · Two Myths</span>
+              <span className="shrink-0" style={{ color: PERSEPHONE }}>🌿</span>
             </div>
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold mb-5 tracking-tighter leading-none">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold mb-4 sm:mb-5 tracking-tighter leading-none px-1">
               Today at <span className="text-gradient bg-clip-text text-transparent">the Forge</span>
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
-              Pieces from <span style={{ color: HADES }}>Hades</span> and <span style={{ color: PERSEPHONE }}>Persephone</span>, ordered by their place in the forge — Premium, Pro, then Basic.
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed px-2">
+              Pieces from <span style={{ color: HADES }}>Hades</span> and{" "}
+              <span style={{ color: PERSEPHONE }}>Persephone</span> — the forge’s most considered work rises to the front first.
             </p>
             <div className="max-w-sm mx-auto mt-7 text-muted-foreground/60">
               <GreekDivider color="hsl(45 90% 60%)" />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-14">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-14">
             {showcaseLoading
               ? Array.from({ length: SHOWCASE_COUNT }).map((_, i) => <ProductCardSkeleton key={i} />)
               : showcase.map(({ product, realm }, index) => (
@@ -220,36 +221,36 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-32 container mx-auto px-4 relative">
+      <section className="relative py-16 sm:py-24 md:py-32 container mx-auto max-w-[100vw] px-3 sm:px-4">
         <div className="absolute inset-0 bg-gradient-forge opacity-30 blur-3xl" />
 
         <div className="relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-6xl lg:text-8xl font-heading font-bold mb-8 tracking-tighter leading-none">
+          <div className="text-center mb-12 sm:mb-20 px-1">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-heading font-bold mb-5 sm:mb-8 tracking-tighter leading-none">
               Mythic <span className="text-gradient bg-clip-text text-transparent">Craftsmanship</span>
             </h2>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
+            <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
               Each ring is forged with care and inspired by ancient Greek legends
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14">
-            <div className="group text-center p-10 rounded-2xl bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/60 hover:bg-card/50 transition-all duration-500 hover-lift hover:shadow-gold">
-              <div className="text-7xl mb-8 group-hover:scale-125 transition-transform duration-500">♻️</div>
-              <h3 className="text-3xl md:text-4xl font-heading font-bold mb-5 group-hover:text-primary transition-colors">Sustainable</h3>
-              <p className="text-muted-foreground leading-relaxed text-lg">Crafted with care and environmental consciousness, giving new life to materials</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-10 lg:gap-14">
+            <div className="group text-center p-6 sm:p-10 rounded-2xl bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/60 hover:bg-card/50 transition-all duration-500 hover-lift hover:shadow-gold">
+              <div className="text-5xl sm:text-7xl mb-6 sm:mb-8 group-hover:scale-125 transition-transform duration-500">♻️</div>
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold mb-4 sm:mb-5 group-hover:text-primary transition-colors">Sustainable</h3>
+              <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">Crafted with care and environmental consciousness, giving new life to materials</p>
             </div>
 
-            <div className="group text-center p-10 rounded-2xl bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/60 hover:bg-card/50 transition-all duration-500 hover-lift hover:shadow-gold">
-              <div className="text-7xl mb-8 group-hover:scale-125 transition-transform duration-500">⚒️</div>
-              <h3 className="text-3xl md:text-4xl font-heading font-bold mb-5 group-hover:text-primary transition-colors">Handmade</h3>
-              <p className="text-muted-foreground leading-relaxed text-lg">Each piece individually forged by skilled artisans using traditional techniques</p>
+            <div className="group text-center p-6 sm:p-10 rounded-2xl bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/60 hover:bg-card/50 transition-all duration-500 hover-lift hover:shadow-gold">
+              <div className="text-5xl sm:text-7xl mb-6 sm:mb-8 group-hover:scale-125 transition-transform duration-500">⚒️</div>
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold mb-4 sm:mb-5 group-hover:text-primary transition-colors">Handmade</h3>
+              <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">Each piece individually forged by skilled artisans using traditional techniques</p>
             </div>
 
-            <div className="group text-center p-10 rounded-2xl bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/60 hover:bg-card/50 transition-all duration-500 hover-lift hover:shadow-gold">
-              <div className="text-7xl mb-8 group-hover:scale-125 transition-transform duration-500">🏛️</div>
-              <h3 className="text-3xl md:text-4xl font-heading font-bold mb-5 group-hover:text-primary transition-colors">Mythic Design</h3>
-              <p className="text-muted-foreground leading-relaxed text-lg">Inspired by the timeless tales and symbols of ancient Greek mythology</p>
+            <div className="group text-center p-6 sm:p-10 rounded-2xl bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/60 hover:bg-card/50 transition-all duration-500 hover-lift hover:shadow-gold">
+              <div className="text-5xl sm:text-7xl mb-6 sm:mb-8 group-hover:scale-125 transition-transform duration-500">🏛️</div>
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold mb-4 sm:mb-5 group-hover:text-primary transition-colors">Mythic Design</h3>
+              <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">Inspired by the timeless tales and symbols of ancient Greek mythology</p>
             </div>
           </div>
         </div>
@@ -262,60 +263,5 @@ const Index = () => {
     </div>
   );
 };
-
-const RealmDoor = ({
-  to,
-  color,
-  icon,
-  eyebrow,
-  label,
-}: {
-  to: string;
-  color: string;
-  icon: string;
-  eyebrow: string;
-  label: string;
-}) => (
-  <Link to={to} className="group block">
-    <div
-      className="relative rounded-xl overflow-hidden border transition-all duration-300 hover-lift flex items-center gap-4 p-5"
-      style={{ borderColor: `${color}33` }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = `${color}99`;
-        e.currentTarget.style.boxShadow = `0 12px 40px -12px ${color}55`;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = `${color}33`;
-        e.currentTarget.style.boxShadow = "none";
-      }}
-    >
-      <div
-        className="absolute inset-0 opacity-30"
-        style={{ background: `linear-gradient(135deg, transparent, ${color}22)` }}
-      />
-      <div className="relative z-10 flex items-center gap-4 w-full">
-        <span
-          className="text-3xl drop-shadow-[0_0_8px_currentColor]"
-          style={{ color }}
-        >
-          {icon}
-        </span>
-        <div className="flex-1">
-          <p
-            className="text-[10px] font-bold tracking-[0.35em] uppercase mb-0.5"
-            style={{ color, opacity: 0.85 }}
-          >
-            {eyebrow}
-          </p>
-          <p className="text-base md:text-lg font-heading font-semibold tracking-tight">{label}</p>
-        </div>
-        <ArrowRight
-          className="h-5 w-5 group-hover:translate-x-1 transition-transform"
-          style={{ color }}
-        />
-      </div>
-    </div>
-  </Link>
-);
 
 export default Index;

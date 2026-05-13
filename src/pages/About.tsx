@@ -43,12 +43,12 @@ const About = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      <main className="pt-24 pb-20">
+      <main className="max-w-[100vw] overflow-x-clip pt-32 pb-16 sm:pt-40 sm:pb-20">
         {/* Hero Section */}
-        <section className="relative py-20 overflow-hidden">
+        <section className="relative overflow-hidden py-12 sm:py-20">
           <div className="absolute inset-0 bg-gradient-forge opacity-30 blur-3xl" />
 
-          <div className="container mx-auto px-4 relative z-10">
+          <div className="container relative z-10 mx-auto max-w-[100vw] px-3 sm:px-4">
             <div className="max-w-4xl mx-auto text-center">
               <div className="inline-flex items-center gap-2 mb-6 px-5 py-2.5 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full animate-fade-in">
                 <Flame className="h-4 w-4 text-primary animate-pulse" />
@@ -74,7 +74,7 @@ const About = () => {
         </section>
 
         {/* Origin Story */}
-        <section className="py-20 container mx-auto px-4">
+        <section className="py-20 container mx-auto max-w-[100vw] px-3 sm:px-4">
           <div className="max-w-5xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
@@ -120,7 +120,7 @@ const About = () => {
 
         {/* Stats */}
         <section className="py-16 bg-card/50 border-y border-border">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto max-w-[100vw] px-3 sm:px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {stats.map((stat, index) => (
                 <div
@@ -139,7 +139,7 @@ const About = () => {
         </section>
 
         {/* Values Section */}
-        <section className="py-24 container mx-auto px-4">
+        <section className="py-24 container mx-auto max-w-[100vw] px-3 sm:px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-6 tracking-tight">
               Our <span className="text-gradient">Values</span>
@@ -176,7 +176,7 @@ const About = () => {
         </section>
 
         {/* Youth Entrepreneurship */}
-        <section className="py-20 container mx-auto px-4">
+        <section className="py-20 container mx-auto max-w-[100vw] px-3 sm:px-4">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 mb-6 px-5 py-2.5 bg-secondary/10 border border-secondary/30 rounded-full">
               <Users className="h-4 w-4 text-secondary" />

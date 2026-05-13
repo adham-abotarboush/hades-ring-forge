@@ -17,7 +17,7 @@ const Policies = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="pt-40 pb-20">
+      <main className="pt-32 pb-16 container mx-auto max-w-[100vw] px-3 sm:pt-40 sm:pb-20 sm:px-4">
         <div className="container mx-auto px-4 max-w-4xl">
           <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">
             Policies

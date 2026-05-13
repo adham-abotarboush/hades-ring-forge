@@ -145,7 +145,7 @@ export function SearchDialog() {
                                             {product.node.title}
                                         </h3>
                                         <div className="flex items-center gap-2 mt-1">
-                                            <span className="text-lg font-bold text-primary">
+                                            <span className="text-lg font-bold text-white transition-colors duration-300 group-hover:text-primary">
                                                 E£{parseFloat(product.node.priceRange.minVariantPrice.amount).toFixed(0)}
                                             </span>
                                             {!isProductAvailable(product) && (

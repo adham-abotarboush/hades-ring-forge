@@ -24,10 +24,13 @@ import { RecentlyViewed } from "@/components/RecentlyViewed";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useProducts } from "@/contexts/ProductsContext";
 import { StockWarning } from "@/components/cart/StockWarning";
+import { useProductTierMap } from "@/hooks/useProductTierMap";
+import { cn } from "@/lib/utils";
 
 const ProductDetail = () => {
   const { handle } = useParams();
   const { getProductByHandle, isLoading } = useProducts();
+  const productTierMap = useProductTierMap();
   const product = getProductByHandle(handle || "");
   const loading = isLoading;
   
@@ -212,7 +215,7 @@ const ProductDetail = () => {
     return (
       <div className="min-h-screen bg-background page-transition">
         <Navigation />
-        <main className="pt-40 pb-20 container mx-auto px-4">
+        <main className="pt-32 pb-16 container mx-auto max-w-[100vw] px-3 sm:pt-40 sm:pb-20 sm:px-4">
           <ProductDetailSkeleton />
         </main>
         <Footer />
@@ -224,7 +227,7 @@ const ProductDetail = () => {
     return (
       <div className="min-h-screen bg-background page-transition">
         <Navigation />
-        <main className="pt-40 pb-20 container mx-auto px-4 text-center">
+        <main className="pt-32 pb-16 container mx-auto max-w-[100vw] px-3 sm:pt-40 sm:pb-20 sm:px-4 text-center">
           <h1 className="text-3xl font-heading font-bold mb-4">Product Not Found</h1>
           <p className="text-muted-foreground">This mythic treasure has vanished into the underworld.</p>
         </main>
@@ -234,6 +237,7 @@ const ProductDetail = () => {
   }
 
   const { node } = product;
+  const tier = productTierMap.get(node.id);
   const image = node.images.edges[0]?.node;
   const firstVariant = node.variants.edges[0]?.node;
   const price = firstVariant?.price || node.priceRange.minVariantPrice;
@@ -272,16 +276,28 @@ const ProductDetail = () => {
       )}
       <Navigation />
 
-      <main className="pt-40 pb-20 container mx-auto px-4">
+      <main className="pt-32 pb-16 container mx-auto max-w-[100vw] px-3 sm:pt-40 sm:pb-20 sm:px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Image Gallery with Zoom */}
           <div className="space-y-4">
             <div
-              className="aspect-square bg-muted rounded-lg overflow-hidden relative cursor-zoom-in group"
+              className={cn(
+                "aspect-square rounded-xl overflow-hidden relative cursor-zoom-in group bg-muted",
+                tier === "premium-tier" &&
+                  cn(
+                    "border border-neutral-200/10",
+                    "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),0_8px_28px_-16px_rgba(0,0,0,0.45)]",
+                  ),
+              )}
               onClick={() => setIsZoomOpen(true)}
             >
               {node.images.edges[selectedImageIndex]?.node && (
                 <>
+                  {tier === "premium-tier" && (
+                    <div
+                      className="pointer-events-none absolute inset-0 z-[1] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-b from-transparent to-black/[0.06]"
+                    />
+                  )}
                   <ProgressiveImage
                     src={node.images.edges[selectedImageIndex].node.url}
                     alt={node.images.edges[selectedImageIndex].node.altText || node.title}

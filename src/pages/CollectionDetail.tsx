@@ -6,7 +6,12 @@ import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
 import { fetchCollectionByHandle, ShopifyProduct } from "@/lib/shopify";
-import { useProductTierMap, tierRank } from "@/hooks/useProductTierMap";
+import {
+  useProductTierMap,
+  tierRank,
+  matchesShopTierFilter,
+  type ShopTierFilter,
+} from "@/hooks/useProductTierMap";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -19,7 +24,6 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, X, SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 import { SEO } from "@/components/SEO";
-import { GreekMeander } from "@/components/GreekOrnaments";
 import {
   Sheet,
   SheetContent,
@@ -28,7 +32,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-type SortOption = "featured" | "price-low" | "price-high" | "title";
+type SortOption = "featured" | "price-low" | "price-high" | "newest" | "title";
 
 const MAX_PRICE = 1000;
 
@@ -83,62 +87,18 @@ const COLLECTION_THEMES: Record<string, {
     heroDesc: "Rings born of spring's defiance — where pomegranate blossoms meet eternal shadow. Delicate yet timeless, as radiant as the seeds that bound her.",
     cta: "Rings of Bloom & Verdant Light",
   },
-  "basic-tier": {
-    accent: "hsl(210 25% 70%)",
-    accentMuted: "hsl(210 25% 60% / 0.15)",
-    accentBorder: "hsl(210 25% 60% / 0.3)",
-    accentHover: "hsl(210 25% 60%)",
-    gradientFrom: "hsl(210 20% 8%)",
-    gradientTo: "hsl(210 20% 18%)",
-    glow: "0 20px 60px -15px hsl(210 25% 60% / 0.35)",
-    icon: "🔹",
-    badge: "Basic Tier",
-    heroTagline: "Where the Journey Begins",
-    heroDesc: "Approachable yet uncompromising. Entry rings that carry the same forge-fire as their elder siblings — accessible without sacrificing soul.",
-    cta: "Approachable Mythic Pieces",
-  },
-  "pro-tier": {
-    accent: "hsl(170 60% 55%)",
-    accentMuted: "hsl(170 60% 50% / 0.15)",
-    accentBorder: "hsl(170 60% 50% / 0.3)",
-    accentHover: "hsl(170 60% 50%)",
-    gradientFrom: "hsl(170 50% 6%)",
-    gradientTo: "hsl(170 60% 18%)",
-    glow: "0 20px 60px -15px hsl(170 60% 50% / 0.35)",
-    icon: "🔸",
-    badge: "Pro Tier",
-    heroTagline: "Crafted for the Devoted",
-    heroDesc: "Mid-tier rings forged with deeper detail and refined finishes. For those who walk between realms — a step deeper into the legend.",
-    cta: "Refined Forged Detail",
-  },
-  "premium-tier": {
-    accent: "hsl(45 90% 60%)",
-    accentMuted: "hsl(45 90% 55% / 0.15)",
-    accentBorder: "hsl(45 90% 55% / 0.3)",
-    accentHover: "hsl(45 90% 55%)",
-    gradientFrom: "hsl(45 70% 8%)",
-    gradientTo: "hsl(45 90% 22%)",
-    glow: "0 20px 60px -15px hsl(45 90% 55% / 0.4)",
-    icon: "👑",
-    badge: "Premium Tier",
-    heroTagline: "The Heroes of the Forge",
-    heroDesc: "One-of-one statement rings — the crown jewels of the collection. Each piece is singular, named, and carries its own myth.",
-    cta: "Singular, Hero-Tier Pieces",
-  },
 };
 
 const DEFAULT_THEME = COLLECTION_THEMES.hades;
 
-const REALM_HANDLES = ["hades", "persephone"] as const;
-
 const CollectionDetail = () => {
   const { handle } = useParams<{ handle: string }>();
   const theme = (handle && COLLECTION_THEMES[handle]) ?? DEFAULT_THEME;
-  const isRealm = !!handle && (REALM_HANDLES as readonly string[]).includes(handle);
 
   const [sortBy, setSortBy] = useState<SortOption>("featured");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, MAX_PRICE]);
   const [showInStock, setShowInStock] = useState(false);
+  const [shopTierFilter, setShopTierFilter] = useState<ShopTierFilter>("all");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -155,7 +115,7 @@ const CollectionDetail = () => {
 
   // For realm pages (Hades/Persephone), look up each product's tier so the
   // card can render tier-specific styling.
-  const productTierMap = useProductTierMap(isRealm);
+  const productTierMap = useProductTierMap(true);
 
   const products: ShopifyProduct[] = collection?.node.products.edges ?? [];
 
@@ -171,6 +131,8 @@ const CollectionDetail = () => {
     });
 
     if (showInStock) result = result.filter(isProductInStock);
+
+    result = result.filter((p) => matchesShopTierFilter(productTierMap, p.node.id, shopTierFilter));
 
     switch (sortBy) {
       case "price-low":
@@ -190,10 +152,13 @@ const CollectionDetail = () => {
       case "title":
         result.sort((a, b) => a.node.title.localeCompare(b.node.title));
         break;
+      case "newest":
+        result.reverse();
+        break;
       case "featured":
       default:
         result.sort((a, b) => {
-          // Primary: tier rank (Premium → Pro → Basic → untiered)
+          // Premium → Basic (merged) → untiered
           const aRank = tierRank(productTierMap.get(a.node.id));
           const bRank = tierRank(productTierMap.get(b.node.id));
           if (aRank !== bRank) return aRank - bRank;
@@ -207,14 +172,15 @@ const CollectionDetail = () => {
     }
 
     return result;
-  }, [products, priceRange, showInStock, sortBy, productTierMap]);
+  }, [products, priceRange, showInStock, sortBy, productTierMap, shopTierFilter]);
 
   const hasActiveFilters =
-    priceRange[0] > 0 || priceRange[1] < MAX_PRICE || showInStock;
+    priceRange[0] > 0 || priceRange[1] < MAX_PRICE || showInStock || shopTierFilter !== "all";
 
   const clearFilters = () => {
     setPriceRange([0, MAX_PRICE]);
     setShowInStock(false);
+    setShopTierFilter("all");
     setSortBy("featured");
   };
 
@@ -255,6 +221,20 @@ const CollectionDetail = () => {
         <Switch id="in-stock-col" checked={showInStock} onCheckedChange={setShowInStock} />
       </div>
 
+      <div>
+        <Label className="text-base font-semibold mb-3 block">Tier</Label>
+        <Select value={shopTierFilter} onValueChange={(v) => setShopTierFilter(v as ShopTierFilter)}>
+          <SelectTrigger>
+            <SelectValue placeholder="All tiers" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All tiers</SelectItem>
+            <SelectItem value="premium">Premium</SelectItem>
+            <SelectItem value="basic">Basic</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       {hasActiveFilters && (
         <Button variant="outline" onClick={clearFilters} className="w-full">
           <X className="h-4 w-4 mr-2" />
@@ -269,7 +249,7 @@ const CollectionDetail = () => {
     return (
       <div className="min-h-screen bg-background page-transition">
         <Navigation />
-        <main className="pt-40 pb-20 container mx-auto px-4 text-center">
+        <main className="pt-32 pb-16 container mx-auto max-w-[100vw] px-3 text-center sm:pt-40 sm:pb-20 sm:px-4">
           <div className="text-6xl mb-6">🏛️</div>
           <h1 className="text-4xl font-heading font-bold mb-4">Collection Not Found</h1>
           <p className="text-muted-foreground mb-8">
@@ -297,18 +277,10 @@ const CollectionDetail = () => {
       />
       <Navigation />
 
-      <main className="pt-28 pb-20">
-        {/* Compact Hero — just enough to set the realm tone */}
-        <div className="relative overflow-hidden mb-8">
-          <div
-            className="absolute inset-0 opacity-25"
-            style={{
-              background: `radial-gradient(ellipse at 50% 0%, ${theme.accent}33, transparent 70%)`,
-            }}
-          />
-
-          <div className="relative z-10 container mx-auto px-4 pt-6 pb-5">
-            {/* Breadcrumb */}
+      <main className="max-w-[100vw] overflow-x-clip pb-16 pt-28 sm:pb-20">
+        {/* Compact hero — breadcrumb + title, no ornamental borders */}
+        <div className="border-b border-border mb-8">
+          <div className="container mx-auto max-w-[100vw] px-3 pt-6 pb-5 sm:px-4">
             <div className="flex justify-start mb-4">
               <Link
                 to="/collections"
@@ -319,90 +291,83 @@ const CollectionDetail = () => {
               </Link>
             </div>
 
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-3">
-                <span className="text-3xl md:text-4xl drop-shadow-[0_0_12px_currentColor]" style={{ color: theme.accent }}>
-                  {theme.icon}
-                </span>
-                <div>
-                  <p
-                    className="text-[10px] md:text-xs font-semibold tracking-[0.35em] uppercase mb-0.5"
-                    style={{ color: theme.accent, opacity: 0.9 }}
-                  >
-                    {theme.badge}
-                  </p>
-                  <h1
-                    className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold tracking-tighter leading-none"
-                    style={{ textShadow: `0 0 30px ${theme.accent}40` }}
-                  >
-                    {collectionTitle}
-                  </h1>
-                </div>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl md:text-3xl" style={{ color: theme.accent }}>
+                {theme.icon}
+              </span>
+              <div>
+                <p
+                  className="text-[10px] md:text-xs font-semibold tracking-[0.35em] uppercase mb-0.5"
+                  style={{ color: theme.accent, opacity: 0.9 }}
+                >
+                  {theme.badge}
+                </p>
+                <h1 className="text-2xl md:text-3xl font-heading font-bold tracking-tight leading-tight text-foreground">
+                  {collectionTitle}
+                </h1>
               </div>
             </div>
           </div>
-
-          {/* Thin meander divider beneath the title */}
-          <div className="container mx-auto px-4">
-            <GreekMeander color={theme.accent} height={10} opacity={0.45} />
-          </div>
         </div>
 
-        <div className="container mx-auto px-4">
-          {/* Sort & Filter Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-            <div className="flex items-center gap-4">
-              {/* Mobile Filter */}
-              <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="outline" className="lg:hidden">
-                    <SlidersHorizontal className="h-4 w-4 mr-2" />
-                    Filters
-                    {hasActiveFilters && (
-                      <span className="ml-2 bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full">!</span>
-                    )}
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-80">
-                  <SheetHeader>
-                    <SheetTitle>Filters</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6">
-                    <FilterContent />
-                  </div>
-                </SheetContent>
-              </Sheet>
+        <div className="container mx-auto max-w-[100vw] px-3 sm:px-4">
+          {/* Sort & Filter Controls — aligned with Shop: filters row, then sort */}
+          <div className="flex flex-col gap-4 mb-8">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" className="lg:hidden">
+                      <SlidersHorizontal className="h-4 w-4 mr-2" />
+                      Filters
+                      {hasActiveFilters && (
+                        <span className="ml-2 bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full">!</span>
+                      )}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-80">
+                    <SheetHeader>
+                      <SheetTitle>Filters</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-6">
+                      <FilterContent />
+                    </div>
+                  </SheetContent>
+                </Sheet>
 
-              {/* Desktop Filter Toggle */}
-              <Button
-                variant="outline"
-                onClick={() => setFiltersOpen(!filtersOpen)}
-                className="hidden lg:flex"
-              >
-                <SlidersHorizontal className="h-4 w-4 mr-2" />
-                Filters
-                {filtersOpen ? <ChevronUp className="h-4 w-4 ml-2" /> : <ChevronDown className="h-4 w-4 ml-2" />}
-                {hasActiveFilters && (
-                  <span className="ml-2 bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full">!</span>
-                )}
-              </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setFiltersOpen(!filtersOpen)}
+                  className="hidden lg:flex"
+                >
+                  <SlidersHorizontal className="h-4 w-4 mr-2" />
+                  Filters
+                  {filtersOpen ? <ChevronUp className="h-4 w-4 ml-2" /> : <ChevronDown className="h-4 w-4 ml-2" />}
+                  {hasActiveFilters && (
+                    <span className="ml-2 bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full">!</span>
+                  )}
+                </Button>
 
-              <p className="text-sm text-muted-foreground">
-                {isLoading ? "Loading…" : `${filteredProducts.length} ${filteredProducts.length === 1 ? "piece" : "pieces"}`}
-              </p>
+                <p className="text-sm text-muted-foreground">
+                  {isLoading ? "Loading…" : `${filteredProducts.length} ${filteredProducts.length === 1 ? "piece" : "pieces"}`}
+                </p>
+              </div>
             </div>
 
-            <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="featured">Featured</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
-                <SelectItem value="title">Alphabetically</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="featured">Featured</SelectItem>
+                  <SelectItem value="price-low">Price: Low to High</SelectItem>
+                  <SelectItem value="price-high">Price: High to Low</SelectItem>
+                  <SelectItem value="title">Alphabetically</SelectItem>
+                  <SelectItem value="newest">Newest</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="flex gap-8">
@@ -446,9 +411,7 @@ const CollectionDetail = () => {
                   } gap-6 lg:gap-8`}
                 >
                   {filteredProducts.map((product, index) => {
-                    const productTier = isRealm
-                      ? productTierMap.get(product.node.id)
-                      : undefined;
+                    const productTier = productTierMap.get(product.node.id);
                     return (
                       <div
                         key={product.node.id}

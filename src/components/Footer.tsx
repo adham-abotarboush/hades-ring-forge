@@ -1,12 +1,13 @@
 import { Instagram, Music } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
-    <footer className="relative bg-card border-t border-border mt-32 overflow-hidden">
+    <footer className="relative bg-card border-t border-border mt-20 overflow-hidden sm:mt-32">
       <div className="absolute inset-0 bg-gradient-forge opacity-30" />
 
-      <div className="relative container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+      <div className="relative container mx-auto max-w-[100vw] px-3 py-12 sm:px-4 sm:py-16">
+        <div className="grid grid-cols-1 gap-10 mb-10 sm:gap-12 md:grid-cols-4 md:mb-12">
           <div className="space-y-4">
             <h3 className="text-3xl font-heading font-bold text-gradient mb-4">HADES</h3>
             <p className="text-muted-foreground leading-relaxed">
@@ -18,24 +19,24 @@ export const Footer = () => {
             <h4 className="text-lg font-heading font-semibold mb-6">Quick Links</h4>
             <ul className="space-y-3">
               <li>
-                <a href="/" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
+                <Link to="/" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group py-1 min-h-10">
                   <span className="group-hover:translate-x-1 transition-transform">Home</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/shop" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
+                <Link to="/shop" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group py-1 min-h-10">
                   <span className="group-hover:translate-x-1 transition-transform">Shop</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/about" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
+                <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group py-1 min-h-10">
                   <span className="group-hover:translate-x-1 transition-transform">About Us</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/contact" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
+                <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group py-1 min-h-10">
                   <span className="group-hover:translate-x-1 transition-transform">Contact</span>
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -44,9 +45,9 @@ export const Footer = () => {
             <h4 className="text-lg font-heading font-semibold mb-6">Legal</h4>
             <ul className="space-y-3">
               <li>
-                <a href="/policies" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group">
+                <Link to="/policies" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-flex items-center group py-1 min-h-10">
                   <span className="group-hover:translate-x-1 transition-transform">Our Policies</span>
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
