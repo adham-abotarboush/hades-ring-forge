@@ -54,6 +54,9 @@ function PremiumMatNameOverlay({ title }: { title: string }) {
     "pointer-events-none absolute z-[7] flex items-center justify-center overflow-hidden select-none";
   const railText =
     "whitespace-nowrap font-sans font-medium uppercase tracking-[0.12em] text-primary/70 text-[5px] sm:text-[7px] leading-none [font-variant-ligatures:none]";
+  const cornerBase =
+    "pointer-events-none absolute z-[7] flex items-center justify-center select-none h-2.5 w-2.5 sm:h-3 sm:w-3";
+  const cornerDot = "block h-[2px] w-[2px] sm:h-[3px] sm:w-[3px] rounded-full bg-primary/70";
 
   return (
     <>
@@ -80,6 +83,18 @@ function PremiumMatNameOverlay({ title }: { title: string }) {
         aria-hidden
       >
         <span className={cn(railText, "[writing-mode:vertical-rl]")}>{repeated}</span>
+      </div>
+      <div className={cn(cornerBase, "top-0 left-0")} aria-hidden>
+        <span className={cornerDot} />
+      </div>
+      <div className={cn(cornerBase, "top-0 right-0")} aria-hidden>
+        <span className={cornerDot} />
+      </div>
+      <div className={cn(cornerBase, "bottom-0 left-0")} aria-hidden>
+        <span className={cornerDot} />
+      </div>
+      <div className={cn(cornerBase, "bottom-0 right-0")} aria-hidden>
+        <span className={cornerDot} />
       </div>
     </>
   );
@@ -217,20 +232,20 @@ export const ProductCard = ({ product, tier, realm, compact }: ProductCardProps)
         {node.description}
       </p>
 
-      <div className="flex items-center justify-between gap-3 mt-auto">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2 sm:gap-x-3 mt-auto">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5 sm:gap-x-2">
           <span
             className={cn(
-              "font-bold text-white transition-colors duration-300 group-hover:text-primary",
-              isPremium ? "text-[1.65rem] tabular-nums" : "text-2xl",
+              "font-bold text-white transition-colors duration-300 group-hover:text-primary whitespace-nowrap",
+              isPremium ? "text-[1.35rem] sm:text-[1.65rem] tabular-nums" : "text-xl sm:text-2xl",
             )}
           >
-            <span className="text-sm font-medium mr-0.5 opacity-90 transition-opacity group-hover:opacity-100">EGP</span>
+            <span className="text-xs sm:text-sm font-medium mr-0.5 opacity-90 transition-opacity group-hover:opacity-100">EGP</span>
             {price ? parseFloat(price.amount).toFixed(0) : "—"}
           </span>
           {isOnSale && compareAtPrice && (
-            <span className="text-base text-muted-foreground line-through">
-              <span className="text-xs mr-0.5">EGP</span>
+            <span className="text-sm sm:text-base text-muted-foreground line-through whitespace-nowrap">
+              <span className="text-[10px] sm:text-xs mr-0.5">EGP</span>
               {parseFloat(compareAtPrice.amount).toFixed(0)}
             </span>
           )}
@@ -240,22 +255,22 @@ export const ProductCard = ({ product, tier, realm, compact }: ProductCardProps)
           size={compact ? "icon" : "sm"}
           disabled={isSoldOut || isAdding}
           className={cn(
-            "bg-primary hover:bg-primary/90 text-primary-foreground group/btn disabled:opacity-50 disabled:cursor-not-allowed shrink-0",
+            "bg-primary hover:bg-primary/90 text-primary-foreground group/btn disabled:opacity-50 disabled:cursor-not-allowed shrink-0 ml-auto",
             isPremium && "shadow-[0_4px_20px_-4px_hsla(38,85%,42%,0.35)]",
             !isPremium && "shadow-gold",
-            compact ? "h-8 w-8 p-0" : "px-3",
-            !compact && isPremium && "px-4",
+            compact ? "h-8 w-8 p-0" : "px-2.5 sm:px-3",
+            !compact && isPremium && "sm:px-4",
           )}
           aria-label={isSoldOut ? "Sold Out" : `Add ${node.title} size 17 to cart`}
           title="Adds size 17 to cart"
         >
           {isAdding ? (
-            <Loader2 className={cn("h-4 w-4 animate-spin", !compact && "mr-2")} />
+            <Loader2 className={cn("h-4 w-4 animate-spin", !compact && "mr-1.5 sm:mr-2")} />
           ) : (
-            <ShoppingCart className={cn("h-4 w-4 group-hover/btn:rotate-12 transition-transform", !compact && "mr-2")} />
+            <ShoppingCart className={cn("h-4 w-4 group-hover/btn:rotate-12 transition-transform", !compact && "mr-1.5 sm:mr-2")} />
           )}
           {!compact && (
-            <span>{isSoldOut ? "Sold Out" : isAdding ? "Adding..." : "Size 17"}</span>
+            <span className="text-xs sm:text-sm whitespace-nowrap">{isSoldOut ? "Sold Out" : isAdding ? "Adding..." : "Size 17"}</span>
           )}
         </Button>
       </div>
