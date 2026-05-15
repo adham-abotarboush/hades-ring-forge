@@ -54,6 +54,9 @@ function PremiumMatNameOverlay({ title }: { title: string }) {
     "pointer-events-none absolute z-[7] flex items-center justify-center overflow-hidden select-none";
   const railText =
     "whitespace-nowrap font-sans font-medium uppercase tracking-[0.12em] text-primary/70 text-[5px] sm:text-[7px] leading-none [font-variant-ligatures:none]";
+  const cornerBase =
+    "pointer-events-none absolute z-[7] flex items-center justify-center select-none h-2.5 w-2.5 sm:h-3 sm:w-3";
+  const cornerDot = "block h-[2px] w-[2px] sm:h-[3px] sm:w-[3px] rounded-full bg-primary/70";
 
   return (
     <>
@@ -80,6 +83,18 @@ function PremiumMatNameOverlay({ title }: { title: string }) {
         aria-hidden
       >
         <span className={cn(railText, "[writing-mode:vertical-rl]")}>{repeated}</span>
+      </div>
+      <div className={cn(cornerBase, "top-0 left-0")} aria-hidden>
+        <span className={cornerDot} />
+      </div>
+      <div className={cn(cornerBase, "top-0 right-0")} aria-hidden>
+        <span className={cornerDot} />
+      </div>
+      <div className={cn(cornerBase, "bottom-0 left-0")} aria-hidden>
+        <span className={cornerDot} />
+      </div>
+      <div className={cn(cornerBase, "bottom-0 right-0")} aria-hidden>
+        <span className={cornerDot} />
       </div>
     </>
   );
