@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import { ShoppingCart, Eye, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -44,60 +44,44 @@ function segmentForNameRail(raw: string): string {
     .trim();
 }
 
-/** Repeating title on mat seams — SVG overlay (does not change layout; image block unchanged) */
+/** Repeating title on mat seams — overlay strips sized to padding so text always centers in the gap */
 function PremiumMatNameOverlay({ title }: { title: string }) {
-  const idBase = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const full = (typeof title === "string" ? title : String(title ?? "")).trim();
   const seg = segmentForNameRail(full);
   const loop = `${seg} · `;
   const repeated = Array.from({ length: 28 }, () => loop).join("");
-  const s = 5.2;
-  const yT = 2.08;
-  const yB = 97.92;
-  const xL = 2.08;
-  const xR = 97.92;
-  const idT = `${idBase}-t`;
-  const idR = `${idBase}-r`;
-  const idB = `${idBase}-b`;
-  const idL = `${idBase}-l`;
-  const railClass =
-    "fill-current font-sans font-medium uppercase tracking-[0.12em] text-primary opacity-70 [font-variant-ligatures:none]";
-  const railStyle = { fontSize: 2, letterSpacing: "0.12em" } as const;
+  const railBase =
+    "pointer-events-none absolute z-[7] flex items-center justify-center overflow-hidden select-none";
+  const railText =
+    "whitespace-nowrap font-sans font-medium uppercase tracking-[0.12em] text-primary/70 text-[5px] sm:text-[7px] leading-none [font-variant-ligatures:none]";
 
   return (
-    <svg
-      className="pointer-events-none absolute inset-0 z-[7] h-full w-full select-none"
-      viewBox="0 0 100 100"
-      preserveAspectRatio="xMidYMid meet"
-      aria-hidden
-    >
-      <defs>
-        <path id={idT} d={`M ${s} ${yT} L ${100 - s} ${yT}`} fill="none" />
-        <path id={idR} d={`M ${xR} ${s} L ${xR} ${100 - s}`} fill="none" />
-        <path id={idB} d={`M ${s} ${yB} L ${100 - s} ${yB}`} fill="none" />
-        <path id={idL} d={`M ${xL} ${100 - s} L ${xL} ${s}`} fill="none" />
-      </defs>
-      <text className={railClass} style={railStyle} dominantBaseline="central">
-        <textPath href={`#${idT}`} xlinkHref={`#${idT}`} startOffset="0%">
-          {repeated}
-        </textPath>
-      </text>
-      <text className={railClass} style={railStyle} dominantBaseline="central">
-        <textPath href={`#${idR}`} xlinkHref={`#${idR}`} startOffset="0%">
-          {repeated}
-        </textPath>
-      </text>
-      <text className={railClass} style={railStyle} dominantBaseline="central">
-        <textPath href={`#${idB}`} xlinkHref={`#${idB}`} startOffset="0%">
-          {repeated}
-        </textPath>
-      </text>
-      <text className={railClass} style={railStyle} dominantBaseline="central">
-        <textPath href={`#${idL}`} xlinkHref={`#${idL}`} startOffset="0%">
-          {repeated}
-        </textPath>
-      </text>
-    </svg>
+    <>
+      <div
+        className={cn(railBase, "top-0 left-2.5 right-2.5 sm:left-3 sm:right-3 h-2.5 sm:h-3")}
+        aria-hidden
+      >
+        <span className={railText}>{repeated}</span>
+      </div>
+      <div
+        className={cn(railBase, "bottom-0 left-2.5 right-2.5 sm:left-3 sm:right-3 h-2.5 sm:h-3")}
+        aria-hidden
+      >
+        <span className={railText}>{repeated}</span>
+      </div>
+      <div
+        className={cn(railBase, "left-0 top-2.5 bottom-2.5 sm:top-3 sm:bottom-3 w-2.5 sm:w-3")}
+        aria-hidden
+      >
+        <span className={cn(railText, "[writing-mode:vertical-rl] rotate-180")}>{repeated}</span>
+      </div>
+      <div
+        className={cn(railBase, "right-0 top-2.5 bottom-2.5 sm:top-3 sm:bottom-3 w-2.5 sm:w-3")}
+        aria-hidden
+      >
+        <span className={cn(railText, "[writing-mode:vertical-rl]")}>{repeated}</span>
+      </div>
+    </>
   );
 }
 
