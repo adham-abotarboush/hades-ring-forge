@@ -114,11 +114,11 @@ const Index = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 animate-fade-in-delay-2 mb-12 sm:mb-16 px-2">
-              <Link to="/shop" className="w-full sm:w-auto">
+              <Link to="/collections" className="w-full sm:w-auto">
                 <Button variant="hero" size="lg" className="w-full text-base px-8 py-6 h-auto sm:w-auto sm:text-lg sm:px-10 sm:py-7 group relative overflow-hidden">
                   <span className="relative z-10 flex items-center justify-center gap-3">
                     <Sparkles className="h-5 w-5 shrink-0" />
-                    Explore Rings
+                    Explore Collections
                     <ArrowRight className="h-5 w-5 shrink-0 motion-safe:md:group-hover:translate-x-2 transition-transform duration-300" />
                   </span>
                 </Button>
