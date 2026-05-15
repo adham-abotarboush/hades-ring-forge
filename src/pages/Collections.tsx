@@ -171,7 +171,7 @@ function RealmCollectionPanel({
                       className="animate-fade-in-up min-w-0"
                       style={{ animationDelay: `${index * 0.05}s` }}
                     >
-                      <ProductCard product={product} tier={tierMap.get(product.node.id)} realm={realm} compact />
+                      <ProductCard product={product} tier={tierMap.get(product.node.id)} realm={realm} />
                     </div>
                   ))
                 )}
